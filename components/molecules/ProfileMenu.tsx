@@ -15,9 +15,14 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { logout } from '@/api/actions/auth.actions';
+import { useRouter } from 'next/navigation';
 
 export default function ProfileMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const { user } = useAuth();
+  const router = useRouter();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -27,16 +32,26 @@ export default function ProfileMenu() {
     setAnchorEl(null);
   };
 
-  const handleLogout = () => {
-    handleProfileMenuClose();
-    // Logic for logout will be implemented later
-    console.log('Logout clicked');
+  const handleLogout = async () => {
+    try {
+      await logout();
+      handleProfileMenuClose();
+      router.push('/auth/login');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
   };
+
+  const userInitial = user?.name ? user.name[0].toUpperCase() : 'U';
 
   return (
     <>
       <IconButton color="inherit" onClick={handleProfileMenuOpen}>
-        <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.dark' }}>J</Avatar>
+        {user?.avatar ? (
+          <Avatar sx={{ width: 32, height: 32 }} src={user.avatar} />
+        ) : (
+          <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.dark' }}>{userInitial}</Avatar>
+        )}
       </IconButton>
 
       <Menu
