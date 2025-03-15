@@ -15,7 +15,7 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
-import { useAuth } from '@/app/contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { logout } from '@/api/actions/auth.actions';
 import { useRouter } from 'next/navigation';
 

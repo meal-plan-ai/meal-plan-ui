@@ -1,5 +1,5 @@
 import ThemeProviderWrapper from '@/components/ThemeProviderWrapper';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider } from '../contexts/AuthContext';
 import './globals.css';
 import { Inter } from 'next/font/google';
 

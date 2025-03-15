@@ -5,8 +5,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme, Theme } from '@mui/material/styles';
 import { Inter } from 'next/font/google';
 import LoadingProgress from './LoadingProgress';
-import { ThemeProvider } from '@/app/contexts/ThemeContext';
-import { useTheme } from '@/app/contexts/ThemeContext';
+import { ThemeProvider } from '@/contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface ThemeProviderWrapperProps {
   children: React.ReactNode;
