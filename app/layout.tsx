@@ -2,6 +2,7 @@ import ThemeProviderWrapper from '@/components/ThemeProviderWrapper';
 import QueryProvider from '@/providers/QueryProvider';
 import './globals.css';
 import { Inter } from 'next/font/google';
+import ToastProvider from '@/components/toast-provider';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -10,7 +11,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={inter.className}>
         <QueryProvider>
-          <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
+          <ThemeProviderWrapper>
+            <ToastProvider>
+              {children}
+            </ToastProvider>
+          </ThemeProviderWrapper>
         </QueryProvider>
       </body>
     </html>

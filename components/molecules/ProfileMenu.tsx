@@ -45,7 +45,7 @@ export default function ProfileMenu() {
   }
 
   const userInitial = user.name ? user.name[0].toUpperCase() : 'U';
-
+  console.log('user', user)
   return (
     <>
       <IconButton color="inherit" onClick={handleProfileMenuOpen}>

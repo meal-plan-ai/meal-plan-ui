@@ -4,7 +4,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { authKeys } from '@/api/query/auth/auth.query';
 import type { LoginRequestDto } from '@/api/query/auth/auth.dto';
 
-
 export function useLoginWithRedirect() {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -15,9 +14,7 @@ export function useLoginWithRedirect() {
     async mutateAsync(credentials: LoginRequestDto) {
       try {
         const result = await login.mutateAsync(credentials);
-        // Инвалидируем кэш, чтобы получить актуальные данные пользователя
         await queryClient.invalidateQueries({ queryKey: authKeys.me });
-        // Перенаправляем на главную страницу после успешного входа
         router.push('/cabinet');
         return result;
       } catch (error) {
@@ -27,7 +24,6 @@ export function useLoginWithRedirect() {
     }
   };
 }
-
 
 export function useLogoutWithRedirect() {
   const router = useRouter();
