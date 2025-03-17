@@ -2,14 +2,19 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // Add paths that should be accessible only to non-authenticated users
-const publicPaths = ['/auth/login', '/auth/register', '/auth/reset-password'];
+const publicPaths = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+  '/'
+];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Get the token from cookies
   const token = request.cookies.get('token');
-  const isAuthenticated = !!token;
+  const isAuthenticated = !!token?.value;
 
   // Check if the path is public (auth pages)
   const isPublicPath = publicPaths.some(path => pathname === path);
@@ -29,7 +34,6 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Configure which paths the middleware should run on
 export const config = {
   matcher: [
     /*

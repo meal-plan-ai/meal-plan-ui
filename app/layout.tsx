@@ -1,5 +1,5 @@
 import ThemeProviderWrapper from '@/components/ThemeProviderWrapper';
-import { AuthProvider } from '../contexts/AuthContext';
+import QueryProvider from '@/providers/QueryProvider';
 import './globals.css';
 import { Inter } from 'next/font/google';
 
@@ -9,9 +9,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <AuthProvider>
+        <QueryProvider>
           <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
-        </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );

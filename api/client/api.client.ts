@@ -6,17 +6,15 @@ class ApiClient {
 
   private constructor() {
     this.client = axios.create({
-      baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001',
-      withCredentials: true, // This is important for handling httpOnly cookies
+      baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api',
+      withCredentials: true,
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
-    // Add request interceptor for handling tokens
     this.client.interceptors.request.use(
       (config) => {
-        // You can add any request preprocessing here
         return config;
       },
       (error) => {
@@ -24,13 +22,11 @@ class ApiClient {
       }
     );
 
-    // Add response interceptor for handling errors
     this.client.interceptors.response.use(
       (response) => response,
       async (error) => {
         if (error.response?.status === 401) {
           // Handle unauthorized access
-          // You might want to redirect to login page or refresh token
         }
         return Promise.reject(error);
       }

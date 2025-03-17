@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   email: string;
@@ -5,6 +6,13 @@ export interface User {
   avatar?: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface RegisterCredentials {
+  email: string;
+  password: string;
+  name: string;
+  confirmPassword: string;
 }
 
 export interface LoginCredentials {

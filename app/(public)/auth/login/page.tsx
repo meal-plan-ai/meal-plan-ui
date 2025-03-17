@@ -1,12 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Button, TextField, Paper, Typography, Box, Container } from '@mui/material';
+import { useSearchParams } from 'next/navigation';
+import { Button, TextField, Paper, Typography, Box, Container, Alert } from '@mui/material';
+import { useLoginWithRedirect } from '@/hooks/useAuthWithRedirect';
 
 export default function LoginPage() {
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const registered = searchParams.get('registered');
+  const passwordReset = searchParams.get('passwordReset');
+  const { mutateAsync: login, error, isPending, isError } = useLoginWithRedirect();
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -15,6 +20,15 @@ export default function LoginPage() {
     email: '',
     password: '',
   });
+  const [successMessage, setSuccessMessage] = useState('');
+
+  useEffect(() => {
+    if (registered === 'true') {
+      setSuccessMessage('Registration successful! Please log in with your new account.');
+    } else if (passwordReset === 'true') {
+      setSuccessMessage('Password reset successful! Please log in with your new password.');
+    }
+  }, [registered, passwordReset]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -47,11 +61,7 @@ export default function LoginPage() {
       return;
     }
 
-    // In the future, real authentication will be implemented here
-    console.log('Login attempt with:', formData);
-
-    // Temporary successful login simulation
-    router.push('/cabinet');
+    await login(formData);
   };
 
   return (
@@ -61,6 +71,19 @@ export default function LoginPage() {
           <Typography variant="h4" component="h1" gutterBottom>
             Login
           </Typography>
+
+          {successMessage && (
+            <Alert severity="success" sx={{ mb: 3 }}>
+              {successMessage}
+            </Alert>
+          )}
+
+          {isError && error instanceof Error && (
+            <Alert severity="error" sx={{ mb: 3 }}>
+              {error.message}
+            </Alert>
+          )}
+
           <form onSubmit={handleSubmit}>
             <TextField
               label="Email"
@@ -73,6 +96,7 @@ export default function LoginPage() {
               onChange={handleChange}
               error={Boolean(errors.email)}
               helperText={errors.email}
+              disabled={isPending}
             />
 
             <TextField
@@ -86,10 +110,11 @@ export default function LoginPage() {
               onChange={handleChange}
               error={Boolean(errors.password)}
               helperText={errors.password}
+              disabled={isPending}
             />
 
             <Box mt={2} mb={3} textAlign="right">
-              <Link href="/auth/forgot">
+              <Link href="/auth/forgot-password">
                 <Typography variant="body2" color="primary">
                   Forgot password?
                 </Typography>
@@ -103,8 +128,9 @@ export default function LoginPage() {
               fullWidth
               size="large"
               sx={{ py: 1.5 }}
+              disabled={isPending}
             >
-              Log In
+              {isPending ? 'Logging in...' : 'Log In'}
             </Button>
           </form>
 

@@ -15,14 +15,13 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
-import { useAuth } from '@/contexts/AuthContext';
-import { logout } from '@/api/actions/auth.actions';
-import { useRouter } from 'next/navigation';
+import { useCurrentUser } from '@/api/query/auth/auth.query';
+import { useLogoutWithRedirect } from '@/hooks/useAuthWithRedirect';
 
 export default function ProfileMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const { user } = useAuth();
-  const router = useRouter();
+  const { data: user } = useCurrentUser();
+  const { mutateAsync: logout } = useLogoutWithRedirect();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -36,18 +35,21 @@ export default function ProfileMenu() {
     try {
       await logout();
       handleProfileMenuClose();
-      router.push('/auth/login');
     } catch (error) {
       console.error('Logout failed:', error);
     }
   };
 
-  const userInitial = user?.name ? user.name[0].toUpperCase() : 'U';
+  if (!user) {
+    return null;
+  }
+
+  const userInitial = user.name ? user.name[0].toUpperCase() : 'U';
 
   return (
     <>
       <IconButton color="inherit" onClick={handleProfileMenuOpen}>
-        {user?.avatar ? (
+        {user.avatar ? (
           <Avatar sx={{ width: 32, height: 32 }} src={user.avatar} />
         ) : (
           <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.dark' }}>{userInitial}</Avatar>
