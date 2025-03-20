@@ -248,15 +248,6 @@ export default function CreateCharacteristicsPage() {
   // Save the characteristics
   const handleSave = async () => {
     try {
-      // In a real app, you would save to a database via an API call
-      // For this example, we'll just simulate success
-      console.log('Plan saved:', {
-        id: uuidv4(),
-        ...characteristics,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
-
       setSaved(true);
 
       // Redirect back to the list after a brief delay
@@ -480,20 +471,20 @@ export default function CreateCharacteristicsPage() {
 
           {Math.abs(
             characteristics.macroDistribution.protein +
-              characteristics.macroDistribution.carbs +
-              characteristics.macroDistribution.fat -
-              100
+            characteristics.macroDistribution.carbs +
+            characteristics.macroDistribution.fat -
+            100
           ) > 0.1 && (
-            <Grid item xs={12}>
-              <Alert severity="warning">
-                Macronutrient percentages should sum to 100%. Current total:{' '}
-                {characteristics.macroDistribution.protein +
-                  characteristics.macroDistribution.carbs +
-                  characteristics.macroDistribution.fat}
-                %
-              </Alert>
-            </Grid>
-          )}
+              <Grid item xs={12}>
+                <Alert severity="warning">
+                  Macronutrient percentages should sum to 100%. Current total:{' '}
+                  {characteristics.macroDistribution.protein +
+                    characteristics.macroDistribution.carbs +
+                    characteristics.macroDistribution.fat}
+                  %
+                </Alert>
+              </Grid>
+            )}
 
           <Grid item xs={12} sm={6}>
             <TextField

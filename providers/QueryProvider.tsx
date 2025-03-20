@@ -23,4 +23,4 @@ export default function QueryProvider({ children }: QueryProviderProps) {
       {children}
     </QueryClientProvider>
   );
-} 
+}

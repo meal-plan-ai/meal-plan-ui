@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
-import { LoginRequestDto } from '@/api/query/auth/auth.dto';
+import { LoginRequestDto, LoginResponseDto } from '@/api/query/auth/auth.dto';
 import { handleCookiesFromBackend } from '@/utils/cookies';
+import { ResponseError } from '@/api/api.types';
 
 export async function POST(request: Request) {
   try {
@@ -16,17 +17,23 @@ export async function POST(request: Request) {
     });
 
     if (!backendResponse.ok) {
-      const errorData = await backendResponse.json();
-      throw new Error(errorData.error || 'Login failed');
+      const errorData = await backendResponse.json() as ResponseError;
+
+      return NextResponse.json(
+        { error: errorData.message || 'Authentication failed' },
+        { status: backendResponse.status }
+      );
     }
 
-    const responseData = await backendResponse.json();
-
+    const responseData = await backendResponse.json() as LoginResponseDto;
     const response = NextResponse.json(responseData);
 
-    return handleCookiesFromBackend(response, backendResponse, responseData);
+    return handleCookiesFromBackend(response, backendResponse);
   } catch (error) {
     console.error('Login error:', error);
-    return NextResponse.json({ error: 'Failed to login' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Failed to login' },
+      { status: 500 }
+    );
   }
-} 
+}

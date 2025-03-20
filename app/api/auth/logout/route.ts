@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { handleLogoutCookies } from '@/utils/cookies';
+import { LogoutResponseDto } from '@/api/query/auth/auth.dto';
+import { ResponseError } from '@/api/api.types';
 
 export async function POST(request: Request) {
   try {
@@ -14,16 +16,48 @@ export async function POST(request: Request) {
       credentials: 'include',
     });
 
+
     if (!backendResponse.ok) {
-      const errorData = await backendResponse.json();
-      throw new Error(errorData.error || 'Logout failed');
+      const errorData = await backendResponse.json() as ResponseError;
+
+      return NextResponse.json(
+        { error: errorData.message || 'Authentication failed' },
+        {
+          status: backendResponse.status,
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0',
+            'Surrogate-Control': 'no-store'
+          }
+        }
+      );
     }
 
-    const response = NextResponse.json({ success: true });
+    const responseData = await backendResponse.json() as LogoutResponseDto;
+    const response = NextResponse.json(responseData, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+        'Surrogate-Control': 'no-store'
+      }
+    });
 
     return handleLogoutCookies(response, backendResponse);
   } catch (error) {
     console.error('Logout error:', error);
-    return NextResponse.json({ error: 'Failed to logout' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to logout' },
+      {
+        status: 500,
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+          'Pragma': 'no-cache',
+          'Expires': '0',
+          'Surrogate-Control': 'no-store'
+        }
+      }
+    );
   }
-} 
+}

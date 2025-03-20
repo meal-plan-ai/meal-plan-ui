@@ -15,12 +15,14 @@ import {
   Logout as LogoutIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
-import { useCurrentUser } from '@/api/query/auth/auth.query';
+import { useCurrentUser } from '@/api/query/users/users.query';
 import { useLogoutWithRedirect } from '@/hooks/useAuthWithRedirect';
+import { useProfile } from '@/api/query/profile/profile.query';
 
 export default function ProfileMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { data: user } = useCurrentUser();
+  const { data: profile } = useProfile();
   const { mutateAsync: logout } = useLogoutWithRedirect();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -44,16 +46,13 @@ export default function ProfileMenu() {
     return null;
   }
 
-  const userInitial = user.name ? user.name[0].toUpperCase() : 'U';
-  console.log('user', user)
+  const userInitial = profile?.firstName ? profile?.firstName[0].toUpperCase() :
+    user.email ? user.email[0].toUpperCase() : 'U';
+
   return (
     <>
       <IconButton color="inherit" onClick={handleProfileMenuOpen}>
-        {user.avatar ? (
-          <Avatar sx={{ width: 32, height: 32 }} src={user.avatar} />
-        ) : (
-          <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.dark' }}>{userInitial}</Avatar>
-        )}
+        <Avatar sx={{ width: 32, height: 32, bgcolor: 'primary.dark' }}>{userInitial}</Avatar>
       </IconButton>
 
       <Menu
@@ -81,4 +80,4 @@ export default function ProfileMenu() {
       </Menu>
     </>
   );
-} 
+}

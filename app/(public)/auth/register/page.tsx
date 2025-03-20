@@ -1,102 +1,43 @@
 'use client';
 
-import { useState } from 'react';
+import { useFormState } from 'react-dom';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Button, TextField, Paper, Typography, Box, Container, Alert } from '@mui/material';
-import { useRegister } from '@/api/query/auth/auth.query';
+import { registerAction, RegisterValidationResult } from '@/actions/auth.actions';
+import { EMPTY_FORM_STATE } from '@/utils/form-state';
+import { useFormReset } from '@/hooks/useFormReset';
+import { useRegisterWithRedirect } from '@/hooks/useAuthWithRedirect';
+import { useEffect, useRef } from 'react';
+
+const initialState: RegisterValidationResult = {
+  success: false,
+  data: null,
+  formState: EMPTY_FORM_STATE
+};
 
 export default function RegisterPage() {
-  const router = useRouter();
-  const { mutate: register, isPending, error, isError } = useRegister();
+  const processedDataRef = useRef<Record<string, string> | null>(null);
+  const [validationResult, action, pending] = useFormState(registerAction, initialState);
+  const { formState } = validationResult;
+  const formRef = useFormReset(formState);
+  const { mutateAsync: register, isPending, errorMessage } = useRegisterWithRedirect();
 
-  const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
-  const [errors, setErrors] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-  });
+  useEffect(() => {
+    if (validationResult.success &&
+      validationResult.data &&
+      !isPending &&
+      JSON.stringify(processedDataRef.current) !== JSON.stringify(validationResult.data)) {
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setErrors(prev => ({ ...prev, [name]: '' }));
-  };
-
-  const validateForm = () => {
-    let valid = true;
-    const newErrors = { ...errors };
-
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = 'First name is required';
-      valid = false;
+      processedDataRef.current = validationResult.data;
+      register(validationResult.data);
     }
+  }, [validationResult, register, isPending]);
 
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = 'Last name is required';
-      valid = false;
+  useEffect(() => {
+    if (errorMessage) {
+      processedDataRef.current = null;
     }
-
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-      valid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
-      valid = false;
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-      valid = false;
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-      valid = false;
-    }
-
-    if (!formData.confirmPassword) {
-      newErrors.confirmPassword = 'Please confirm your password';
-      valid = false;
-    } else if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-      valid = false;
-    }
-
-    setErrors(newErrors);
-    return valid;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    const userData = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      password: formData.password,
-    };
-
-    register(userData, {
-      onSuccess: () => {
-        // Redirect to login page on successful registration
-        router.push('/auth/login?registered=true');
-      },
-      onError: (error) => {
-        console.error('Registration error:', error);
-      }
-    });
-  };
+  }, [errorMessage]);
 
   return (
     <Container maxWidth="sm">
@@ -106,13 +47,13 @@ export default function RegisterPage() {
             Create an Account
           </Typography>
 
-          {isError && error instanceof Error && (
+          {errorMessage && (
             <Alert severity="error" sx={{ mb: 3 }}>
-              {error.message}
+              {errorMessage}
             </Alert>
           )}
 
-          <form onSubmit={handleSubmit}>
+          <form action={action} ref={formRef}>
             <TextField
               label="First Name"
               type="text"
@@ -120,12 +61,10 @@ export default function RegisterPage() {
               fullWidth
               margin="normal"
               variant="outlined"
-              value={formData.firstName}
-              onChange={handleChange}
-              error={Boolean(errors.firstName)}
-              helperText={errors.firstName}
+              error={Boolean(formState.fieldErrors?.firstName)}
+              helperText={formState.fieldErrors?.firstName?.[0]}
               autoFocus
-              disabled={isPending}
+              disabled={isPending || pending}
             />
 
             <TextField
@@ -135,11 +74,9 @@ export default function RegisterPage() {
               fullWidth
               margin="normal"
               variant="outlined"
-              value={formData.lastName}
-              onChange={handleChange}
-              error={Boolean(errors.lastName)}
-              helperText={errors.lastName}
-              disabled={isPending}
+              error={Boolean(formState.fieldErrors?.lastName)}
+              helperText={formState.fieldErrors?.lastName?.[0]}
+              disabled={isPending || pending}
             />
 
             <TextField
@@ -149,11 +86,9 @@ export default function RegisterPage() {
               fullWidth
               margin="normal"
               variant="outlined"
-              value={formData.email}
-              onChange={handleChange}
-              error={Boolean(errors.email)}
-              helperText={errors.email}
-              disabled={isPending}
+              error={Boolean(formState.fieldErrors?.email)}
+              helperText={formState.fieldErrors?.email?.[0]}
+              disabled={isPending || pending}
             />
 
             <TextField
@@ -163,11 +98,9 @@ export default function RegisterPage() {
               fullWidth
               margin="normal"
               variant="outlined"
-              value={formData.password}
-              onChange={handleChange}
-              error={Boolean(errors.password)}
-              helperText={errors.password}
-              disabled={isPending}
+              error={Boolean(formState.fieldErrors?.password)}
+              helperText={formState.fieldErrors?.password?.[0]}
+              disabled={isPending || pending}
             />
 
             <TextField
@@ -177,11 +110,9 @@ export default function RegisterPage() {
               fullWidth
               margin="normal"
               variant="outlined"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              error={Boolean(errors.confirmPassword)}
-              helperText={errors.confirmPassword}
-              disabled={isPending}
+              error={Boolean(formState.fieldErrors?.confirmPassword)}
+              helperText={formState.fieldErrors?.confirmPassword?.[0]}
+              disabled={isPending || pending}
             />
 
             <Button
@@ -191,9 +122,9 @@ export default function RegisterPage() {
               fullWidth
               size="large"
               sx={{ py: 1.5, mt: 3 }}
-              disabled={isPending}
+              disabled={isPending || pending}
             >
-              {isPending ? 'Creating Account...' : 'Register'}
+              {isPending || pending ? 'Creating Account...' : 'Register'}
             </Button>
           </form>
 
@@ -211,4 +142,4 @@ export default function RegisterPage() {
       </Box>
     </Container>
   );
-} 
+}

@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCurrentUser } from '@/api/query/auth/auth.query';
+import { useCurrentUser } from '@/api/query/users/users.query';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -31,4 +31,4 @@ export default function ProtectedRoute({
   }
 
   return <>{children}</>;
-} 
+}

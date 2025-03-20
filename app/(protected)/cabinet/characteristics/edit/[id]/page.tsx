@@ -248,19 +248,11 @@ export default function EditCharacteristicsPage({ params }: { params: { id: stri
     setCharacteristics(prev => ({ ...prev!, caloriesTarget }));
   };
 
-  // Save the edited plan
   const handleSave = async () => {
     try {
-      // In a real app, you would update via an API call
-      // For this example, we'll just simulate success
-      console.log('Plan updated:', {
-        ...characteristics,
-        updatedAt: new Date().toISOString(),
-      });
 
       setSaved(true);
 
-      // Redirect back to the list after a brief delay
       setTimeout(() => {
         router.push('/cabinet/characteristics');
       }, 1500);
@@ -481,20 +473,20 @@ export default function EditCharacteristicsPage({ params }: { params: { id: stri
 
           {Math.abs(
             characteristics.macroDistribution.protein +
-              characteristics.macroDistribution.carbs +
-              characteristics.macroDistribution.fat -
-              100
+            characteristics.macroDistribution.carbs +
+            characteristics.macroDistribution.fat -
+            100
           ) > 0.1 && (
-            <Grid item xs={12}>
-              <Alert severity="warning">
-                Macronutrient percentages should sum to 100%. Current total:{' '}
-                {characteristics.macroDistribution.protein +
-                  characteristics.macroDistribution.carbs +
-                  characteristics.macroDistribution.fat}
-                %
-              </Alert>
-            </Grid>
-          )}
+              <Grid item xs={12}>
+                <Alert severity="warning">
+                  Macronutrient percentages should sum to 100%. Current total:{' '}
+                  {characteristics.macroDistribution.protein +
+                    characteristics.macroDistribution.carbs +
+                    characteristics.macroDistribution.fat}
+                  %
+                </Alert>
+              </Grid>
+            )}
 
           <Grid item xs={12} sm={6}>
             <TextField

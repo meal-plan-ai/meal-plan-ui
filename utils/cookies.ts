@@ -1,29 +1,20 @@
 import { NextResponse } from 'next/server';
 
-
-interface ResponseWithPossibleToken {
-  token?: string;
-  [key: string]: unknown;
-}
-
 /**
  * Handles cookies from a backend response and adds them to the Next.js response
  * @param response The Next.js response object
  * @param backendResponse The response from the backend API
- * @param responseData The data from the backend response
  * @returns The updated Next.js response with cookies
  */
 export function handleCookiesFromBackend(
   response: NextResponse,
   backendResponse: Response,
-  responseData: ResponseWithPossibleToken
 ): NextResponse {
   const setCookieHeader = backendResponse.headers.get('set-cookie');
-  console.log('Set-Cookie header:', setCookieHeader);
 
   if (setCookieHeader) {
     const cookies = parseCookies(setCookieHeader);
-    console.log('Parsed cookies:', cookies);
+
 
     for (const [name, { value, options }] of Object.entries(cookies)) {
       if (name === 'token') {
@@ -32,13 +23,6 @@ export function handleCookiesFromBackend(
       console.log(`Setting cookie ${name} with options:`, options);
       response.cookies.set(name, value, options);
     }
-  } else if (responseData.token) {
-    console.log('Using fallback with token from responseData');
-    response.cookies.set('token', responseData.token, {
-      path: '/',
-      httpOnly: true,
-      sameSite: 'strict'
-    });
   }
 
   return response;
@@ -55,11 +39,11 @@ export function handleLogoutCookies(
   backendResponse: Response
 ): NextResponse {
   const setCookieHeader = backendResponse.headers.get('set-cookie');
-  console.log('Logout Set-Cookie header:', setCookieHeader);
+
+  const cookiesToClear = ['token', 'refreshToken', 'auth', 'session', 'user'];
 
   if (setCookieHeader) {
     const cookies = parseCookies(setCookieHeader);
-    console.log('Logout parsed cookies:', cookies);
 
     for (const [name, { value, options }] of Object.entries(cookies)) {
       console.log(`Setting logout cookie ${name} with options:`, options);
@@ -76,18 +60,18 @@ export function handleLogoutCookies(
         response.cookies.set(name, value, options);
       }
     }
-  } else {
-    console.log('Using fallback to delete token cookie');
+  }
 
-    // Правильное удаление cookie: установка пустого значения с истекшим сроком действия
-    response.cookies.set('token', '', {
+  // Очищаем все куки из предопределенного списка, даже если их нет в ответе
+  cookiesToClear.forEach(cookieName => {
+    response.cookies.set(cookieName, '', {
       expires: new Date(0),
       maxAge: 0,
       path: '/',
       httpOnly: true,
       sameSite: 'strict'
     });
-  }
+  });
 
   return response;
 }
@@ -158,7 +142,6 @@ function parseCookies(setCookieHeader: string): Record<string, {
       } else if (lowerAttrName === 'path') {
         options.path = attrValue;
       } else if (lowerAttrName === 'httponly') {
-        console.log('Found HttpOnly attribute');
         options.httpOnly = true;
       } else if (lowerAttrName === 'samesite') {
         const lowerSameSite = attrValue?.toLowerCase();
@@ -179,4 +162,4 @@ function parseCookies(setCookieHeader: string): Record<string, {
   }
 
   return result;
-} 
+}

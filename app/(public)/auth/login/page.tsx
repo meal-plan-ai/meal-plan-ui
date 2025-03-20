@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormState } from 'react-dom';
 import Link from 'next/link';
 import { Button, TextField, Paper, Typography, Box, Container } from '@mui/material';
 import { loginAction, ValidationResult } from '@/actions/auth.actions';
@@ -9,8 +9,6 @@ import { useFormReset } from '@/hooks/useFormReset';
 import { useLoginWithRedirect } from '@/hooks/useAuthWithRedirect';
 import { useEffect, useRef } from 'react';
 
-
-
 const initialState: ValidationResult = {
   success: false,
   data: null,
@@ -18,18 +16,28 @@ const initialState: ValidationResult = {
 };
 
 export default function LoginPage() {
-  const attemptedRef = useRef(false);
+  const processedDataRef = useRef<Record<string, string> | null>(null);
   const [validationResult, action, pending] = useFormState(loginAction, initialState);
   const { formState } = validationResult;
   const formRef = useFormReset(formState);
-  const { mutateAsync: login, isPending } = useLoginWithRedirect();
+  const { mutateAsync: login, isPending, errorMessage } = useLoginWithRedirect();
 
   useEffect(() => {
-    if (validationResult.success && validationResult.data && !isPending && !attemptedRef.current) {
-      attemptedRef.current = true;
-      login(validationResult.data)
+    if (validationResult.success &&
+      validationResult.data &&
+      !isPending &&
+      JSON.stringify(processedDataRef.current) !== JSON.stringify(validationResult.data)) {
+
+      processedDataRef.current = validationResult.data;
+      login(validationResult.data);
     }
   }, [validationResult, login, isPending]);
+
+  useEffect(() => {
+    if (errorMessage) {
+      processedDataRef.current = null;
+    }
+  }, [errorMessage]);
 
   return (
     <Container maxWidth="sm">
@@ -60,14 +68,6 @@ export default function LoginPage() {
               error={Boolean(formState.fieldErrors?.password)}
               helperText={formState.fieldErrors?.password?.[0]}
             />
-
-            <Box mt={2} mb={3} textAlign="right">
-              <Link href="/auth/forgot-password">
-                <Typography variant="body2" color="primary">
-                  Forgot password?
-                </Typography>
-              </Link>
-            </Box>
             <Button
               type="submit"
               variant="contained"
@@ -95,4 +95,4 @@ export default function LoginPage() {
       </Box>
     </Container>
   );
-} 
+}
