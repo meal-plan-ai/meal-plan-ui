@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useFormState } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -24,7 +23,6 @@ import {
   DialogContentText,
   DialogTitle,
   CircularProgress,
-  Alert,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -34,68 +32,6 @@ import {
 } from '@mui/icons-material';
 import { getCharacteristics, deleteCharacteristic } from './actions';
 import { NutritionCharacteristics } from '@/lib/generateCharacteristics';
-import { EMPTY_FORM_STATE } from '@/utils/form-state';
-
-// Define types for form validation
-interface DeleteValidationResult {
-  success: boolean;
-  data: string | null;
-  formState: {
-    message?: string;
-    fieldErrors?: Record<string, string[] | undefined>;
-  };
-}
-
-// Server action for deletion with validation
-async function deleteCharacteristicAction(prevState: DeleteValidationResult, formData: FormData) {
-  const planId = formData.get('planId') as string;
-
-  if (!planId) {
-    return {
-      success: false,
-      data: null,
-      formState: {
-        message: 'Invalid nutrition plan ID',
-        fieldErrors: {},
-      },
-    };
-  }
-
-  try {
-    const result = await deleteCharacteristic(planId);
-    if (result.success) {
-      return {
-        success: true,
-        data: planId,
-        formState: {
-          message: 'Nutrition plan deleted successfully',
-        },
-      };
-    } else {
-      return {
-        success: false,
-        data: null,
-        formState: {
-          message: result.error || 'Failed to delete nutrition plan',
-        },
-      };
-    }
-  } catch (error) {
-    return {
-      success: false,
-      data: null,
-      formState: {
-        message: error instanceof Error ? error.message : 'An error occurred',
-      },
-    };
-  }
-}
-
-const initialState: DeleteValidationResult = {
-  success: false,
-  data: null,
-  formState: EMPTY_FORM_STATE,
-};
 
 export default function CharacteristicsListPage() {
   const router = useRouter();
@@ -106,11 +42,6 @@ export default function CharacteristicsListPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [planToDelete, setPlanToDelete] = useState<string | null>(null);
-  const [validationResult, deleteAction, pending] = useFormState(
-    deleteCharacteristicAction,
-    initialState
-  );
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   const fetchPlans = useCallback(async () => {
     setLoading(true);
@@ -127,24 +58,7 @@ export default function CharacteristicsListPage() {
 
   useEffect(() => {
     fetchPlans();
-  }, [fetchPlans]);
-
-  // Handle successful deletion
-  useEffect(() => {
-    if (validationResult.success && validationResult.data) {
-      setDeleteDialogOpen(false);
-      setShowSuccessAlert(true);
-      // Refresh the plans list
-      fetchPlans();
-
-      // Hide success message after 3 seconds
-      const timeoutId = setTimeout(() => {
-        setShowSuccessAlert(false);
-      }, 3000);
-
-      return () => clearTimeout(timeoutId);
-    }
-  }, [validationResult, fetchPlans]);
+  }, [page, rowsPerPage, fetchPlans]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -172,6 +86,24 @@ export default function CharacteristicsListPage() {
     setDeleteDialogOpen(true);
   };
 
+  const handleDeleteConfirm = async () => {
+    if (planToDelete) {
+      try {
+        const result = await deleteCharacteristic(planToDelete);
+        if (result.success) {
+          // Refresh the plans list
+          fetchPlans();
+        } else {
+          console.error('Error deleting plan:', result.error);
+        }
+      } catch (error) {
+        console.error('Error deleting plan:', error);
+      }
+    }
+    setDeleteDialogOpen(false);
+    setPlanToDelete(null);
+  };
+
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);
     setPlanToDelete(null);
@@ -187,22 +119,6 @@ export default function CharacteristicsListPage() {
 
   return (
     <Box>
-      {showSuccessAlert && (
-        <Alert severity="success" sx={{ mb: 2 }} onClose={() => setShowSuccessAlert(false)}>
-          Nutrition plan deleted successfully
-        </Alert>
-      )}
-
-      {validationResult.formState.message && !validationResult.success && (
-        <Alert
-          severity="error"
-          sx={{ mb: 2 }}
-          onClose={() => (validationResult.formState.message = '')}
-        >
-          {validationResult.formState.message}
-        </Alert>
-      )}
-
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Typography variant="h4" component="h1">
           My Nutrition Plans
@@ -305,25 +221,22 @@ export default function CharacteristicsListPage() {
         )}
       </Paper>
 
-      {/* Delete Confirmation Dialog with Server-side Validation */}
+      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
-        <form action={deleteAction}>
-          <DialogTitle>Delete Nutrition Plan</DialogTitle>
-          <DialogContent>
-            <DialogContentText>
-              Are you sure you want to delete this nutrition plan? This action cannot be undone.
-            </DialogContentText>
-            {planToDelete && <input type="hidden" name="planId" value={planToDelete} />}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleDeleteCancel} color="primary" disabled={pending}>
-              Cancel
-            </Button>
-            <Button type="submit" color="error" autoFocus disabled={pending}>
-              {pending ? 'Deleting...' : 'Delete'}
-            </Button>
-          </DialogActions>
-        </form>
+        <DialogTitle>Delete Nutrition Plan</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this nutrition plan? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleDeleteConfirm} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
       </Dialog>
     </Box>
   );
