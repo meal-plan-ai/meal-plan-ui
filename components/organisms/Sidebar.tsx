@@ -1,14 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import {
-  Drawer,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-} from '@mui/material';
+import { Drawer, List, ListItem, ListItemIcon, ListItemText, Toolbar } from '@mui/material';
 import {
   Dashboard as DashboardIcon,
   Restaurant as RestaurantIcon,
@@ -35,21 +28,24 @@ export default function Sidebar({ variant, open = false, onClose }: SidebarProps
 
   const isMenuItemActive = (path: string) => pathname === path;
 
-  const drawerProps = variant === 'temporary' ? {
-    open,
-    onClose,
-    sx: {
-      display: { xs: 'block', sm: 'none' },
-      [`& .MuiDrawer-paper`]: { width: 240, boxSizing: 'border-box' },
-    },
-  } : {
-    sx: {
-      width: 240,
-      flexShrink: 0,
-      display: { xs: 'none', sm: 'block' },
-      [`& .MuiDrawer-paper`]: { width: 240, boxSizing: 'border-box', mt: 8 },
-    },
-  };
+  const drawerProps =
+    variant === 'temporary'
+      ? {
+          open,
+          onClose,
+          sx: {
+            display: { xs: 'block', sm: 'none' },
+            [`& .MuiDrawer-paper`]: { width: 240, boxSizing: 'border-box' },
+          },
+        }
+      : {
+          sx: {
+            width: 240,
+            flexShrink: 0,
+            display: { xs: 'none', sm: 'block' },
+            [`& .MuiDrawer-paper`]: { width: 240, boxSizing: 'border-box', mt: 8 },
+          },
+        };
 
   return (
     <Drawer variant={variant} {...drawerProps}>
@@ -80,4 +76,4 @@ export default function Sidebar({ variant, open = false, onClose }: SidebarProps
       </List>
     </Drawer>
   );
-} 
+}

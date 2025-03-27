@@ -12,9 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         <QueryProvider>
           <ThemeProviderWrapper>
-            <ToastProvider>
-              {children}
-            </ToastProvider>
+            <ToastProvider>{children}</ToastProvider>
           </ThemeProviderWrapper>
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryProvider>

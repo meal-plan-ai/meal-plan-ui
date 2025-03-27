@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -29,7 +29,6 @@ import {
   Delete as DeleteIcon,
   Add as AddIcon,
   Visibility as ViewIcon,
-  Restaurant as RestaurantIcon,
 } from '@mui/icons-material';
 import { getMealPlans, deleteMealPlan } from './actions';
 import { MealPlan } from '@/lib/generateMealPlans';
@@ -44,11 +43,7 @@ export default function MealPlansListPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [planToDelete, setPlanToDelete] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchPlans();
-  }, [page, rowsPerPage]);
-
-  const fetchPlans = async () => {
+  const fetchPlans = useCallback(async () => {
     setLoading(true);
     try {
       const response = await getMealPlans(page + 1, rowsPerPage);
@@ -59,7 +54,11 @@ export default function MealPlansListPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, rowsPerPage]);
+
+  useEffect(() => {
+    fetchPlans();
+  }, [page, rowsPerPage, fetchPlans]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);

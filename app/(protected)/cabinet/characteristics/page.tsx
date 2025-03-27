@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -43,11 +43,7 @@ export default function CharacteristicsListPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [planToDelete, setPlanToDelete] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchPlans();
-  }, [page, rowsPerPage]);
-
-  const fetchPlans = async () => {
+  const fetchPlans = useCallback(async () => {
     setLoading(true);
     try {
       const response = await getCharacteristics(page + 1, rowsPerPage);
@@ -58,7 +54,11 @@ export default function CharacteristicsListPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, rowsPerPage]);
+
+  useEffect(() => {
+    fetchPlans();
+  }, [page, rowsPerPage, fetchPlans]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);

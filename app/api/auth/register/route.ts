@@ -5,19 +5,22 @@ import { ResponseError } from '@/api/api.types';
 
 export async function POST(request: Request) {
   try {
-    const userData = await request.json() as RegisterRequestDto;
+    const userData = (await request.json()) as RegisterRequestDto;
 
-    const backendResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/auth/register`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(userData),
-      credentials: 'include',
-    });
+    const backendResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/auth/register`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData),
+        credentials: 'include',
+      }
+    );
 
     if (!backendResponse.ok) {
-      const errorData = await backendResponse.json() as ResponseError;
+      const errorData = (await backendResponse.json()) as ResponseError;
 
       return NextResponse.json(
         { error: errorData.message || 'Registration failed' },
@@ -25,12 +28,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const responseData = await backendResponse.json() as RegisterResponseDto;
+    const responseData = (await backendResponse.json()) as RegisterResponseDto;
     const response = NextResponse.json(responseData, { status: 201 });
 
     return handleCookiesFromBackend(response, backendResponse);
   } catch (error) {
     console.error('Registration error:', error);
-    return NextResponse.json({ error: error instanceof Error ? error.message : 'Failed to register' }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : 'Failed to register' },
+      { status: 500 }
+    );
   }
 }

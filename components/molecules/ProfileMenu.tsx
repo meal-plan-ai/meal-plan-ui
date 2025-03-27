@@ -10,10 +10,7 @@ import {
   ListItemText,
   Divider,
 } from '@mui/material';
-import {
-  AccountCircle as AccountIcon,
-  Logout as LogoutIcon,
-} from '@mui/icons-material';
+import { AccountCircle as AccountIcon, Logout as LogoutIcon } from '@mui/icons-material';
 import Link from 'next/link';
 import { useCurrentUser } from '@/api/query/users/users.query';
 import { useLogoutWithRedirect } from '@/hooks/useAuthWithRedirect';
@@ -46,8 +43,11 @@ export default function ProfileMenu() {
     return null;
   }
 
-  const userInitial = profile?.firstName ? profile?.firstName[0].toUpperCase() :
-    user.email ? user.email[0].toUpperCase() : 'U';
+  const userInitial = profile?.firstName
+    ? profile?.firstName[0].toUpperCase()
+    : user.email
+      ? user.email[0].toUpperCase()
+      : 'U';
 
   return (
     <>

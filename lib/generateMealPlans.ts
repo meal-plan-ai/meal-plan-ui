@@ -48,7 +48,6 @@ const dietTypes = [
   'Paleo',
   'Low Carb',
 ];
-const mealTypes = ['Breakfast', 'Lunch', 'Dinner', 'Snack'];
 
 const breakfastRecipes = [
   'Avocado Toast with Poached Eggs',

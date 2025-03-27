@@ -22,16 +22,14 @@ export function useLoginWithRedirect() {
         queryClient.invalidateQueries();
 
         router.push('/cabinet');
-        toast.success('Login successful')
+        toast.success('Login successful');
         return result;
       } catch (error) {
-        const message = error instanceof Error
-          ? error.message
-          : 'Login failed';
+        const message = error instanceof Error ? error.message : 'Login failed';
         setErrorMessage(message);
-        toast.error(message)
+        toast.error(message);
       }
-    }
+    },
   };
 }
 
@@ -49,13 +47,11 @@ export function useRegisterWithRedirect() {
         toast.success('Registration successful!');
         return result;
       } catch (error) {
-        const message = error instanceof Error
-          ? error.message
-          : 'Registration failed';
+        const message = error instanceof Error ? error.message : 'Registration failed';
         setErrorMessage(message);
         toast.error(message);
       }
-    }
+    },
   };
 }
 
@@ -84,15 +80,13 @@ export function useLogoutWithRedirect() {
         router.refresh();
 
         router.push('/auth/login');
-        toast.success('Logout successful')
+        toast.success('Logout successful');
         return result;
       } catch (error) {
-        const message = error instanceof Error
-          ? error.message
-          : 'Logout failed';
-        setErrorMessage(message)
-        toast.error(message)
+        const message = error instanceof Error ? error.message : 'Logout failed';
+        setErrorMessage(message);
+        toast.error(message);
       }
-    }
+    },
   };
 }

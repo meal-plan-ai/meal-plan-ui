@@ -7,7 +7,7 @@ const publicPaths = [
   '/auth/register',
   '/auth/forgot-password',
   '/auth/reset-password',
-  '/'
+  '/',
 ];
 
 export function middleware(request: NextRequest) {
@@ -46,4 +46,4 @@ export const config = {
      */
     '/((?!api|_next/static|_next/image|favicon.ico|public).*)',
   ],
-}; 
+};

@@ -29,14 +29,12 @@ import {
 } from '@mui/material';
 import {
   Add as AddIcon,
-  Remove as RemoveIcon,
   Save as SaveIcon,
   ArrowBack as ArrowBackIcon,
   Refresh as RefreshIcon,
   ExpandMore as ExpandMoreIcon,
   Info as InfoIcon,
 } from '@mui/icons-material';
-import { v4 as uuidv4 } from 'uuid';
 
 export default function CreateCharacteristicsPage() {
   const router = useRouter();
@@ -44,7 +42,39 @@ export default function CreateCharacteristicsPage() {
   const [newVitamin, setNewVitamin] = useState('');
   const [newIngredient, setNewIngredient] = useState('');
 
-  const [characteristics, setCharacteristics] = useState({
+  // Define a type for the nutrition characteristics
+  type CharacteristicsType = {
+    name: string;
+    weight: number;
+    height: number;
+    age: number;
+    activityLevel: string;
+    goal: string;
+    caloriesTarget: number;
+    macroDistribution: {
+      protein: number;
+      carbs: number;
+      fat: number;
+    };
+    mealsPerDay: number;
+    includingSnacks: boolean;
+    nutrientTargets: {
+      fiber: number;
+      sugar: number;
+      sodium: number;
+    };
+    vitaminsAndMinerals: Array<{ name: string; priority: string }>;
+    avoidIngredients: string[];
+    preferences: {
+      organic: boolean;
+      seasonal: boolean;
+      localProduce: boolean;
+      sustainableSeafood: boolean;
+      budgetFriendly: boolean;
+    };
+  };
+
+  const [characteristics, setCharacteristics] = useState<CharacteristicsType>({
     // Basic information
     name: 'My New Nutrition Plan',
     weight: 70, // in kg
@@ -102,7 +132,7 @@ export default function CreateCharacteristicsPage() {
       setCharacteristics(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof typeof prev],
+          ...(prev[parent as keyof CharacteristicsType] as object),
           [child]: value,
         },
       }));
@@ -119,7 +149,7 @@ export default function CreateCharacteristicsPage() {
         setCharacteristics(prev => ({
           ...prev,
           [parent]: {
-            ...prev[parent as keyof typeof prev],
+            ...(prev[parent as keyof CharacteristicsType] as object),
             [child]: newValue,
           },
         }));
@@ -144,7 +174,7 @@ export default function CreateCharacteristicsPage() {
       setCharacteristics(prev => ({
         ...prev,
         [parent]: {
-          ...prev[parent as keyof typeof prev],
+          ...(prev[parent as keyof CharacteristicsType] as object),
           [child]: checked,
         },
       }));
@@ -206,7 +236,7 @@ export default function CreateCharacteristicsPage() {
     const { weight, height, age, activityLevel, goal } = characteristics;
 
     // BMR calculation
-    let bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+    const bmr = 10 * weight + 6.25 * height - 5 * age + 5;
 
     // Activity multiplier
     let activityMultiplier;
@@ -471,20 +501,20 @@ export default function CreateCharacteristicsPage() {
 
           {Math.abs(
             characteristics.macroDistribution.protein +
-            characteristics.macroDistribution.carbs +
-            characteristics.macroDistribution.fat -
-            100
+              characteristics.macroDistribution.carbs +
+              characteristics.macroDistribution.fat -
+              100
           ) > 0.1 && (
-              <Grid item xs={12}>
-                <Alert severity="warning">
-                  Macronutrient percentages should sum to 100%. Current total:{' '}
-                  {characteristics.macroDistribution.protein +
-                    characteristics.macroDistribution.carbs +
-                    characteristics.macroDistribution.fat}
-                  %
-                </Alert>
-              </Grid>
-            )}
+            <Grid item xs={12}>
+              <Alert severity="warning">
+                Macronutrient percentages should sum to 100%. Current total:{' '}
+                {characteristics.macroDistribution.protein +
+                  characteristics.macroDistribution.carbs +
+                  characteristics.macroDistribution.fat}
+                %
+              </Alert>
+            </Grid>
+          )}
 
           <Grid item xs={12} sm={6}>
             <TextField

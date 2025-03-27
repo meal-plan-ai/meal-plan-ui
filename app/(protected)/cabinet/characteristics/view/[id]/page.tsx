@@ -9,16 +9,12 @@ import {
   Grid,
   Button,
   Chip,
-  Divider,
-  List,
-  ListItem,
-  ListItemText,
+  Card,
+  CardContent,
   CircularProgress,
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Card,
-  CardContent,
 } from '@mui/material';
 import {
   ArrowBack as ArrowBackIcon,
@@ -34,7 +30,6 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
   const { id } = params;
   const [loading, setLoading] = useState(true);
   const [plan, setPlan] = useState<NutritionCharacteristics | null>(null);
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     async function fetchPlan() {
@@ -64,27 +59,19 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
     router.push(`/cabinet/characteristics/edit/${id}`);
   };
 
-  const handleDeleteClick = () => {
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    try {
-      const result = await deleteCharacteristic(id);
-      if (result.success) {
-        router.push('/cabinet/characteristics');
-      } else {
-        console.error('Error deleting plan:', result.error);
+  const handleDeleteClick = async () => {
+    if (confirm('Are you sure you want to delete this plan?')) {
+      try {
+        const result = await deleteCharacteristic(id);
+        if (result.success) {
+          router.push('/cabinet/characteristics');
+        } else {
+          console.error('Error deleting plan:', result.error);
+        }
+      } catch (error) {
+        console.error('Error deleting plan:', error);
       }
-    } catch (error) {
-      console.error('Error deleting plan:', error);
-    } finally {
-      setDeleteDialogOpen(false);
     }
-  };
-
-  const handleDeleteCancel = () => {
-    setDeleteDialogOpen(false);
   };
 
   const formatDate = (dateString: string) => {

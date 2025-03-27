@@ -8,13 +8,12 @@ import { NextResponse } from 'next/server';
  */
 export function handleCookiesFromBackend(
   response: NextResponse,
-  backendResponse: Response,
+  backendResponse: Response
 ): NextResponse {
   const setCookieHeader = backendResponse.headers.get('set-cookie');
 
   if (setCookieHeader) {
     const cookies = parseCookies(setCookieHeader);
-
 
     for (const [name, { value, options }] of Object.entries(cookies)) {
       if (name === 'token') {
@@ -54,7 +53,7 @@ export function handleLogoutCookies(
           maxAge: 0,
           path: '/',
           httpOnly: true,
-          sameSite: 'strict'
+          sameSite: 'strict',
         });
       } else {
         response.cookies.set(name, value, options);
@@ -69,7 +68,7 @@ export function handleLogoutCookies(
       maxAge: 0,
       path: '/',
       httpOnly: true,
-      sameSite: 'strict'
+      sameSite: 'strict',
     });
   });
 
@@ -81,18 +80,9 @@ export function handleLogoutCookies(
  * @param setCookieHeader The Set-Cookie header string
  * @returns An object mapping cookie names to values and options
  */
-function parseCookies(setCookieHeader: string): Record<string, {
-  value: string;
-  options: {
-    path?: string;
-    maxAge?: number;
-    expires?: Date;
-    httpOnly?: boolean;
-    secure?: boolean;
-    sameSite?: 'strict' | 'lax' | 'none';
-  };
-}> {
-  const result: Record<string, {
+function parseCookies(setCookieHeader: string): Record<
+  string,
+  {
     value: string;
     options: {
       path?: string;
@@ -102,7 +92,22 @@ function parseCookies(setCookieHeader: string): Record<string, {
       secure?: boolean;
       sameSite?: 'strict' | 'lax' | 'none';
     };
-  }> = {};
+  }
+> {
+  const result: Record<
+    string,
+    {
+      value: string;
+      options: {
+        path?: string;
+        maxAge?: number;
+        expires?: Date;
+        httpOnly?: boolean;
+        secure?: boolean;
+        sameSite?: 'strict' | 'lax' | 'none';
+      };
+    }
+  > = {};
 
   // Split header by comma for multiple cookies
   const cookieStrings = setCookieHeader.split(',');

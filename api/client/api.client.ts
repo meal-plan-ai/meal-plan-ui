@@ -14,17 +14,17 @@ class ApiClient {
     });
 
     this.client.interceptors.request.use(
-      (config) => {
+      config => {
         return config;
       },
-      (error) => {
+      error => {
         return Promise.reject(error);
       }
     );
 
     this.client.interceptors.response.use(
-      (response) => response,
-      async (error) => {
+      response => response,
+      async error => {
         if (error.response?.status === 401) {
           // Handle unauthorized access
         }
@@ -61,4 +61,4 @@ class ApiClient {
   }
 }
 
-export const apiClient = ApiClient.getInstance(); 
+export const apiClient = ApiClient.getInstance();

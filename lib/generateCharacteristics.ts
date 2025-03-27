@@ -128,7 +128,7 @@ export function generateRandomPlan(): NutritionCharacteristics {
   ];
 
   // Basic BMR calculation (Mifflin-St Jeor)
-  let bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+  const bmr = 10 * weight + 6.25 * height - 5 * age + 5;
 
   // Apply activity multiplier
   const activityLevel = activityLevels[Math.floor(Math.random() * activityLevels.length)];

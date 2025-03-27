@@ -2,7 +2,7 @@
 
 import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { createTheme, Theme } from '@mui/material/styles';
+import { createTheme } from '@mui/material/styles';
 import { Inter } from 'next/font/google';
 import LoadingProgress from './LoadingProgress';
 import { ThemeProvider } from '@/contexts/ThemeContext';

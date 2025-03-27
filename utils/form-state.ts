@@ -39,14 +39,11 @@ export const fromErrorToFormState = (error: unknown): FormState => {
   }
 };
 
-export const toFormState = (
-  status: FormState['status'],
-  message: string
-): FormState => {
+export const toFormState = (status: FormState['status'], message: string): FormState => {
   return {
     status,
     message,
     fieldErrors: {},
     timestamp: Date.now(),
   };
-}; 
+};

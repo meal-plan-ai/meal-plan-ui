@@ -4,14 +4,17 @@ export async function GET(request: Request) {
   try {
     const cookie = request.headers.get('cookie') || '';
 
-    const backendResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/users/me`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'Cookie': cookie
-      },
-      credentials: 'include',
-    });
+    const backendResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/users/me`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Cookie: cookie,
+        },
+        credentials: 'include',
+      }
+    );
 
     if (!backendResponse.ok) {
       if (backendResponse.status === 401) {

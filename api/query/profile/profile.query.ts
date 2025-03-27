@@ -42,7 +42,7 @@ const profileApi = {
     }
 
     return response.json();
-  }
+  },
 };
 
 export function useProfile() {

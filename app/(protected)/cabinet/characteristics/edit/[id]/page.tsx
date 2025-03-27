@@ -30,7 +30,6 @@ import {
 } from '@mui/material';
 import {
   Add as AddIcon,
-  Remove as RemoveIcon,
   Save as SaveIcon,
   ArrowBack as ArrowBackIcon,
   Refresh as RefreshIcon,
@@ -209,7 +208,7 @@ export default function EditCharacteristicsPage({ params }: { params: { id: stri
     const { weight, height, age, activityLevel, goal } = characteristics;
 
     // BMR calculation
-    let bmr = 10 * weight + 6.25 * height - 5 * age + 5;
+    const bmr = 10 * weight + 6.25 * height - 5 * age + 5;
 
     // Activity multiplier
     let activityMultiplier;
@@ -250,7 +249,6 @@ export default function EditCharacteristicsPage({ params }: { params: { id: stri
 
   const handleSave = async () => {
     try {
-
       setSaved(true);
 
       setTimeout(() => {
@@ -473,20 +471,20 @@ export default function EditCharacteristicsPage({ params }: { params: { id: stri
 
           {Math.abs(
             characteristics.macroDistribution.protein +
-            characteristics.macroDistribution.carbs +
-            characteristics.macroDistribution.fat -
-            100
+              characteristics.macroDistribution.carbs +
+              characteristics.macroDistribution.fat -
+              100
           ) > 0.1 && (
-              <Grid item xs={12}>
-                <Alert severity="warning">
-                  Macronutrient percentages should sum to 100%. Current total:{' '}
-                  {characteristics.macroDistribution.protein +
-                    characteristics.macroDistribution.carbs +
-                    characteristics.macroDistribution.fat}
-                  %
-                </Alert>
-              </Grid>
-            )}
+            <Grid item xs={12}>
+              <Alert severity="warning">
+                Macronutrient percentages should sum to 100%. Current total:{' '}
+                {characteristics.macroDistribution.protein +
+                  characteristics.macroDistribution.carbs +
+                  characteristics.macroDistribution.fat}
+                %
+              </Alert>
+            </Grid>
+          )}
 
           <Grid item xs={12} sm={6}>
             <TextField

@@ -2,15 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useFormState } from 'react-dom';
-import {
-  Box,
-  Button,
-  TextField,
-  Grid,
-  Paper,
-  Typography,
-  Divider,
-} from '@mui/material';
+import { Box, Button, TextField, Grid, Paper, Typography, Divider } from '@mui/material';
 import { profileInfoAction, ProfileValidationResult } from '@/actions/profile.actions';
 import { useProfile, useUpdateProfile } from '@/api/query/profile/profile.query';
 import { EMPTY_FORM_STATE } from '@/utils/form-state';
@@ -21,7 +13,7 @@ import { UpdateProfileDto } from '@/api/query/profile/profile.dto';
 const initialState: ProfileValidationResult = {
   success: false,
   data: null,
-  formState: EMPTY_FORM_STATE
+  formState: EMPTY_FORM_STATE,
 };
 
 export default function ProfileInfoForm() {
@@ -34,11 +26,12 @@ export default function ProfileInfoForm() {
   const processedDataRef = useRef<Record<string, string> | null>(null);
 
   useEffect(() => {
-    if (validationResult.success &&
+    if (
+      validationResult.success &&
       validationResult.data &&
       !updateProfileMutation.isPending &&
-      JSON.stringify(processedDataRef.current) !== JSON.stringify(validationResult.data)) {
-
+      JSON.stringify(processedDataRef.current) !== JSON.stringify(validationResult.data)
+    ) {
       processedDataRef.current = validationResult.data;
 
       const updateData: UpdateProfileDto = {
@@ -52,9 +45,9 @@ export default function ProfileInfoForm() {
           toast.success('Profile updated successfully');
           setEditMode(false);
         },
-        onError: (error) => {
+        onError: error => {
           toast.error(`Update failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        }
+        },
       });
     }
   }, [validationResult, updateProfileMutation, profile]);

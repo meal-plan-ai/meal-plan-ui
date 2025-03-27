@@ -12,7 +12,7 @@ import { useEffect, useRef } from 'react';
 const initialState: RegisterValidationResult = {
   success: false,
   data: null,
-  formState: EMPTY_FORM_STATE
+  formState: EMPTY_FORM_STATE,
 };
 
 export default function RegisterPage() {
@@ -23,11 +23,12 @@ export default function RegisterPage() {
   const { mutateAsync: register, isPending, errorMessage } = useRegisterWithRedirect();
 
   useEffect(() => {
-    if (validationResult.success &&
+    if (
+      validationResult.success &&
       validationResult.data &&
       !isPending &&
-      JSON.stringify(processedDataRef.current) !== JSON.stringify(validationResult.data)) {
-
+      JSON.stringify(processedDataRef.current) !== JSON.stringify(validationResult.data)
+    ) {
       processedDataRef.current = validationResult.data;
       register(validationResult.data);
     }

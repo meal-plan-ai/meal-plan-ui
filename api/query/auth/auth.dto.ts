@@ -4,11 +4,11 @@ export interface LoginRequestDto {
 }
 
 export interface LoginResponseDto {
-  success: boolean
+  success: boolean;
 }
 
 export interface LogoutResponseDto {
-  success: boolean
+  success: boolean;
 }
 
 export interface RegisterRequestDto {

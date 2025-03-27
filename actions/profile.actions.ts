@@ -4,18 +4,20 @@ import { z } from 'zod';
 import { FormState, fromErrorToFormState, toFormState } from '@/utils/form-state';
 
 const profileInfoSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
+  firstName: z.string().min(1, 'First name is required'),
+  lastName: z.string().min(1, 'Last name is required'),
 });
 
-const passwordChangeSchema = z.object({
-  currentPassword: z.string().min(1, "Current password is required"),
-  password: z.string().min(8, "New password must be at least 8 characters"),
-  confirmPassword: z.string().min(1, "Please confirm your new password"),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Passwords do not match",
-  path: ["confirmPassword"],
-});
+const passwordChangeSchema = z
+  .object({
+    currentPassword: z.string().min(1, 'Current password is required'),
+    password: z.string().min(8, 'New password must be at least 8 characters'),
+    confirmPassword: z.string().min(1, 'Please confirm your new password'),
+  })
+  .refine(data => data.password === data.confirmPassword, {
+    message: 'Passwords do not match',
+    path: ['confirmPassword'],
+  });
 
 export type ProfileValidationResult = {
   success: boolean;
@@ -45,13 +47,13 @@ export async function profileInfoAction(
     return {
       success: true,
       data: validatedData,
-      formState: toFormState('SUCCESS', 'Validation successful')
+      formState: toFormState('SUCCESS', 'Validation successful'),
     };
   } catch (error) {
     return {
       success: false,
       data: null,
-      formState: fromErrorToFormState(error)
+      formState: fromErrorToFormState(error),
     };
   }
 }
@@ -75,13 +77,13 @@ export async function passwordChangeAction(
         currentPassword: validatedData.currentPassword,
         password: validatedData.password,
       },
-      formState: toFormState('SUCCESS', 'Validation successful')
+      formState: toFormState('SUCCESS', 'Validation successful'),
     };
   } catch (error) {
     return {
       success: false,
       data: null,
-      formState: fromErrorToFormState(error)
+      formState: fromErrorToFormState(error),
     };
   }
 }

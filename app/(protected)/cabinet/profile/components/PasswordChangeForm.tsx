@@ -24,7 +24,7 @@ import toast from 'react-hot-toast';
 const initialState: PasswordChangeValidationResult = {
   success: false,
   data: null,
-  formState: EMPTY_FORM_STATE
+  formState: EMPTY_FORM_STATE,
 };
 
 export default function PasswordChangeForm() {
@@ -45,11 +45,12 @@ export default function PasswordChangeForm() {
   const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(prev => !prev);
 
   useEffect(() => {
-    if (validationResult.success &&
+    if (
+      validationResult.success &&
       validationResult.data &&
       !passwordChangeMutation.isPending &&
-      JSON.stringify(processedDataRef.current) !== JSON.stringify(validationResult.data)) {
-
+      JSON.stringify(processedDataRef.current) !== JSON.stringify(validationResult.data)
+    ) {
       processedDataRef.current = validationResult.data;
 
       passwordChangeMutation.mutate(validationResult.data, {
@@ -62,9 +63,11 @@ export default function PasswordChangeForm() {
             setPasswordSuccess(false);
           }, 3000);
         },
-        onError: (error) => {
-          toast.error(`Password change failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
-        }
+        onError: error => {
+          toast.error(
+            `Password change failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+          );
+        },
       });
     }
   }, [validationResult, passwordChangeMutation]);
@@ -86,11 +89,7 @@ export default function PasswordChangeForm() {
       <Divider sx={{ mb: 3 }} />
 
       {!showPasswordForm ? (
-        <Button
-          variant="outlined"
-          color="primary"
-          onClick={() => setShowPasswordForm(true)}
-        >
+        <Button variant="outlined" color="primary" onClick={() => setShowPasswordForm(true)}>
           Change Password
         </Button>
       ) : (

@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Typography,
-  Box,
-} from '@mui/material';
+import { AppBar, Toolbar, IconButton, Typography, Box } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import ThemeToggle from '../atoms/ThemeToggle';
 import ProfileMenu from '../molecules/ProfileMenu';
@@ -39,4 +33,4 @@ export default function Navbar({ onMenuClick }: NavbarProps) {
       </Toolbar>
     </AppBar>
   );
-} 
+}
