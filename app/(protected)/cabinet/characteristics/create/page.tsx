@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
+import { useActionState, useState, useEffect, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
-import { useFormState } from 'react-dom';
 import {
   Box,
   Typography,
@@ -15,289 +14,327 @@ import {
   Select,
   MenuItem,
   FormControlLabel,
-  Switch,
   Button,
   Divider,
-  Chip,
   IconButton,
   SelectChangeEvent,
   InputAdornment,
   Tooltip,
   Alert,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
+  Checkbox,
 } from '@mui/material';
 import {
   Add as AddIcon,
   Save as SaveIcon,
   ArrowBack as ArrowBackIcon,
   Refresh as RefreshIcon,
-  ExpandMore as ExpandMoreIcon,
   Info as InfoIcon,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { createCharacteristic } from '../actions';
 import { FormState, EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
-
-// Define a type for the nutrition characteristics
-type CharacteristicsType = {
-  name: string;
-  weight: number;
-  height: number;
-  age: number;
-  activityLevel: string;
-  goal: string;
-  caloriesTarget: number;
-  macroDistribution: {
-    protein: number;
-    carbs: number;
-    fat: number;
-  };
-  mealsPerDay: number;
-  includingSnacks: boolean;
-  nutrientTargets: {
-    fiber: number;
-    sugar: number;
-    sodium: number;
-  };
-  vitaminsAndMinerals: Array<{ name: string; priority: string }>;
-  avoidIngredients: string[];
-  preferences: {
-    organic: boolean;
-    seasonal: boolean;
-    localProduce: boolean;
-    sustainableSeafood: boolean;
-    budgetFriendly: boolean;
-  };
-};
+import { calculateCalories } from '@/utils/calorieCalculations';
+import {
+  ActivityLevel,
+  Gender,
+  Goal,
+  CookingComplexity,
+  MealCharacteristicDto,
+} from '@/api/query/meal-characteristics/meal-characteristics.dto';
+import ChipInputSection from '@/app/components/ChipInputSection';
 
 // Initial form state for validation
 const initialState: FormState = EMPTY_FORM_STATE;
+
+const preferences = [
+  'Organic',
+  'Local Produce',
+  'Budget Friendly',
+  'Seasonal',
+  'Sustainable Seafood',
+];
 
 export default function CreateCharacteristicsPage() {
   const router = useRouter();
   const [newVitamin, setNewVitamin] = useState('');
   const [newIngredient, setNewIngredient] = useState('');
+  const [newMedicalCondition, setNewMedicalCondition] = useState('');
+  const [newDietType, setNewDietType] = useState('');
   const [redirecting, setRedirecting] = useState(false);
+  const [newNutrientName, setNewNutrientName] = useState('');
+  const [newNutrientValue, setNewNutrientValue] = useState<number | ''>('');
 
   // Setup form state with server validation action
-  const [formState, action, isPending] = useFormState(createCharacteristic, initialState);
+  const [formState, action, isPending] = useActionState(createCharacteristic, initialState);
   const formRef = useFormReset(formState);
 
   // Check if submission was successful
-  if (formState.status === 'SUCCESS' && !redirecting) {
-    setRedirecting(true);
-    // Redirect after a successful submission
-    setTimeout(() => {
-      router.push('/cabinet/characteristics');
-    }, 1500);
-  }
+  useEffect(() => {
+    if (formState.status === 'SUCCESS' && !redirecting) {
+      setRedirecting(true);
+      // Redirect after a successful submission
+      const timer = setTimeout(() => {
+        router.push('/cabinet/characteristics');
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [formState.status, redirecting, router]);
 
-  const [characteristics, setCharacteristics] = useState<CharacteristicsType>({
+  const [characteristics, setCharacteristics] = useState<MealCharacteristicDto>({
     // Basic information
-    name: 'My New Nutrition Plan',
-    weight: 70, // in kg
-    height: 175, // in cm
+    planName: 'My New Nutrition Plan',
+    gender: Gender.MALE,
     age: 30,
-    activityLevel: 'moderate',
-    goal: 'maintain',
+    height: 175,
+    weight: 70,
+    activityLevel: ActivityLevel.MODERATE,
+    activityCalories: undefined,
+    goal: Goal.MAINTENANCE,
 
     // Caloric and macronutrient targets
-    caloriesTarget: 2000,
-    macroDistribution: {
-      protein: 30, // percentage
-      carbs: 40, // percentage
-      fat: 30, // percentage
-    },
+    targetDailyCalories: 2000,
+    proteinPercentage: 30,
+    carbsPercentage: 40,
+    fatPercentage: 30,
 
     // Meal frequency
     mealsPerDay: 3,
-    includingSnacks: true,
+    includeSnacks: 1,
 
-    // Specific nutritional requirements
+    // Diet preferences & restrictions
+    medicalConditions: ['Diabetes', 'High Blood Pressure'],
+    dietType: ['Vegan', 'Vegetarian'],
+    dietaryRestrictions: ['Shellfish', 'Peanuts'],
+
+    // Nutrients
     nutrientTargets: {
-      fiber: 25, // in grams
-      sugar: 25, // in grams
-      sodium: 2300, // in mg
+      fiber: 25,
+      sugar: 25,
+      sodium: 2300,
     },
 
-    // Vitamin and mineral focus
-    vitaminsAndMinerals: [
-      { name: 'Vitamin D', priority: 'high' },
-      { name: 'Iron', priority: 'medium' },
-      { name: 'Calcium', priority: 'medium' },
-    ],
-
-    // Dietary restrictions
-    avoidIngredients: ['Shellfish', 'Peanuts'],
+    // Vitamins and minerals
+    vitaminsAndMinerals: ['Vitamin D', 'Iron', 'Calcium'],
 
     // Additional preferences
-    preferences: {
-      organic: false,
-      seasonal: true,
-      localProduce: false,
-      sustainableSeafood: true,
-      budgetFriendly: true,
-    },
+    additionalPreferences: ['Organic', 'Seasonal', 'Sustainable Seafood', 'Budget Friendly'],
+
+    cookingComplexity: CookingComplexity.STANDARD,
   });
 
+  // Memoize calculation parameters for calorie calculation
+  const calculationParams = useMemo(
+    () => ({
+      weight: characteristics.weight,
+      height: characteristics.height,
+      age: characteristics.age,
+      activityLevel: characteristics.activityLevel,
+      activityCalories: characteristics.activityCalories,
+      goal: characteristics.goal,
+    }),
+    [
+      characteristics.weight,
+      characteristics.height,
+      characteristics.age,
+      characteristics.activityLevel,
+      characteristics.activityCalories,
+      characteristics.goal,
+    ]
+  );
+
   // Handle text and number inputs
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    // Handle nested properties
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
+    // Handle nested properties for nutrientTargets
+    if (name.startsWith('nutrientTargets.')) {
+      const nutrientName = name.split('.')[1];
       setCharacteristics(prev => ({
         ...prev,
-        [parent]: {
-          ...(prev[parent as keyof CharacteristicsType] as object),
-          [child]: value,
+        nutrientTargets: {
+          ...(prev.nutrientTargets || {}),
+          [nutrientName]: Number(value),
         },
       }));
     } else {
       setCharacteristics(prev => ({ ...prev, [name]: value }));
     }
-  };
+  }, []);
 
   // Handle slider changes
-  const handleSliderChange = (name: string) => (event: Event, newValue: number | number[]) => {
-    if (typeof newValue === 'number') {
-      if (name.includes('.')) {
-        const [parent, child] = name.split('.');
-        setCharacteristics(prev => ({
-          ...prev,
-          [parent]: {
-            ...(prev[parent as keyof CharacteristicsType] as object),
-            [child]: newValue,
-          },
-        }));
-      } else {
+  const handleSliderChange = useCallback(
+    (name: string) => (event: Event, newValue: number | number[]) => {
+      if (typeof newValue === 'number') {
         setCharacteristics(prev => ({ ...prev, [name]: newValue }));
       }
-    }
-  };
+    },
+    []
+  );
 
   // Handle select changes
-  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+  const handleSelectChange = useCallback((e: SelectChangeEvent<string>) => {
     const { name, value } = e.target;
     setCharacteristics(prev => ({ ...prev, [name]: value }));
-  };
-
-  // Handle switch changes
-  const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setCharacteristics(prev => ({
-        ...prev,
-        [parent]: {
-          ...(prev[parent as keyof CharacteristicsType] as object),
-          [child]: checked,
-        },
-      }));
-    } else {
-      setCharacteristics(prev => ({ ...prev, [name]: checked }));
-    }
-  };
-
-  // Handle vitamin/mineral priority change
-  const handlePriorityChange = (index: number, priority: string) => {
-    const updatedVitamins = [...characteristics.vitaminsAndMinerals];
-    updatedVitamins[index].priority = priority;
-    setCharacteristics(prev => ({ ...prev, vitaminsAndMinerals: updatedVitamins }));
-  };
+  }, []);
 
   // Add a new vitamin/mineral
-  const handleAddVitamin = () => {
+  const handleAddVitamin = useCallback(() => {
     if (newVitamin.trim()) {
       setCharacteristics(prev => ({
         ...prev,
-        vitaminsAndMinerals: [
-          ...prev.vitaminsAndMinerals,
-          { name: newVitamin, priority: 'medium' },
-        ],
+        vitaminsAndMinerals: [...(prev.vitaminsAndMinerals || []), newVitamin],
       }));
       setNewVitamin('');
     }
-  };
+  }, [newVitamin]);
 
   // Remove a vitamin/mineral
-  const handleRemoveVitamin = (index: number) => {
-    const updatedVitamins = [...characteristics.vitaminsAndMinerals];
-    updatedVitamins.splice(index, 1);
-    setCharacteristics(prev => ({ ...prev, vitaminsAndMinerals: updatedVitamins }));
-  };
+  const handleRemoveVitamin = useCallback((index: number) => {
+    setCharacteristics(prev => ({
+      ...prev,
+      vitaminsAndMinerals: (prev.vitaminsAndMinerals || []).filter((_, i) => i !== index),
+    }));
+  }, []);
 
   // Add a new ingredient to avoid
-  const handleAddIngredient = () => {
-    if (newIngredient.trim() && !characteristics.avoidIngredients.includes(newIngredient)) {
+  const handleAddIngredient = useCallback(() => {
+    if (newIngredient.trim() && !characteristics.dietaryRestrictions?.includes(newIngredient)) {
       setCharacteristics(prev => ({
         ...prev,
-        avoidIngredients: [...prev.avoidIngredients, newIngredient],
+        dietaryRestrictions: [...(prev.dietaryRestrictions || []), newIngredient],
       }));
       setNewIngredient('');
     }
-  };
+  }, [newIngredient, characteristics.dietaryRestrictions]);
 
   // Remove an ingredient
-  const handleRemoveIngredient = (ingredient: string) => {
+  const handleRemoveIngredient = useCallback((ingredient: string) => {
     setCharacteristics(prev => ({
       ...prev,
-      avoidIngredients: prev.avoidIngredients.filter(item => item !== ingredient),
+      dietaryRestrictions: (prev.dietaryRestrictions || []).filter(item => item !== ingredient),
     }));
-  };
+  }, []);
 
-  // Calculate BMR and suggested calories
-  const calculateCalories = () => {
-    // Mifflin-St Jeor Equation
-    const { weight, height, age, activityLevel, goal } = characteristics;
-
-    // BMR calculation
-    const bmr = 10 * weight + 6.25 * height - 5 * age + 5;
-
-    // Activity multiplier
-    let activityMultiplier;
-    switch (activityLevel) {
-      case 'sedentary':
-        activityMultiplier = 1.2;
-        break;
-      case 'light':
-        activityMultiplier = 1.375;
-        break;
-      case 'moderate':
-        activityMultiplier = 1.55;
-        break;
-      case 'active':
-        activityMultiplier = 1.725;
-        break;
-      case 'veryActive':
-        activityMultiplier = 1.9;
-        break;
-      default:
-        activityMultiplier = 1.55;
+  // Add a new medical condition
+  const handleAddMedicalCondition = useCallback(() => {
+    if (
+      newMedicalCondition.trim() &&
+      !characteristics.medicalConditions?.includes(newMedicalCondition)
+    ) {
+      setCharacteristics(prev => ({
+        ...prev,
+        medicalConditions: [...(prev.medicalConditions || []), newMedicalCondition],
+      }));
+      setNewMedicalCondition('');
     }
+  }, [newMedicalCondition, characteristics.medicalConditions]);
 
-    let caloriesTarget = Math.round(bmr * activityMultiplier);
+  // Remove a medical condition
+  const handleRemoveMedicalCondition = useCallback((condition: string) => {
+    setCharacteristics(prev => ({
+      ...prev,
+      medicalConditions: (prev.medicalConditions || []).filter(item => item !== condition),
+    }));
+  }, []);
 
-    // Goal adjustment
-    switch (goal) {
-      case 'lose':
-        caloriesTarget = Math.round(caloriesTarget * 0.8);
-        break; // 20% deficit
-      case 'gain':
-        caloriesTarget = Math.round(caloriesTarget * 1.15);
-        break; // 15% surplus
+  // Add a new diet type
+  const handleAddDietType = useCallback(() => {
+    if (newDietType.trim() && !characteristics.dietType?.includes(newDietType)) {
+      setCharacteristics(prev => ({
+        ...prev,
+        dietType: [...(prev.dietType || []), newDietType],
+      }));
+      setNewDietType('');
     }
+  }, [newDietType, characteristics.dietType]);
 
-    setCharacteristics(prev => ({ ...prev, caloriesTarget }));
-  };
+  // Remove a diet type
+  const handleRemoveDietType = useCallback((dietType: string) => {
+    setCharacteristics(prev => ({
+      ...prev,
+      dietType: (prev.dietType || []).filter(item => item !== dietType),
+    }));
+  }, []);
 
-  const handleCancel = () => {
+  // Calculate calories using the utility function
+  const handleCalculateCalories = useCallback(() => {
+    const targetCalories = calculateCalories(calculationParams);
+    if (targetCalories) {
+      setCharacteristics(prev => ({ ...prev, targetDailyCalories: targetCalories }));
+    }
+  }, [calculationParams]);
+
+  // Add a new custom nutrient target
+  const handleAddNutrientTarget = useCallback(() => {
+    if (newNutrientName.trim() && newNutrientValue !== '') {
+      setCharacteristics(prev => ({
+        ...prev,
+        nutrientTargets: {
+          ...(prev.nutrientTargets || {}),
+          [newNutrientName.trim()]: Number(newNutrientValue),
+        },
+      }));
+      setNewNutrientName('');
+      setNewNutrientValue('');
+    }
+  }, [newNutrientName, newNutrientValue]);
+
+  // Remove a nutrient target
+  const handleRemoveNutrientTarget = useCallback((nutrientName: string) => {
+    setCharacteristics(prev => {
+      const updatedTargets = { ...(prev.nutrientTargets || {}) };
+      delete updatedTargets[nutrientName];
+      return {
+        ...prev,
+        nutrientTargets: updatedTargets,
+      };
+    });
+  }, []);
+
+  // Handle preference checkbox changes
+  const handlePreferenceChange = useCallback((preference: string, isChecked: boolean) => {
+    setCharacteristics(prev => {
+      const currentPreferences = [...(prev.additionalPreferences || [])];
+      if (isChecked && !currentPreferences.includes(preference)) {
+        return {
+          ...prev,
+          additionalPreferences: [...currentPreferences, preference],
+        };
+      } else if (!isChecked && currentPreferences.includes(preference)) {
+        return {
+          ...prev,
+          additionalPreferences: currentPreferences.filter(p => p !== preference),
+        };
+      }
+      return prev;
+    });
+  }, []);
+
+  const handleCancel = useCallback(() => {
     router.push('/cabinet/characteristics');
-  };
+  }, [router]);
+
+  // Memoize macro nutrient gram calculations for the UI tooltips
+  const macroGrams = useMemo(() => {
+    const { targetDailyCalories, proteinPercentage, carbsPercentage, fatPercentage } =
+      characteristics;
+    return {
+      protein: Math.round(((targetDailyCalories || 0) * (proteinPercentage || 0)) / 400),
+      carbs: Math.round(((targetDailyCalories || 0) * (carbsPercentage || 0)) / 400),
+      fat: Math.round(((targetDailyCalories || 0) * (fatPercentage || 0)) / 900),
+    };
+  }, [characteristics]);
+
+  // Memoize validation for macros sum
+  const macroValidation = useMemo(() => {
+    const { proteinPercentage, carbsPercentage, fatPercentage } = characteristics;
+    const total = (proteinPercentage || 0) + (carbsPercentage || 0) + (fatPercentage || 0);
+    return {
+      total,
+      isValid: Math.abs(total - 100) <= 0.1,
+    };
+  }, [characteristics]);
 
   return (
     <Box>
@@ -333,14 +370,14 @@ export default function CreateCharacteristicsPage() {
             <Grid item xs={12}>
               <TextField
                 label="Plan Name"
-                name="name"
-                value={characteristics.name}
+                name="planName"
+                value={characteristics.planName}
                 onChange={handleInputChange}
                 fullWidth
                 variant="outlined"
                 sx={{ mb: 2 }}
-                error={Boolean(formState.fieldErrors?.name)}
-                helperText={formState.fieldErrors?.name?.[0]}
+                error={Boolean(formState.fieldErrors?.planName)}
+                helperText={formState.fieldErrors?.planName?.[0]}
               />
             </Grid>
 
@@ -348,12 +385,32 @@ export default function CreateCharacteristicsPage() {
             <input
               type="hidden"
               name="vitaminsAndMinerals"
-              value={JSON.stringify(characteristics.vitaminsAndMinerals)}
+              value={JSON.stringify(characteristics.vitaminsAndMinerals || [])}
             />
             <input
               type="hidden"
-              name="avoidIngredients"
-              value={JSON.stringify(characteristics.avoidIngredients)}
+              name="dietaryRestrictions"
+              value={JSON.stringify(characteristics.dietaryRestrictions || [])}
+            />
+            <input
+              type="hidden"
+              name="additionalPreferences"
+              value={JSON.stringify(characteristics.additionalPreferences || [])}
+            />
+            <input
+              type="hidden"
+              name="medicalConditions"
+              value={JSON.stringify(characteristics.medicalConditions || [])}
+            />
+            <input
+              type="hidden"
+              name="dietType"
+              value={JSON.stringify(characteristics.dietType || [])}
+            />
+            <input
+              type="hidden"
+              name="nutrientTargets"
+              value={JSON.stringify(characteristics.nutrientTargets || {})}
             />
 
             <Grid item xs={12} sm={4}>
@@ -361,7 +418,7 @@ export default function CreateCharacteristicsPage() {
                 label="Weight"
                 type="number"
                 name="weight"
-                value={characteristics.weight}
+                value={characteristics.weight || ''}
                 onChange={handleInputChange}
                 fullWidth
                 InputProps={{
@@ -377,7 +434,7 @@ export default function CreateCharacteristicsPage() {
                 label="Height"
                 type="number"
                 name="height"
-                value={characteristics.height}
+                value={characteristics.height || ''}
                 onChange={handleInputChange}
                 fullWidth
                 InputProps={{
@@ -393,12 +450,52 @@ export default function CreateCharacteristicsPage() {
                 label="Age"
                 type="number"
                 name="age"
-                value={characteristics.age}
+                value={characteristics.age || ''}
                 onChange={handleInputChange}
                 fullWidth
                 error={Boolean(formState.fieldErrors?.age)}
                 helperText={formState.fieldErrors?.age?.[0]}
               />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth error={Boolean(formState.fieldErrors?.gender)}>
+                <InputLabel>Gender</InputLabel>
+                <Select
+                  name="gender"
+                  value={characteristics.gender || ''}
+                  onChange={handleSelectChange}
+                  label="Gender"
+                >
+                  <MenuItem value={Gender.MALE}>Male</MenuItem>
+                  <MenuItem value={Gender.FEMALE}>Female</MenuItem>
+                  <MenuItem value={Gender.OTHER}>Other</MenuItem>
+                </Select>
+                {formState.fieldErrors?.gender && (
+                  <Typography color="error" variant="caption">
+                    {formState.fieldErrors.gender[0]}
+                  </Typography>
+                )}
+              </FormControl>
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl fullWidth error={Boolean(formState.fieldErrors?.goal)}>
+                <InputLabel>Goal</InputLabel>
+                <Select
+                  name="goal"
+                  value={characteristics.goal || ''}
+                  onChange={handleSelectChange}
+                  label="Goal"
+                >
+                  <MenuItem value={Goal.WEIGHT_LOSS}>Weight Loss</MenuItem>
+                  <MenuItem value={Goal.MAINTENANCE}>Maintenance</MenuItem>
+                  <MenuItem value={Goal.MUSCLE_GAIN}>Muscle Gain</MenuItem>
+                </Select>
+                {formState.fieldErrors?.goal && (
+                  <Typography color="error" variant="caption">
+                    {formState.fieldErrors.goal[0]}
+                  </Typography>
+                )}
+              </FormControl>
             </Grid>
 
             <Grid item xs={12} sm={6}>
@@ -406,15 +503,23 @@ export default function CreateCharacteristicsPage() {
                 <InputLabel>Activity Level</InputLabel>
                 <Select
                   name="activityLevel"
-                  value={characteristics.activityLevel}
+                  value={characteristics.activityLevel || ''}
                   onChange={handleSelectChange}
                   label="Activity Level"
                 >
-                  <MenuItem value="sedentary">Sedentary (little to no exercise)</MenuItem>
-                  <MenuItem value="light">Light (light exercise 1-3 days/week)</MenuItem>
-                  <MenuItem value="moderate">Moderate (moderate exercise 3-5 days/week)</MenuItem>
-                  <MenuItem value="active">Active (hard exercise 6-7 days/week)</MenuItem>
-                  <MenuItem value="veryActive">
+                  <MenuItem value={ActivityLevel.SEDENTARY}>
+                    Sedentary (little to no exercise)
+                  </MenuItem>
+                  <MenuItem value={ActivityLevel.LIGHT}>
+                    Light (light exercise 1-3 days/week)
+                  </MenuItem>
+                  <MenuItem value={ActivityLevel.MODERATE}>
+                    Moderate (moderate exercise 3-5 days/week)
+                  </MenuItem>
+                  <MenuItem value={ActivityLevel.ACTIVE}>
+                    Active (hard exercise 6-7 days/week)
+                  </MenuItem>
+                  <MenuItem value={ActivityLevel.VERY_ACTIVE}>
                     Very Active (very hard exercise & physical job)
                   </MenuItem>
                 </Select>
@@ -427,44 +532,25 @@ export default function CreateCharacteristicsPage() {
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <FormControl fullWidth error={Boolean(formState.fieldErrors?.goal)}>
-                <InputLabel>Goal</InputLabel>
-                <Select
-                  name="goal"
-                  value={characteristics.goal}
-                  onChange={handleSelectChange}
-                  label="Goal"
-                >
-                  <MenuItem value="lose">Weight Loss</MenuItem>
-                  <MenuItem value="maintain">Maintenance</MenuItem>
-                  <MenuItem value="gain">Weight Gain</MenuItem>
-                </Select>
-                {formState.fieldErrors?.goal && (
-                  <Typography color="error" variant="caption">
-                    {formState.fieldErrors.goal[0]}
-                  </Typography>
-                )}
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+              <Box sx={{ display: 'flex', height: '100%', width: '100%' }}>
                 <Button
                   variant="outlined"
                   color="secondary"
-                  onClick={calculateCalories}
+                  onClick={handleCalculateCalories}
                   startIcon={<RefreshIcon />}
                 >
                   Calculate Suggested Calories
                 </Button>
               </Box>
+            </Grid>
 
+            <Grid item xs={12}>
               <Typography gutterBottom>
-                Target Daily Calories: {characteristics.caloriesTarget} kcal
+                Target Daily Calories: {characteristics.targetDailyCalories || 0} kcal
               </Typography>
               <Slider
-                value={characteristics.caloriesTarget}
-                onChange={handleSliderChange('caloriesTarget')}
+                value={characteristics.targetDailyCalories || 2000}
+                onChange={handleSliderChange('targetDailyCalories')}
                 min={1200}
                 max={4000}
                 step={50}
@@ -477,90 +563,84 @@ export default function CreateCharacteristicsPage() {
                   { value: 3500, label: '3500' },
                 ]}
               />
-              {formState.fieldErrors?.caloriesTarget && (
+              {formState.fieldErrors?.targetDailyCalories && (
                 <Typography color="error" variant="caption">
-                  {formState.fieldErrors.caloriesTarget[0]}
+                  {formState.fieldErrors.targetDailyCalories[0]}
                 </Typography>
               )}
             </Grid>
 
             <Grid item xs={12} sm={4}>
               <Typography gutterBottom>
-                Protein: {characteristics.macroDistribution.protein}%
-                <Tooltip
-                  title={`Approximately ${Math.round((characteristics.caloriesTarget * characteristics.macroDistribution.protein) / 400)}g of protein per day`}
-                >
+                Protein: {characteristics.proteinPercentage || 0}%
+                <Tooltip title={`Approximately ${macroGrams.protein}g of protein per day`}>
                   <IconButton size="small">
                     <InfoIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               </Typography>
               <Slider
-                name="macroDistribution.protein"
-                value={characteristics.macroDistribution.protein}
-                onChange={handleSliderChange('macroDistribution.protein')}
+                name="proteinPercentage"
+                value={characteristics.proteinPercentage || 0}
+                onChange={handleSliderChange('proteinPercentage')}
                 min={10}
                 max={60}
                 step={5}
                 valueLabelDisplay="auto"
               />
-              {formState.fieldErrors?.['macroDistribution.protein'] && (
+              {formState.fieldErrors?.proteinPercentage && (
                 <Typography color="error" variant="caption">
-                  {formState.fieldErrors['macroDistribution.protein'][0]}
+                  {formState.fieldErrors.proteinPercentage[0]}
                 </Typography>
               )}
             </Grid>
 
             <Grid item xs={12} sm={4}>
               <Typography gutterBottom>
-                Carbs: {characteristics.macroDistribution.carbs}%
-                <Tooltip
-                  title={`Approximately ${Math.round((characteristics.caloriesTarget * characteristics.macroDistribution.carbs) / 400)}g of carbs per day`}
-                >
+                Carbs: {characteristics.carbsPercentage || 0}%
+                <Tooltip title={`Approximately ${macroGrams.carbs}g of carbs per day`}>
                   <IconButton size="small">
                     <InfoIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               </Typography>
               <Slider
-                name="macroDistribution.carbs"
-                value={characteristics.macroDistribution.carbs}
-                onChange={handleSliderChange('macroDistribution.carbs')}
+                name="carbsPercentage"
+                value={characteristics.carbsPercentage || 0}
+                onChange={handleSliderChange('carbsPercentage')}
                 min={10}
                 max={70}
                 step={5}
                 valueLabelDisplay="auto"
               />
-              {formState.fieldErrors?.['macroDistribution.carbs'] && (
+              {formState.fieldErrors?.carbsPercentage && (
                 <Typography color="error" variant="caption">
-                  {formState.fieldErrors['macroDistribution.carbs'][0]}
+                  {formState.fieldErrors.carbsPercentage[0]}
                 </Typography>
               )}
             </Grid>
 
             <Grid item xs={12} sm={4}>
               <Typography gutterBottom>
-                Fat: {characteristics.macroDistribution.fat}%
-                <Tooltip
-                  title={`Approximately ${Math.round((characteristics.caloriesTarget * characteristics.macroDistribution.fat) / 900)}g of fat per day`}
-                >
+                Fat: {characteristics.fatPercentage || 0}%
+                <Tooltip title={`Approximately ${macroGrams.fat}g of fat per day`}>
                   <IconButton size="small">
                     <InfoIcon fontSize="small" />
                   </IconButton>
                 </Tooltip>
               </Typography>
               <Slider
-                name="macroDistribution.fat"
-                value={characteristics.macroDistribution.fat}
-                onChange={handleSliderChange('macroDistribution.fat')}
+                name="fatPercentage"
+                value={characteristics.fatPercentage || 0}
+                onChange={handleSliderChange('fatPercentage')}
                 min={10}
                 max={60}
                 step={5}
                 valueLabelDisplay="auto"
               />
-              {formState.fieldErrors?.['macroDistribution.fat'] && (
+              {formState.fieldErrors?.fatPercentage && (
                 <Typography color="error" variant="caption">
-                  {formState.fieldErrors['macroDistribution.fat'][0]}
+                  {formState.fieldErrors.fatPercentage[0]}
                 </Typography>
               )}
             </Grid>
@@ -572,318 +652,269 @@ export default function CreateCharacteristicsPage() {
               </Grid>
             )}
 
-            {Math.abs(
-              characteristics.macroDistribution.protein +
-                characteristics.macroDistribution.carbs +
-                characteristics.macroDistribution.fat -
-                100
-            ) > 0.1 && (
+            {!macroValidation.isValid && (
               <Grid item xs={12}>
                 <Alert severity="warning">
                   Macronutrient percentages should sum to 100%. Current total:{' '}
-                  {characteristics.macroDistribution.protein +
-                    characteristics.macroDistribution.carbs +
-                    characteristics.macroDistribution.fat}
-                  %
+                  {macroValidation.total}%
                 </Alert>
               </Grid>
             )}
 
             <Grid item xs={12} sm={6}>
-              <TextField
-                label="Meals Per Day"
-                type="number"
-                name="mealsPerDay"
-                value={characteristics.mealsPerDay}
-                onChange={handleInputChange}
-                fullWidth
-                error={Boolean(formState.fieldErrors?.mealsPerDay)}
-                helperText={formState.fieldErrors?.mealsPerDay?.[0]}
-              />
+              <FormControl fullWidth error={Boolean(formState.fieldErrors?.mealsPerDay)}>
+                <InputLabel>Meals Per Day</InputLabel>
+                <Select
+                  name="mealsPerDay"
+                  value={characteristics.mealsPerDay?.toString() || '3'}
+                  onChange={e => {
+                    setCharacteristics(prev => ({
+                      ...prev,
+                      mealsPerDay: Number(e.target.value),
+                    }));
+                  }}
+                  label="Meals Per Day"
+                >
+                  <MenuItem value="1">1 Meal</MenuItem>
+                  <MenuItem value="2">2 Meals</MenuItem>
+                  <MenuItem value="3">3 Meals</MenuItem>
+                  <MenuItem value="4">4 Meals</MenuItem>
+                  <MenuItem value="5">5 Meals</MenuItem>
+                </Select>
+                {formState.fieldErrors?.mealsPerDay && (
+                  <Typography color="error" variant="caption">
+                    {formState.fieldErrors.mealsPerDay[0]}
+                  </Typography>
+                )}
+              </FormControl>
             </Grid>
 
             <Grid item xs={12} sm={6}>
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={characteristics.includingSnacks}
-                    onChange={handleSwitchChange}
-                    name="includingSnacks"
-                  />
-                }
-                label="Include Snacks"
-              />
+              <FormControl fullWidth>
+                <InputLabel>Snacks</InputLabel>
+                <Select
+                  name="includeSnacks"
+                  value={characteristics.includeSnacks?.toString() || '1'}
+                  onChange={e => {
+                    setCharacteristics(prev => ({
+                      ...prev,
+                      includeSnacks: Number(e.target.value),
+                    }));
+                  }}
+                  label="Snacks"
+                >
+                  <MenuItem value="1">1 Snack</MenuItem>
+                  <MenuItem value="2">2 Snacks</MenuItem>
+                  <MenuItem value="3">3 Snacks</MenuItem>
+                </Select>
+              </FormControl>
               <input
                 type="hidden"
-                name="includingSnacks"
-                value={characteristics.includingSnacks.toString()}
+                name="includeSnacks"
+                value={characteristics.includeSnacks?.toString() || '1'}
               />
+            </Grid>
+
+            <Grid item xs={6}>
+              <ChipInputSection
+                title="Medical Conditions"
+                description="Add any medical conditions that may affect your nutrition plan:"
+                items={characteristics.medicalConditions || []}
+                onAdd={handleAddMedicalCondition}
+                onRemove={handleRemoveMedicalCondition}
+                inputValue={newMedicalCondition}
+                onInputChange={e => setNewMedicalCondition(e.target.value)}
+                inputLabel="Add Medical Condition"
+              />
+            </Grid>
+
+            <Grid item xs={6}>
+              <ChipInputSection
+                title="Diet Type"
+                description="Select diet types that apply to you:"
+                items={characteristics.dietType || []}
+                onAdd={handleAddDietType}
+                onRemove={handleRemoveDietType}
+                inputValue={newDietType}
+                onInputChange={e => setNewDietType(e.target.value)}
+                inputLabel="Add Diet Type"
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <ChipInputSection
+                title="Vitamins & Minerals"
+                description="Select vitamins and minerals you want to prioritize in your meal plan:"
+                items={characteristics.vitaminsAndMinerals || []}
+                onAdd={handleAddVitamin}
+                onRemove={vitamin => {
+                  const index = characteristics.vitaminsAndMinerals?.indexOf(vitamin) || -1;
+                  if (index !== -1) {
+                    handleRemoveVitamin(index);
+                  }
+                }}
+                inputValue={newVitamin}
+                onInputChange={e => setNewVitamin(e.target.value)}
+                inputLabel="Add Vitamin or Mineral"
+              />
+            </Grid>
+            <Grid item xs={6}>
+              <ChipInputSection
+                title="Dietary Restrictions"
+                description="Add ingredients you want to avoid in your meal plan:"
+                items={characteristics.dietaryRestrictions || []}
+                onAdd={handleAddIngredient}
+                onRemove={handleRemoveIngredient}
+                inputValue={newIngredient}
+                onInputChange={e => setNewIngredient(e.target.value)}
+                inputLabel="Add Ingredient to Avoid"
+              />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                Nutrient Targets
+              </Typography>
+              {/* Display custom nutrient targets */}
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                {characteristics.nutrientTargets &&
+                  Object.entries(characteristics.nutrientTargets).map(([nutrientName, value]) => (
+                    <Grid item xs={12} sm={4} key={nutrientName}>
+                      <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                        <TextField
+                          label={nutrientName}
+                          type="number"
+                          value={value}
+                          onChange={e => {
+                            setCharacteristics(prev => ({
+                              ...prev,
+                              nutrientTargets: {
+                                ...(prev.nutrientTargets || {}),
+                                [nutrientName]: Number(e.target.value),
+                              },
+                            }));
+                          }}
+                          fullWidth
+                          InputProps={{
+                            endAdornment: <InputAdornment position="end">g</InputAdornment>,
+                          }}
+                        />
+                        <IconButton
+                          color="error"
+                          onClick={() => handleRemoveNutrientTarget(nutrientName)}
+                          sx={{ ml: 1 }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
+                    </Grid>
+                  ))}
+              </Grid>
+
+              {/* Add new nutrient target fields */}
+              <Typography variant="subtitle2" sx={{ mt: 3, mb: 1 }}>
+                Add Custom Nutrient Target
+              </Typography>
+              <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                <TextField
+                  label="Nutrient Name"
+                  value={newNutrientName}
+                  onChange={e => setNewNutrientName(e.target.value)}
+                  size="small"
+                  fullWidth
+                />
+                <TextField
+                  label="Target Value"
+                  type="number"
+                  value={newNutrientValue}
+                  onChange={e =>
+                    setNewNutrientValue(e.target.value === '' ? '' : Number(e.target.value))
+                  }
+                  size="small"
+                  fullWidth
+                  InputProps={{
+                    endAdornment: <InputAdornment position="end">g</InputAdornment>,
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleAddNutrientTarget}
+                  disabled={!newNutrientName.trim() || newNutrientValue === ''}
+                  startIcon={<AddIcon />}
+                >
+                  Add
+                </Button>
+              </Box>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                Cooking Complexity
+              </Typography>
+              <FormControl fullWidth>
+                <InputLabel>Cooking Complexity</InputLabel>
+                <Select
+                  name="cookingComplexity"
+                  value={characteristics.cookingComplexity || ''}
+                  onChange={handleSelectChange}
+                  label="Cooking Complexity"
+                >
+                  <MenuItem value={CookingComplexity.QUICK}>Quick & Easy</MenuItem>
+                  <MenuItem value={CookingComplexity.STANDARD}>Standard</MenuItem>
+                  <MenuItem value={CookingComplexity.GOURMET}>Gourmet</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+              <Divider sx={{ my: 2 }} />
+              <Typography variant="h6" gutterBottom>
+                Additional Preferences
+              </Typography>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Select additional preferences for your meal plan:
+              </Typography>
+
+              <Grid container spacing={2} sx={{ mt: 1 }}>
+                {preferences.map(preference => (
+                  <Grid item xs={12} sm={6} md={4} key={preference}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          checked={(characteristics.additionalPreferences || []).includes(
+                            preference
+                          )}
+                          onChange={e => handlePreferenceChange(preference, e.target.checked)}
+                        />
+                      }
+                      label={preference}
+                    />
+                  </Grid>
+                ))}
+              </Grid>
             </Grid>
           </Grid>
 
           <Divider sx={{ my: 3 }} />
 
-          <Accordion defaultExpanded>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="subtitle1">Nutrient Targets</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={3}>
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    label="Fiber"
-                    type="number"
-                    name="nutrientTargets.fiber"
-                    value={characteristics.nutrientTargets.fiber}
-                    onChange={handleInputChange}
-                    fullWidth
-                    InputProps={{
-                      endAdornment: <InputAdornment position="end">g</InputAdornment>,
-                    }}
-                    error={Boolean(formState.fieldErrors?.['nutrientTargets.fiber'])}
-                    helperText={formState.fieldErrors?.['nutrientTargets.fiber']?.[0]}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    label="Sugar"
-                    type="number"
-                    name="nutrientTargets.sugar"
-                    value={characteristics.nutrientTargets.sugar}
-                    onChange={handleInputChange}
-                    fullWidth
-                    InputProps={{
-                      endAdornment: <InputAdornment position="end">g</InputAdornment>,
-                    }}
-                    error={Boolean(formState.fieldErrors?.['nutrientTargets.sugar'])}
-                    helperText={formState.fieldErrors?.['nutrientTargets.sugar']?.[0]}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={4}>
-                  <TextField
-                    label="Sodium"
-                    type="number"
-                    name="nutrientTargets.sodium"
-                    value={characteristics.nutrientTargets.sodium}
-                    onChange={handleInputChange}
-                    fullWidth
-                    InputProps={{
-                      endAdornment: <InputAdornment position="end">mg</InputAdornment>,
-                    }}
-                    error={Boolean(formState.fieldErrors?.['nutrientTargets.sodium'])}
-                    helperText={formState.fieldErrors?.['nutrientTargets.sodium']?.[0]}
-                  />
-                </Grid>
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion defaultExpanded>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="subtitle1">Vitamins & Minerals</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="body2" color="text.secondary" gutterBottom>
-                  Select vitamins and minerals you want to prioritize in your meal plan:
-                </Typography>
-
-                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mt: 2 }}>
-                  {characteristics.vitaminsAndMinerals.map((vitamin, index) => (
-                    <Chip
-                      key={index}
-                      label={vitamin.name}
-                      color={
-                        vitamin.priority === 'high'
-                          ? 'primary'
-                          : vitamin.priority === 'medium'
-                            ? 'secondary'
-                            : 'default'
-                      }
-                      onDelete={() => handleRemoveVitamin(index)}
-                      onClick={() => {
-                        const priorities = ['low', 'medium', 'high'];
-                        const currentIndex = priorities.indexOf(vitamin.priority);
-                        const nextPriority = priorities[(currentIndex + 1) % priorities.length];
-                        handlePriorityChange(index, nextPriority);
-                      }}
-                    />
-                  ))}
-                </Box>
-              </Box>
-
-              <Box sx={{ display: 'flex', alignItems: 'center', mt: 2 }}>
-                <TextField
-                  label="Add Vitamin or Mineral"
-                  value={newVitamin}
-                  onChange={e => setNewVitamin(e.target.value)}
-                  onKeyPress={e => e.key === 'Enter' && handleAddVitamin()}
-                  size="small"
-                  fullWidth
-                />
-                <IconButton color="primary" onClick={handleAddVitamin} sx={{ ml: 1 }}>
-                  <AddIcon />
-                </IconButton>
-              </Box>
-
-              <Typography variant="body2" color="text.secondary" sx={{ mt: 2, fontSize: '0.8rem' }}>
-                Tip: Click on a chip to cycle through priority levels (low, medium, high)
-              </Typography>
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion defaultExpanded>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="subtitle1">Dietary Restrictions</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography variant="body2" color="text.secondary" gutterBottom>
-                Add ingredients you want to avoid in your meal plan:
-              </Typography>
-
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, mb: 2, mt: 1 }}>
-                {characteristics.avoidIngredients.map((ingredient, index) => (
-                  <Chip
-                    key={index}
-                    label={ingredient}
-                    onDelete={() => handleRemoveIngredient(ingredient)}
-                  />
-                ))}
-              </Box>
-
-              <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                <TextField
-                  label="Add Ingredient to Avoid"
-                  value={newIngredient}
-                  onChange={e => setNewIngredient(e.target.value)}
-                  onKeyPress={e => e.key === 'Enter' && handleAddIngredient()}
-                  size="small"
-                  fullWidth
-                />
-                <IconButton color="primary" onClick={handleAddIngredient} sx={{ ml: 1 }}>
-                  <AddIcon />
-                </IconButton>
-              </Box>
-            </AccordionDetails>
-          </Accordion>
-
-          <Accordion defaultExpanded>
-            <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-              <Typography variant="subtitle1">Additional Preferences</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={characteristics.preferences.organic}
-                        onChange={handleSwitchChange}
-                        name="preferences.organic"
-                      />
-                    }
-                    label="Prefer Organic Ingredients"
-                  />
-                  <input
-                    type="hidden"
-                    name="preferences.organic"
-                    value={characteristics.preferences.organic.toString()}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={characteristics.preferences.seasonal}
-                        onChange={handleSwitchChange}
-                        name="preferences.seasonal"
-                      />
-                    }
-                    label="Prefer Seasonal Ingredients"
-                  />
-                  <input
-                    type="hidden"
-                    name="preferences.seasonal"
-                    value={characteristics.preferences.seasonal.toString()}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={characteristics.preferences.localProduce}
-                        onChange={handleSwitchChange}
-                        name="preferences.localProduce"
-                      />
-                    }
-                    label="Prefer Local Produce"
-                  />
-                  <input
-                    type="hidden"
-                    name="preferences.localProduce"
-                    value={characteristics.preferences.localProduce.toString()}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={characteristics.preferences.sustainableSeafood}
-                        onChange={handleSwitchChange}
-                        name="preferences.sustainableSeafood"
-                      />
-                    }
-                    label="Prefer Sustainable Seafood"
-                  />
-                  <input
-                    type="hidden"
-                    name="preferences.sustainableSeafood"
-                    value={characteristics.preferences.sustainableSeafood.toString()}
-                  />
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <FormControlLabel
-                    control={
-                      <Switch
-                        checked={characteristics.preferences.budgetFriendly}
-                        onChange={handleSwitchChange}
-                        name="preferences.budgetFriendly"
-                      />
-                    }
-                    label="Prefer Budget-Friendly Options"
-                  />
-                  <input
-                    type="hidden"
-                    name="preferences.budgetFriendly"
-                    value={characteristics.preferences.budgetFriendly.toString()}
-                  />
-                </Grid>
-              </Grid>
-            </AccordionDetails>
-          </Accordion>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 4 }}>
+            <Button variant="outlined" color="inherit" onClick={handleCancel} sx={{ mr: 2 }}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              size="large"
+              startIcon={<SaveIcon />}
+              disabled={isPending || redirecting}
+            >
+              {isPending ? 'Saving...' : 'Save Plan'}
+            </Button>
+          </Box>
         </Paper>
-
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 4 }}>
-          <Button variant="outlined" color="inherit" onClick={handleCancel} sx={{ mr: 2 }}>
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            size="large"
-            startIcon={<SaveIcon />}
-            disabled={isPending || redirecting}
-          >
-            {isPending ? 'Saving...' : 'Save Plan'}
-          </Button>
-        </Box>
       </form>
     </Box>
   );

@@ -3,205 +3,123 @@
 import { z } from 'zod';
 import { FormState, fromErrorToFormState, toFormState } from '@/utils/form-state';
 import { revalidatePath } from 'next/cache';
+import { cookies } from 'next/headers';
+import {
+  ActivityLevel,
+  Gender,
+  Goal,
+  CookingComplexity,
+  MealCharacteristicDto,
+} from '@/api/query/meal-characteristics/meal-characteristics.dto';
 
-// Mock database for now
-let plans = [
-  {
-    id: '1',
-    name: 'Fitness Focus Plan',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    weight: 75,
-    height: 180,
-    age: 32,
-    activityLevel: 'active',
-    goal: 'maintain',
-    caloriesTarget: 2500,
-    macroDistribution: {
-      protein: 35,
-      carbs: 40,
-      fat: 25,
-    },
-    mealsPerDay: 4,
-    includingSnacks: true,
-    nutrientTargets: {
-      fiber: 30,
-      sugar: 20,
-      sodium: 2000,
-    },
-    vitaminsAndMinerals: [
-      { name: 'Vitamin D', priority: 'high' },
-      { name: 'Calcium', priority: 'medium' },
-      { name: 'Iron', priority: 'medium' },
-    ],
-    avoidIngredients: ['Dairy', 'Gluten'],
-    preferences: {
-      organic: true,
-      seasonal: true,
-      localProduce: true,
-      sustainableSeafood: true,
-      budgetFriendly: false,
-    },
-  },
-  {
-    id: '2',
-    name: 'Weight Loss Plan',
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    weight: 82,
-    height: 170,
-    age: 28,
-    activityLevel: 'moderate',
-    goal: 'lose',
-    caloriesTarget: 1800,
-    macroDistribution: {
-      protein: 40,
-      carbs: 30,
-      fat: 30,
-    },
-    mealsPerDay: 5,
-    includingSnacks: true,
-    nutrientTargets: {
-      fiber: 35,
-      sugar: 15,
-      sodium: 1800,
-    },
-    vitaminsAndMinerals: [
-      { name: 'Vitamin B12', priority: 'high' },
-      { name: 'Magnesium', priority: 'high' },
-      { name: 'Zinc', priority: 'low' },
-    ],
-    avoidIngredients: ['Sugar', 'Processed Foods'],
-    preferences: {
-      organic: true,
-      seasonal: true,
-      localProduce: false,
-      sustainableSeafood: true,
-      budgetFriendly: true,
-    },
-  },
-];
-
-// Define validation schema using zod
+// Define validation schema using zod based on the DTO and entity definitions
 const characteristicsSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  weight: z.coerce
+  planName: z.string().min(1, 'Plan name is required'),
+  gender: z.enum(Object.values(Gender) as [string, ...string[]]),
+  age: z.coerce
     .number()
-    .min(30, 'Weight must be at least 30kg')
-    .max(300, 'Weight must be at most 300kg'),
+    .min(15, 'Age must be at least 15')
+    .max(120, 'Age must be at most 120')
+    .optional(),
   height: z.coerce
     .number()
-    .min(100, 'Height must be at least 100cm')
-    .max(250, 'Height must be at most 250cm'),
-  age: z.coerce.number().min(15, 'Age must be at least 15').max(120, 'Age must be at most 120'),
-  activityLevel: z.enum(['sedentary', 'light', 'moderate', 'active', 'veryActive'], {
-    errorMap: () => ({ message: 'Please select a valid activity level' }),
-  }),
-  goal: z.enum(['lose', 'maintain', 'gain'], {
-    errorMap: () => ({ message: 'Please select a valid goal' }),
-  }),
-  caloriesTarget: z.coerce
+    .min(50, 'Height must be at least 50cm')
+    .max(250, 'Height must be at most 250cm')
+    .optional(),
+  weight: z.coerce
+    .number()
+    .min(20, 'Weight must be at least 20kg')
+    .max(300, 'Weight must be at most 300kg')
+    .optional(),
+  activityLevel: z
+    .enum(Object.values(ActivityLevel) as [string, ...string[]], {
+      errorMap: () => ({ message: 'Please select a valid activity level' }),
+    })
+    .optional(),
+  activityCalories: z.coerce
+    .number()
+    .min(0, 'Activity calories must be non-negative')
+    .max(2000, 'Activity calories must be at most 2000')
+    .optional(),
+  goal: z
+    .enum(Object.values(Goal) as [string, ...string[]], {
+      errorMap: () => ({ message: 'Please select a valid goal' }),
+    })
+    .optional(),
+  targetDailyCalories: z.coerce
     .number()
     .min(1000, 'Calories must be at least 1000')
-    .max(5000, 'Calories must be at most 5000'),
-  includingSnacks: z.coerce.boolean(),
+    .max(3500, 'Calories must be at most 3500')
+    .optional(),
+  proteinPercentage: z.coerce
+    .number()
+    .min(0, 'Protein percentage must be at least 0')
+    .max(100, 'Protein percentage must be at most 100')
+    .optional(),
+  fatPercentage: z.coerce
+    .number()
+    .min(0, 'Fat percentage must be at least 0')
+    .max(100, 'Fat percentage must be at most 100')
+    .optional(),
+  carbsPercentage: z.coerce
+    .number()
+    .min(0, 'Carbs percentage must be at least 0')
+    .max(100, 'Carbs percentage must be at most 100')
+    .optional(),
+  includeSnacks: z.coerce
+    .number()
+    .min(0, 'Snacks must be at least 0')
+    .max(2, 'Snacks must be at most 2')
+    .default(0),
   mealsPerDay: z.coerce
     .number()
     .min(1, 'Must have at least 1 meal per day')
-    .max(7, 'Must have at most 7 meals per day'),
+    .max(3, 'Must have at most 3 meals per day')
+    .default(3),
+  cookingComplexity: z
+    .enum(Object.values(CookingComplexity) as [string, ...string[]], {
+      errorMap: () => ({ message: 'Please select a valid cooking complexity' }),
+    })
+    .optional(),
 });
 
 // For checking that macros add up to 100%
 const macroDistributionSchema = z
   .object({
-    'macroDistribution.protein': z.coerce
+    proteinPercentage: z.coerce
       .number()
       .min(10, 'Protein must be at least 10%')
-      .max(60, 'Protein must be at most 60%'),
-    'macroDistribution.carbs': z.coerce
+      .max(60, 'Protein must be at most 60%')
+      .optional(),
+    carbsPercentage: z.coerce
       .number()
       .min(10, 'Carbs must be at least 10%')
-      .max(70, 'Carbs must be at most 70%'),
-    'macroDistribution.fat': z.coerce
+      .max(70, 'Carbs must be at most 70%')
+      .optional(),
+    fatPercentage: z.coerce
       .number()
       .min(10, 'Fat must be at least 10%')
-      .max(60, 'Fat must be at most 60%'),
+      .max(60, 'Fat must be at most 60%')
+      .optional(),
   })
   .refine(
     data => {
-      const total =
-        data['macroDistribution.protein'] +
-        data['macroDistribution.carbs'] +
-        data['macroDistribution.fat'];
-      return Math.abs(total - 100) <= 1; // Allow for small rounding errors
+      // Only validate if all fields are present
+      if (
+        data.proteinPercentage != null &&
+        data.carbsPercentage != null &&
+        data.fatPercentage != null
+      ) {
+        const total = data.proteinPercentage + data.carbsPercentage + data.fatPercentage;
+        return Math.abs(total - 100) <= 1; // Allow for small rounding errors
+      }
+      return true;
     },
     {
       message: 'Macronutrient percentages must sum to 100%',
       path: ['macroSum'],
     }
   );
-
-// Nutrient targets schema
-const nutrientTargetsSchema = z.object({
-  'nutrientTargets.fiber': z.coerce
-    .number()
-    .min(0, 'Fiber must be non-negative')
-    .max(100, 'Fiber must be at most 100g'),
-  'nutrientTargets.sugar': z.coerce
-    .number()
-    .min(0, 'Sugar must be non-negative')
-    .max(100, 'Sugar must be at most 100g'),
-  'nutrientTargets.sodium': z.coerce
-    .number()
-    .min(0, 'Sodium must be non-negative')
-    .max(5000, 'Sodium must be at most 5000mg'),
-});
-
-// Preferences schema
-const preferencesSchema = z.object({
-  'preferences.organic': z.coerce.boolean(),
-  'preferences.seasonal': z.coerce.boolean(),
-  'preferences.localProduce': z.coerce.boolean(),
-  'preferences.sustainableSeafood': z.coerce.boolean(),
-  'preferences.budgetFriendly': z.coerce.boolean(),
-});
-
-export type CharacteristicsFormData = z.infer<typeof characteristicsSchema>;
-
-/**
- * Get all characteristics with pagination
- */
-export async function getCharacteristics(page: number = 1, perPage: number = 10) {
-  // Simulate database pagination
-  const startIndex = (page - 1) * perPage;
-  const endIndex = startIndex + perPage;
-
-  return {
-    data: plans.slice(startIndex, endIndex),
-    pagination: {
-      total: plans.length,
-      page,
-      perPage,
-      totalPages: Math.ceil(plans.length / perPage),
-    },
-  };
-}
-
-/**
- * Delete a characteristic by ID
- */
-export async function deleteCharacteristic(id: string) {
-  plans = plans.filter(plan => plan.id !== id);
-  revalidatePath('/cabinet/characteristics');
-  return { success: true };
-}
-
-/**
- * Get a characteristic by ID
- */
-export async function getCharacteristicById(id: string) {
-  return plans.find(plan => plan.id === id) || null;
-}
 
 /**
  * Create a new characteristic with validation
@@ -212,44 +130,59 @@ export async function createCharacteristic(
 ): Promise<FormState> {
   try {
     // Parse complex form data
-    let vitaminsAndMinerals: Array<{ name: string; priority: string }> = [];
-    let avoidIngredients: string[] = [];
+    let medicalConditions: string[] = [];
+    let dietType: string[] = [];
+    let dietaryRestrictions: string[] = [];
+    let vitaminsAndMinerals: string[] = [];
+    let nutrientTargets: Record<string, number> = {};
+    let additionalPreferences: string[] = [];
 
     try {
-      const vitaminsData = formData.get('vitaminsAndMinerals');
-      if (vitaminsData) {
-        vitaminsAndMinerals = JSON.parse(vitaminsData as string) as Array<{
-          name: string;
-          priority: string;
-        }>;
+      const medicalConditionsData = formData.get('medicalConditions');
+      if (medicalConditionsData) {
+        medicalConditions = JSON.parse(medicalConditionsData as string) as string[];
       }
 
-      const ingredientsData = formData.get('avoidIngredients');
-      if (ingredientsData) {
-        avoidIngredients = JSON.parse(ingredientsData as string) as string[];
+      const dietTypeData = formData.get('dietType');
+      if (dietTypeData) {
+        dietType = JSON.parse(dietTypeData as string) as string[];
+      }
+
+      const dietaryRestrictionsData = formData.get('dietaryRestrictions');
+      if (dietaryRestrictionsData) {
+        dietaryRestrictions = JSON.parse(dietaryRestrictionsData as string) as string[];
+      }
+
+      const vitaminsData = formData.get('vitaminsAndMinerals');
+      if (vitaminsData) {
+        vitaminsAndMinerals = JSON.parse(vitaminsData as string) as string[];
+      }
+
+      const nutrientTargetsData = formData.get('nutrientTargets');
+      if (nutrientTargetsData) {
+        nutrientTargets = JSON.parse(nutrientTargetsData as string) as Record<string, number>;
+      }
+
+      const preferencesData = formData.get('additionalPreferences');
+      if (preferencesData) {
+        additionalPreferences = JSON.parse(preferencesData as string) as string[];
       }
     } catch {
       return toFormState('ERROR', 'Failed to parse complex data');
     }
 
-    // Validate form data
-    const validationResult = characteristicsSchema.safeParse(Object.fromEntries(formData));
-    const macrosValidation = macroDistributionSchema.safeParse(Object.fromEntries(formData));
-    const nutrientValidation = nutrientTargetsSchema.safeParse(Object.fromEntries(formData));
-    const preferencesValidation = preferencesSchema.safeParse(Object.fromEntries(formData));
+    const formDataObject = Object.fromEntries(formData.entries());
 
-    if (
-      !validationResult.success ||
-      !macrosValidation.success ||
-      !nutrientValidation.success ||
-      !preferencesValidation.success
-    ) {
+    // Validate form data
+    const validationResult = characteristicsSchema.safeParse(formDataObject);
+    const macrosValidation = macroDistributionSchema.safeParse(formDataObject);
+    console.log('--------macrosValidation', macrosValidation);
+    console.log('--------validationResult', validationResult.error?.flatten().fieldErrors);
+    if (!validationResult.success || !macrosValidation.success) {
       // Combine all validation errors
       const fieldErrors = {
         ...(validationResult.error?.flatten().fieldErrors || {}),
         ...(macrosValidation.error?.flatten().fieldErrors || {}),
-        ...(nutrientValidation.error?.flatten().fieldErrors || {}),
-        ...(preferencesValidation.error?.flatten().fieldErrors || {}),
         ...(macrosValidation.error?.flatten().formErrors.length
           ? { macroSum: macrosValidation.error.flatten().formErrors }
           : {}),
@@ -263,43 +196,56 @@ export async function createCharacteristic(
       };
     }
 
-    // Create new characteristic
-    const newCharacteristic = {
-      id: Date.now().toString(),
-      name: formData.get('name') as string,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      weight: Number(formData.get('weight')),
-      height: Number(formData.get('height')),
-      age: Number(formData.get('age')),
-      activityLevel: formData.get('activityLevel') as string,
-      goal: formData.get('goal') as string,
-      caloriesTarget: Number(formData.get('caloriesTarget')),
-      macroDistribution: {
-        protein: Number(formData.get('macroDistribution.protein')),
-        carbs: Number(formData.get('macroDistribution.carbs')),
-        fat: Number(formData.get('macroDistribution.fat')),
-      },
-      mealsPerDay: Number(formData.get('mealsPerDay')),
-      includingSnacks: formData.get('includingSnacks') === 'true',
-      nutrientTargets: {
-        fiber: Number(formData.get('nutrientTargets.fiber')),
-        sugar: Number(formData.get('nutrientTargets.sugar')),
-        sodium: Number(formData.get('nutrientTargets.sodium')),
-      },
+    // Create characteristic data - conform to MealCharacteristicDto
+    const characteristicData: MealCharacteristicDto = {
+      planName: formData.get('planName') as string,
+      gender: formData.get('gender') as Gender,
+      age: formData.get('age') ? Number(formData.get('age')) : undefined,
+      height: formData.get('height') ? Number(formData.get('height')) : undefined,
+      weight: formData.get('weight') ? Number(formData.get('weight')) : undefined,
+      activityLevel: (formData.get('activityLevel') as ActivityLevel) || undefined,
+      activityCalories: formData.get('activityCalories')
+        ? Number(formData.get('activityCalories'))
+        : undefined,
+      goal: (formData.get('goal') as Goal) || undefined,
+      targetDailyCalories: formData.get('targetDailyCalories')
+        ? Number(formData.get('targetDailyCalories'))
+        : undefined,
+      proteinPercentage: formData.get('proteinPercentage')
+        ? Number(formData.get('proteinPercentage'))
+        : undefined,
+      fatPercentage: formData.get('fatPercentage')
+        ? Number(formData.get('fatPercentage'))
+        : undefined,
+      carbsPercentage: formData.get('carbsPercentage')
+        ? Number(formData.get('carbsPercentage'))
+        : undefined,
+      includeSnacks: Number(formData.get('includeSnacks') || 0),
+      mealsPerDay: Number(formData.get('mealsPerDay') || 3),
+      medicalConditions,
+      dietType,
+      dietaryRestrictions,
       vitaminsAndMinerals,
-      avoidIngredients,
-      preferences: {
-        organic: formData.get('preferences.organic') === 'true',
-        seasonal: formData.get('preferences.seasonal') === 'true',
-        localProduce: formData.get('preferences.localProduce') === 'true',
-        sustainableSeafood: formData.get('preferences.sustainableSeafood') === 'true',
-        budgetFriendly: formData.get('preferences.budgetFriendly') === 'true',
-      },
+      nutrientTargets,
+      cookingComplexity: (formData.get('cookingComplexity') as CookingComplexity) || undefined,
+      additionalPreferences,
     };
 
-    // Save to "database"
-    plans.push(newCharacteristic);
+    // Send request to API
+    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/meal-characteristics`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: (await cookies()).toString(),
+      },
+      body: JSON.stringify(characteristicData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return toFormState('ERROR', errorData.message || 'Failed to create meal characteristic');
+    }
 
     // Revalidate the characteristics list page
     revalidatePath('/cabinet/characteristics');
@@ -320,51 +266,59 @@ export async function updateCharacteristic(
   id: string
 ): Promise<FormState> {
   try {
-    // Check if the plan exists
-    const existingPlanIndex = plans.findIndex(plan => plan.id === id);
-    if (existingPlanIndex === -1) {
-      return toFormState('ERROR', 'Nutrition plan not found');
-    }
-
     // Parse complex form data
-    let vitaminsAndMinerals: Array<{ name: string; priority: string }> = [];
-    let avoidIngredients: string[] = [];
+    let medicalConditions: string[] = [];
+    let dietType: string[] = [];
+    let dietaryRestrictions: string[] = [];
+    let vitaminsAndMinerals: string[] = [];
+    let nutrientTargets: Record<string, number> = {};
+    let additionalPreferences: string[] = [];
 
     try {
-      const vitaminsData = formData.get('vitaminsAndMinerals');
-      if (vitaminsData) {
-        vitaminsAndMinerals = JSON.parse(vitaminsData as string) as Array<{
-          name: string;
-          priority: string;
-        }>;
+      const medicalConditionsData = formData.get('medicalConditions');
+      if (medicalConditionsData) {
+        medicalConditions = JSON.parse(medicalConditionsData as string) as string[];
       }
 
-      const ingredientsData = formData.get('avoidIngredients');
-      if (ingredientsData) {
-        avoidIngredients = JSON.parse(ingredientsData as string) as string[];
+      const dietTypeData = formData.get('dietType');
+      if (dietTypeData) {
+        dietType = JSON.parse(dietTypeData as string) as string[];
+      }
+
+      const dietaryRestrictionsData = formData.get('dietaryRestrictions');
+      if (dietaryRestrictionsData) {
+        dietaryRestrictions = JSON.parse(dietaryRestrictionsData as string) as string[];
+      }
+
+      const vitaminsData = formData.get('vitaminsAndMinerals');
+      if (vitaminsData) {
+        vitaminsAndMinerals = JSON.parse(vitaminsData as string) as string[];
+      }
+
+      const nutrientTargetsData = formData.get('nutrientTargets');
+      if (nutrientTargetsData) {
+        nutrientTargets = JSON.parse(nutrientTargetsData as string) as Record<string, number>;
+      }
+
+      const preferencesData = formData.get('additionalPreferences');
+      if (preferencesData) {
+        additionalPreferences = JSON.parse(preferencesData as string) as string[];
       }
     } catch {
       return toFormState('ERROR', 'Failed to parse complex data');
     }
 
-    // Validate form data
-    const validationResult = characteristicsSchema.safeParse(Object.fromEntries(formData));
-    const macrosValidation = macroDistributionSchema.safeParse(Object.fromEntries(formData));
-    const nutrientValidation = nutrientTargetsSchema.safeParse(Object.fromEntries(formData));
-    const preferencesValidation = preferencesSchema.safeParse(Object.fromEntries(formData));
+    const formDataObject = Object.fromEntries(formData.entries());
 
-    if (
-      !validationResult.success ||
-      !macrosValidation.success ||
-      !nutrientValidation.success ||
-      !preferencesValidation.success
-    ) {
+    // Validate form data
+    const validationResult = characteristicsSchema.safeParse(formDataObject);
+    const macrosValidation = macroDistributionSchema.safeParse(formDataObject);
+
+    if (!validationResult.success || !macrosValidation.success) {
       // Combine all validation errors
       const fieldErrors = {
         ...(validationResult.error?.flatten().fieldErrors || {}),
         ...(macrosValidation.error?.flatten().fieldErrors || {}),
-        ...(nutrientValidation.error?.flatten().fieldErrors || {}),
-        ...(preferencesValidation.error?.flatten().fieldErrors || {}),
         ...(macrosValidation.error?.flatten().formErrors.length
           ? { macroSum: macrosValidation.error.flatten().formErrors }
           : {}),
@@ -378,42 +332,57 @@ export async function updateCharacteristic(
       };
     }
 
-    // Update the characteristic
-    const updatedCharacteristic = {
-      ...plans[existingPlanIndex],
-      name: formData.get('name') as string,
-      updatedAt: new Date().toISOString(),
-      weight: Number(formData.get('weight')),
-      height: Number(formData.get('height')),
-      age: Number(formData.get('age')),
-      activityLevel: formData.get('activityLevel') as string,
-      goal: formData.get('goal') as string,
-      caloriesTarget: Number(formData.get('caloriesTarget')),
-      macroDistribution: {
-        protein: Number(formData.get('macroDistribution.protein')),
-        carbs: Number(formData.get('macroDistribution.carbs')),
-        fat: Number(formData.get('macroDistribution.fat')),
-      },
-      mealsPerDay: Number(formData.get('mealsPerDay')),
-      includingSnacks: formData.get('includingSnacks') === 'true',
-      nutrientTargets: {
-        fiber: Number(formData.get('nutrientTargets.fiber')),
-        sugar: Number(formData.get('nutrientTargets.sugar')),
-        sodium: Number(formData.get('nutrientTargets.sodium')),
-      },
+    // Create characteristic data - conform to MealCharacteristicDto with id
+    const characteristicData = {
+      id,
+      planName: formData.get('planName') as string,
+      gender: formData.get('gender') as Gender,
+      age: formData.get('age') ? Number(formData.get('age')) : undefined,
+      height: formData.get('height') ? Number(formData.get('height')) : undefined,
+      weight: formData.get('weight') ? Number(formData.get('weight')) : undefined,
+      activityLevel: (formData.get('activityLevel') as ActivityLevel) || undefined,
+      activityCalories: formData.get('activityCalories')
+        ? Number(formData.get('activityCalories'))
+        : undefined,
+      goal: (formData.get('goal') as Goal) || undefined,
+      targetDailyCalories: formData.get('targetDailyCalories')
+        ? Number(formData.get('targetDailyCalories'))
+        : undefined,
+      proteinPercentage: formData.get('proteinPercentage')
+        ? Number(formData.get('proteinPercentage'))
+        : undefined,
+      fatPercentage: formData.get('fatPercentage')
+        ? Number(formData.get('fatPercentage'))
+        : undefined,
+      carbsPercentage: formData.get('carbsPercentage')
+        ? Number(formData.get('carbsPercentage'))
+        : undefined,
+      includeSnacks: Number(formData.get('includeSnacks') || 0),
+      mealsPerDay: Number(formData.get('mealsPerDay') || 3),
+      medicalConditions,
+      dietType,
+      dietaryRestrictions,
       vitaminsAndMinerals,
-      avoidIngredients,
-      preferences: {
-        organic: formData.get('preferences.organic') === 'true',
-        seasonal: formData.get('preferences.seasonal') === 'true',
-        localProduce: formData.get('preferences.localProduce') === 'true',
-        sustainableSeafood: formData.get('preferences.sustainableSeafood') === 'true',
-        budgetFriendly: formData.get('preferences.budgetFriendly') === 'true',
-      },
+      nutrientTargets,
+      cookingComplexity: (formData.get('cookingComplexity') as CookingComplexity) || undefined,
+      additionalPreferences,
     };
 
-    // Save to "database"
-    plans[existingPlanIndex] = updatedCharacteristic;
+    // Send request to API
+    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/meal-characteristics/${id}`;
+    const response = await fetch(url, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: (await cookies()).toString(),
+      },
+      body: JSON.stringify(characteristicData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      return toFormState('ERROR', errorData.message || 'Failed to update meal characteristic');
+    }
 
     // Revalidate the characteristics list page
     revalidatePath('/cabinet/characteristics');
