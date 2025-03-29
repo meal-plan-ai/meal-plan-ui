@@ -44,9 +44,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
 }
 
 // PUT update a meal characteristic
-export async function PUT(request: Request, { params }: { params: { id: string } }) {
+export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id;
+    const { id } = await params;
     const data = (await request.json()) as UpdateMealCharacteristicRequestDto;
 
     const backendResponse = await fetch(

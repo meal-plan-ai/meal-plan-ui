@@ -222,7 +222,6 @@ export async function createCharacteristic(
 
     // Send request to API
     const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/meal-characteristics`;
-    console.log('--------characteristicData', characteristicData);
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -371,7 +370,7 @@ export async function updateCharacteristic(
     // Send request to API
     const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/meal-characteristics/${id}`;
     const response = await fetch(url, {
-      method: 'PUT',
+      method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
         Cookie: (await cookies()).toString(),
