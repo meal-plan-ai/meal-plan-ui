@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -30,35 +30,43 @@ import {
   Add as AddIcon,
   Visibility as ViewIcon,
 } from '@mui/icons-material';
-import { getCharacteristics, deleteCharacteristic } from './actions';
-import { NutritionCharacteristics } from '@/lib/generateCharacteristics';
+import {
+  useMealCharacteristics,
+  useDeleteMealCharacteristic,
+} from '@/api/query/meal-characteristics/meal-characteristics.query';
+import {
+  MealCharacteristicResponseDto,
+  Goal,
+} from '@/api/query/meal-characteristics/meal-characteristics.dto';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-export default function CharacteristicsListPage() {
+// Create a client
+const queryClient = new QueryClient();
+
+// Define type for Chip color to fix linter error
+type ChipColor = 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
+
+// Wrapper component to provide QueryClient
+function CharacteristicsListPageWrapper() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <CharacteristicsListPageContent />
+    </QueryClientProvider>
+  );
+}
+
+// Main component content
+function CharacteristicsListPageContent() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [plans, setPlans] = useState<NutritionCharacteristics[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalCount, setTotalCount] = useState(0);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [planToDelete, setPlanToDelete] = useState<string | null>(null);
 
-  const fetchPlans = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await getCharacteristics(page + 1, rowsPerPage);
-      setPlans(response.data);
-      setTotalCount(response.pagination.total);
-    } catch (error) {
-      console.error('Error fetching plans:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, rowsPerPage]);
-
-  useEffect(() => {
-    fetchPlans();
-  }, [page, rowsPerPage, fetchPlans]);
+  // Use react-query hook for fetching meal characteristics
+  const { data, isLoading, refetch } = useMealCharacteristics(page + 1, rowsPerPage);
+  console.log(data);
+  const deleteMutation = useDeleteMealCharacteristic();
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -89,13 +97,10 @@ export default function CharacteristicsListPage() {
   const handleDeleteConfirm = async () => {
     if (planToDelete) {
       try {
-        const result = await deleteCharacteristic(planToDelete);
-        if (result.success) {
-          // Refresh the plans list
-          fetchPlans();
-        } else {
-          console.error('Error deleting plan:', result.error);
-        }
+        // Use the react-query mutation
+        await deleteMutation.mutateAsync(planToDelete);
+        // Refresh the data after successful deletion
+        refetch();
       } catch (error) {
         console.error('Error deleting plan:', error);
       }
@@ -117,6 +122,36 @@ export default function CharacteristicsListPage() {
     });
   };
 
+  const getGoalLabel = (goal: string | undefined) => {
+    if (!goal) return 'Not Specified';
+
+    switch (goal) {
+      case Goal.WEIGHT_LOSS:
+        return 'Weight Loss';
+      case Goal.MUSCLE_GAIN:
+        return 'Muscle Gain';
+      case Goal.MAINTENANCE:
+        return 'Maintenance';
+      default:
+        return goal;
+    }
+  };
+
+  const getGoalColor = (goal: string | undefined): ChipColor => {
+    if (!goal) return 'default';
+
+    switch (goal) {
+      case Goal.WEIGHT_LOSS:
+        return 'success';
+      case Goal.MUSCLE_GAIN:
+        return 'primary';
+      case Goal.MAINTENANCE:
+        return 'default';
+      default:
+        return 'default';
+    }
+  };
+
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
@@ -134,7 +169,7 @@ export default function CharacteristicsListPage() {
       </Box>
 
       <Paper elevation={2} sx={{ mb: 4 }}>
-        {loading ? (
+        {isLoading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
             <CircularProgress />
           </Box>
@@ -152,38 +187,26 @@ export default function CharacteristicsListPage() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {plans.length === 0 ? (
+                  {!data || data.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} align="center">
                         No nutrition plans found. Create your first plan!
                       </TableCell>
                     </TableRow>
                   ) : (
-                    plans.map(plan => (
+                    data.map((plan: MealCharacteristicResponseDto) => (
                       <TableRow key={plan.id}>
                         <TableCell component="th" scope="row">
-                          {plan.name}
+                          {plan.planName}
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={
-                              plan.goal === 'lose'
-                                ? 'Weight Loss'
-                                : plan.goal === 'gain'
-                                  ? 'Weight Gain'
-                                  : 'Maintenance'
-                            }
-                            color={
-                              plan.goal === 'lose'
-                                ? 'success'
-                                : plan.goal === 'gain'
-                                  ? 'primary'
-                                  : 'default'
-                            }
+                            label={getGoalLabel(plan.goal)}
+                            color={getGoalColor(plan.goal)}
                             size="small"
                           />
                         </TableCell>
-                        <TableCell>{plan.caloriesTarget} kcal</TableCell>
+                        <TableCell>{plan.targetDailyCalories || 'Not specified'} kcal</TableCell>
                         <TableCell>{formatDate(plan.createdAt)}</TableCell>
                         <TableCell align="right">
                           <Tooltip title="View Details">
@@ -211,7 +234,7 @@ export default function CharacteristicsListPage() {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25]}
               component="div"
-              count={totalCount}
+              count={data?.meta?.totalItems || 0}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}
@@ -233,11 +256,18 @@ export default function CharacteristicsListPage() {
           <Button onClick={handleDeleteCancel} color="primary">
             Cancel
           </Button>
-          <Button onClick={handleDeleteConfirm} color="error" autoFocus>
-            Delete
+          <Button
+            onClick={handleDeleteConfirm}
+            color="error"
+            autoFocus
+            disabled={deleteMutation.isPending}
+          >
+            {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogActions>
       </Dialog>
     </Box>
   );
 }
+
+export default CharacteristicsListPageWrapper;
