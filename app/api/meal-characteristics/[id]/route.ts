@@ -7,9 +7,9 @@ import {
 } from '@/api/query/meal-characteristics/meal-characteristics.dto';
 
 // GET a single meal characteristic by ID
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const id = params.id;
+    const { id } = await params;
 
     const backendResponse = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/meal-characteristics/${id}`,
