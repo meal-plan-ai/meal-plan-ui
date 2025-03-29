@@ -89,7 +89,6 @@ export default function CreateCharacteristicsPage() {
     height: 175,
     weight: 70,
     activityLevel: ActivityLevel.MODERATE,
-    activityCalories: undefined,
     goal: Goal.MAINTENANCE,
 
     // Caloric and macronutrient targets
@@ -130,7 +129,6 @@ export default function CreateCharacteristicsPage() {
       height: characteristics.height,
       age: characteristics.age,
       activityLevel: characteristics.activityLevel,
-      activityCalories: characteristics.activityCalories,
       goal: characteristics.goal,
     }),
     [
@@ -138,7 +136,6 @@ export default function CreateCharacteristicsPage() {
       characteristics.height,
       characteristics.age,
       characteristics.activityLevel,
-      characteristics.activityCalories,
       characteristics.goal,
     ]
   );
@@ -165,9 +162,7 @@ export default function CreateCharacteristicsPage() {
   // Handle slider changes
   const handleSliderChange = useCallback(
     (name: string) => (event: Event, newValue: number | number[]) => {
-      if (typeof newValue === 'number') {
-        setCharacteristics(prev => ({ ...prev, [name]: newValue }));
-      }
+      setCharacteristics(prev => ({ ...prev, [name]: Number(newValue) }));
     },
     []
   );
@@ -413,6 +408,13 @@ export default function CreateCharacteristicsPage() {
               value={JSON.stringify(characteristics.nutrientTargets || {})}
             />
 
+            {/* Add hidden input for targetDailyCalories to ensure it's included in form submission */}
+            <input
+              type="hidden"
+              name="targetDailyCalories"
+              value={characteristics.targetDailyCalories}
+            />
+
             <Grid item xs={12} sm={4}>
               <TextField
                 label="Weight"
@@ -549,7 +551,7 @@ export default function CreateCharacteristicsPage() {
                 Target Daily Calories: {characteristics.targetDailyCalories || 0} kcal
               </Typography>
               <Slider
-                value={characteristics.targetDailyCalories || 2000}
+                value={characteristics.targetDailyCalories}
                 onChange={handleSliderChange('targetDailyCalories')}
                 min={1200}
                 max={4000}

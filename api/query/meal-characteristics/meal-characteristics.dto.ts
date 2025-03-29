@@ -35,7 +35,6 @@ export interface MealCharacteristicDto {
   height?: number;
   weight?: number;
   activityLevel?: ActivityLevel;
-  activityCalories?: number;
   goal?: Goal;
   targetDailyCalories?: number;
   proteinPercentage?: number;

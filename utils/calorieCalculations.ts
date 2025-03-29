@@ -5,7 +5,6 @@ interface CalorieCalculationParams {
   height?: number;
   age?: number;
   activityLevel?: ActivityLevel;
-  activityCalories?: number;
   goal?: Goal;
 }
 
@@ -14,7 +13,6 @@ export function calculateCalories({
   height,
   age,
   activityLevel,
-  activityCalories,
   goal,
 }: CalorieCalculationParams): number | undefined {
   if (!weight || !height || !age) {
@@ -26,32 +24,29 @@ export function calculateCalories({
   let targetDailyCalories: number;
 
   // Check if using manual activity calories
-  if (activityCalories !== undefined) {
-    targetDailyCalories = Math.round(bmr + activityCalories);
-  } else {
-    // Use activity multiplier
-    let activityMultiplier;
-    switch (activityLevel) {
-      case ActivityLevel.SEDENTARY:
-        activityMultiplier = 1.2;
-        break;
-      case ActivityLevel.LIGHT:
-        activityMultiplier = 1.375;
-        break;
-      case ActivityLevel.MODERATE:
-        activityMultiplier = 1.55;
-        break;
-      case ActivityLevel.ACTIVE:
-        activityMultiplier = 1.725;
-        break;
-      case ActivityLevel.VERY_ACTIVE:
-        activityMultiplier = 1.9;
-        break;
-      default:
-        activityMultiplier = 1.55;
-    }
-    targetDailyCalories = Math.round(bmr * activityMultiplier);
+
+  // Use activity multiplier
+  let activityMultiplier;
+  switch (activityLevel) {
+    case ActivityLevel.SEDENTARY:
+      activityMultiplier = 1.2;
+      break;
+    case ActivityLevel.LIGHT:
+      activityMultiplier = 1.375;
+      break;
+    case ActivityLevel.MODERATE:
+      activityMultiplier = 1.55;
+      break;
+    case ActivityLevel.ACTIVE:
+      activityMultiplier = 1.725;
+      break;
+    case ActivityLevel.VERY_ACTIVE:
+      activityMultiplier = 1.9;
+      break;
+    default:
+      activityMultiplier = 1.55;
   }
+  targetDailyCalories = Math.round(bmr * activityMultiplier);
 
   // Goal adjustment
   if (goal) {

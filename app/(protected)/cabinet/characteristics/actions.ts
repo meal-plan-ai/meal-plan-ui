@@ -16,56 +16,37 @@ import {
 const characteristicsSchema = z.object({
   planName: z.string().min(1, 'Plan name is required'),
   gender: z.enum(Object.values(Gender) as [string, ...string[]]),
-  age: z.coerce
-    .number()
-    .min(15, 'Age must be at least 15')
-    .max(120, 'Age must be at most 120')
-    .optional(),
+  age: z.coerce.number().min(15, 'Age must be at least 15').max(120, 'Age must be at most 120'),
   height: z.coerce
     .number()
     .min(50, 'Height must be at least 50cm')
-    .max(250, 'Height must be at most 250cm')
-    .optional(),
+    .max(250, 'Height must be at most 250cm'),
   weight: z.coerce
     .number()
     .min(20, 'Weight must be at least 20kg')
-    .max(300, 'Weight must be at most 300kg')
-    .optional(),
-  activityLevel: z
-    .enum(Object.values(ActivityLevel) as [string, ...string[]], {
-      errorMap: () => ({ message: 'Please select a valid activity level' }),
-    })
-    .optional(),
-  activityCalories: z.coerce
-    .number()
-    .min(0, 'Activity calories must be non-negative')
-    .max(2000, 'Activity calories must be at most 2000')
-    .optional(),
-  goal: z
-    .enum(Object.values(Goal) as [string, ...string[]], {
-      errorMap: () => ({ message: 'Please select a valid goal' }),
-    })
-    .optional(),
+    .max(300, 'Weight must be at most 300kg'),
+  activityLevel: z.enum(Object.values(ActivityLevel) as [string, ...string[]], {
+    errorMap: () => ({ message: 'Please select a valid activity level' }),
+  }),
+  goal: z.enum(Object.values(Goal) as [string, ...string[]], {
+    errorMap: () => ({ message: 'Please select a valid goal' }),
+  }),
   targetDailyCalories: z.coerce
     .number()
     .min(1000, 'Calories must be at least 1000')
-    .max(3500, 'Calories must be at most 3500')
-    .optional(),
+    .max(3500, 'Calories must be at most 3500'),
   proteinPercentage: z.coerce
     .number()
     .min(0, 'Protein percentage must be at least 0')
-    .max(100, 'Protein percentage must be at most 100')
-    .optional(),
+    .max(100, 'Protein percentage must be at most 100'),
   fatPercentage: z.coerce
     .number()
     .min(0, 'Fat percentage must be at least 0')
-    .max(100, 'Fat percentage must be at most 100')
-    .optional(),
+    .max(100, 'Fat percentage must be at most 100'),
   carbsPercentage: z.coerce
     .number()
     .min(0, 'Carbs percentage must be at least 0')
-    .max(100, 'Carbs percentage must be at most 100')
-    .optional(),
+    .max(100, 'Carbs percentage must be at most 100'),
   includeSnacks: z.coerce
     .number()
     .min(0, 'Snacks must be at least 0')
@@ -76,11 +57,9 @@ const characteristicsSchema = z.object({
     .min(1, 'Must have at least 1 meal per day')
     .max(3, 'Must have at most 3 meals per day')
     .default(3),
-  cookingComplexity: z
-    .enum(Object.values(CookingComplexity) as [string, ...string[]], {
-      errorMap: () => ({ message: 'Please select a valid cooking complexity' }),
-    })
-    .optional(),
+  cookingComplexity: z.enum(Object.values(CookingComplexity) as [string, ...string[]], {
+    errorMap: () => ({ message: 'Please select a valid cooking complexity' }),
+  }),
 });
 
 // For checking that macros add up to 100%
@@ -172,11 +151,10 @@ export async function createCharacteristic(
     }
 
     const formDataObject = Object.fromEntries(formData.entries());
-
+    console.log('--------formDataObject', formDataObject);
     // Validate form data
     const validationResult = characteristicsSchema.safeParse(formDataObject);
     const macrosValidation = macroDistributionSchema.safeParse(formDataObject);
-    console.log('--------macrosValidation', macrosValidation);
     console.log('--------validationResult', validationResult.error?.flatten().fieldErrors);
     if (!validationResult.success || !macrosValidation.success) {
       // Combine all validation errors
@@ -195,6 +173,22 @@ export async function createCharacteristic(
         timestamp: Date.now(),
       };
     }
+    console.log('--------formData', formData);
+
+    // Ensure targetDailyCalories is a valid number
+    const targetDailyCaloriesValue = formData.get('targetDailyCalories');
+    const targetDailyCalories = targetDailyCaloriesValue
+      ? Number(targetDailyCaloriesValue)
+      : undefined;
+
+    if (targetDailyCalories === undefined || isNaN(targetDailyCalories)) {
+      return {
+        status: 'ERROR',
+        message: 'Daily calorie target is required and must be a valid number',
+        fieldErrors: { targetDailyCalories: ['Daily calorie target is required'] },
+        timestamp: Date.now(),
+      };
+    }
 
     // Create characteristic data - conform to MealCharacteristicDto
     const characteristicData: MealCharacteristicDto = {
@@ -204,13 +198,8 @@ export async function createCharacteristic(
       height: formData.get('height') ? Number(formData.get('height')) : undefined,
       weight: formData.get('weight') ? Number(formData.get('weight')) : undefined,
       activityLevel: (formData.get('activityLevel') as ActivityLevel) || undefined,
-      activityCalories: formData.get('activityCalories')
-        ? Number(formData.get('activityCalories'))
-        : undefined,
       goal: (formData.get('goal') as Goal) || undefined,
-      targetDailyCalories: formData.get('targetDailyCalories')
-        ? Number(formData.get('targetDailyCalories'))
-        : undefined,
+      targetDailyCalories: targetDailyCalories,
       proteinPercentage: formData.get('proteinPercentage')
         ? Number(formData.get('proteinPercentage'))
         : undefined,
@@ -233,6 +222,7 @@ export async function createCharacteristic(
 
     // Send request to API
     const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/meal-characteristics`;
+    console.log('--------characteristicData', characteristicData);
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -332,6 +322,21 @@ export async function updateCharacteristic(
       };
     }
 
+    // Ensure targetDailyCalories is a valid number
+    const targetDailyCaloriesValue = formData.get('targetDailyCalories');
+    const targetDailyCalories = targetDailyCaloriesValue
+      ? Number(targetDailyCaloriesValue)
+      : undefined;
+
+    if (targetDailyCalories === undefined || isNaN(targetDailyCalories)) {
+      return {
+        status: 'ERROR',
+        message: 'Daily calorie target is required and must be a valid number',
+        fieldErrors: { targetDailyCalories: ['Daily calorie target is required'] },
+        timestamp: Date.now(),
+      };
+    }
+
     // Create characteristic data - conform to MealCharacteristicDto with id
     const characteristicData = {
       id,
@@ -341,13 +346,8 @@ export async function updateCharacteristic(
       height: formData.get('height') ? Number(formData.get('height')) : undefined,
       weight: formData.get('weight') ? Number(formData.get('weight')) : undefined,
       activityLevel: (formData.get('activityLevel') as ActivityLevel) || undefined,
-      activityCalories: formData.get('activityCalories')
-        ? Number(formData.get('activityCalories'))
-        : undefined,
       goal: (formData.get('goal') as Goal) || undefined,
-      targetDailyCalories: formData.get('targetDailyCalories')
-        ? Number(formData.get('targetDailyCalories'))
-        : undefined,
+      targetDailyCalories: targetDailyCalories,
       proteinPercentage: formData.get('proteinPercentage')
         ? Number(formData.get('proteinPercentage'))
         : undefined,
