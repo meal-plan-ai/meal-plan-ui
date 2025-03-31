@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useCurrentUser } from '@/api/query/users/users.query';
+import { useCurrentUser } from '@/api/next-client-api/users/users.hooks';
 
 interface ProtectedRouteProps {
   children: ReactNode;

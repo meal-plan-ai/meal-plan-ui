@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 import { useFormState } from 'react-dom';
 import { Box, Button, TextField, Grid, Paper, Typography, Divider } from '@mui/material';
 import { profileInfoAction, ProfileValidationResult } from '@/actions/profile.actions';
-import { useProfile, useUpdateProfile } from '@/api/query/profile/profile.query';
 import { EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
 import toast from 'react-hot-toast';
-import { UpdateProfileDto } from '@/api/query/profile/profile.dto';
+import { UpdateProfileDto } from '@/api/next-client-api/profile/profile.dto';
+import { useUpdateProfile } from '@/api/next-client-api/profile/profile.hooks';
+import { useProfile } from '@/api/next-client-api/profile/profile.hooks';
 
 const initialState: ProfileValidationResult = {
   success: false,

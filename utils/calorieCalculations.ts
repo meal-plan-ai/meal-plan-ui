@@ -1,4 +1,7 @@
-import { ActivityLevel, Goal } from '@/api/query/meal-characteristics/meal-characteristics.dto';
+import {
+  ActivityLevel,
+  Goal,
+} from '@/api/next-client-api/meal-characteristics/meal-characteristics.dto';
 
 interface CalorieCalculationParams {
   weight?: number;

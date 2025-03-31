@@ -9,22 +9,18 @@ import { FormState, EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
 import MealCharacteristicsForm from '@/components/organisms/MealCharacteristicsForm';
 
-// Initial form state for validation
 const initialState: FormState = EMPTY_FORM_STATE;
 
 export default function CreateCharacteristicsPage() {
   const router = useRouter();
   const [redirecting, setRedirecting] = useState(false);
 
-  // Setup form state with server validation action
   const [formState, action, isPending] = useActionState(createCharacteristic, initialState);
   const formRef = useFormReset(formState);
 
-  // Check if submission was successful
   useEffect(() => {
     if (formState.status === 'SUCCESS' && !redirecting) {
       setRedirecting(true);
-      // Redirect after a successful submission
       const timer = setTimeout(() => {
         router.push('/cabinet/characteristics');
       }, 1500);

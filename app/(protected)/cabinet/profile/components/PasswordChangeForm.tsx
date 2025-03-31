@@ -16,10 +16,10 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { passwordChangeAction, PasswordChangeValidationResult } from '@/actions/profile.actions';
-import { useNewPassword } from '@/api/query/auth/auth.query';
 import { EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
 import toast from 'react-hot-toast';
+import { useChangePassword } from '@/api/next-client-api/users/users.hooks';
 
 const initialState: PasswordChangeValidationResult = {
   success: false,
@@ -37,7 +37,7 @@ export default function PasswordChangeForm() {
   const [validationResult, action, isPending] = useFormState(passwordChangeAction, initialState);
   const { formState } = validationResult;
   const formRef = useFormReset(formState);
-  const passwordChangeMutation = useNewPassword();
+  const passwordChangeMutation = useChangePassword();
   const processedDataRef = useRef<Record<string, string> | null>(null);
 
   const toggleCurrentPasswordVisibility = () => setShowCurrentPassword(prev => !prev);

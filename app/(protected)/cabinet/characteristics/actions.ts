@@ -3,16 +3,18 @@
 import { z } from 'zod';
 import { FormState, fromErrorToFormState, toFormState } from '@/utils/form-state';
 import { revalidatePath } from 'next/cache';
-import { cookies } from 'next/headers';
 import {
   ActivityLevel,
   Gender,
   Goal,
   CookingComplexity,
-  MealCharacteristicDto,
-} from '@/api/query/meal-characteristics/meal-characteristics.dto';
+} from '@/api/next-client-api/meal-characteristics/meal-characteristics.dto';
+import {
+  CreateMealCharacteristicRequestDto,
+  UpdateMealCharacteristicRequestDto,
+} from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
+import { nestServerMealCharacteristicsApi } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.api';
 
-// Define validation schema using zod based on the DTO and entity definitions
 const characteristicsSchema = z.object({
   planName: z.string().min(1, 'Plan name is required'),
   gender: z.enum(Object.values(Gender) as [string, ...string[]]),
@@ -62,7 +64,6 @@ const characteristicsSchema = z.object({
   }),
 });
 
-// For checking that macros add up to 100%
 const macroDistributionSchema = z
   .object({
     proteinPercentage: z.coerce
@@ -83,7 +84,6 @@ const macroDistributionSchema = z
   })
   .refine(
     data => {
-      // Only validate if all fields are present
       if (
         data.proteinPercentage != null &&
         data.carbsPercentage != null &&
@@ -100,15 +100,11 @@ const macroDistributionSchema = z
     }
   );
 
-/**
- * Create a new characteristic with validation
- */
 export async function createCharacteristic(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
   try {
-    // Parse complex form data
     let medicalConditions: string[] = [];
     let dietType: string[] = [];
     let dietaryRestrictions: string[] = [];
@@ -151,13 +147,10 @@ export async function createCharacteristic(
     }
 
     const formDataObject = Object.fromEntries(formData.entries());
-    console.log('--------formDataObject', formDataObject);
-    // Validate form data
     const validationResult = characteristicsSchema.safeParse(formDataObject);
     const macrosValidation = macroDistributionSchema.safeParse(formDataObject);
-    console.log('--------validationResult', validationResult.error?.flatten().fieldErrors);
+
     if (!validationResult.success || !macrosValidation.success) {
-      // Combine all validation errors
       const fieldErrors = {
         ...(validationResult.error?.flatten().fieldErrors || {}),
         ...(macrosValidation.error?.flatten().fieldErrors || {}),
@@ -173,9 +166,7 @@ export async function createCharacteristic(
         timestamp: Date.now(),
       };
     }
-    console.log('--------formData', formData);
 
-    // Ensure targetDailyCalories is a valid number
     const targetDailyCaloriesValue = formData.get('targetDailyCalories');
     const targetDailyCalories = targetDailyCaloriesValue
       ? Number(targetDailyCaloriesValue)
@@ -190,8 +181,7 @@ export async function createCharacteristic(
       };
     }
 
-    // Create characteristic data - conform to MealCharacteristicDto
-    const characteristicData: MealCharacteristicDto = {
+    const characteristicData: CreateMealCharacteristicRequestDto = {
       planName: formData.get('planName') as string,
       gender: formData.get('gender') as Gender,
       age: formData.get('age') ? Number(formData.get('age')) : undefined,
@@ -219,36 +209,26 @@ export async function createCharacteristic(
       cookingComplexity: (formData.get('cookingComplexity') as CookingComplexity) || undefined,
       additionalPreferences,
     };
+    try {
+      await nestServerMealCharacteristicsApi.create(characteristicData);
 
-    // Send request to API
-    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/meal-characteristics`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: (await cookies()).toString(),
-      },
-      body: JSON.stringify(characteristicData),
-    });
+      revalidatePath('/cabinet/characteristics');
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      return toFormState('ERROR', errorData.message || 'Failed to create meal characteristic');
+      return toFormState('SUCCESS', 'Nutrition plan created successfully');
+    } catch (error) {
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        if (axiosError.response?.data?.message) {
+          return toFormState('ERROR', axiosError.response.data.message);
+        }
+      }
+      return fromErrorToFormState(error);
     }
-
-    // Revalidate the characteristics list page
-    revalidatePath('/cabinet/characteristics');
-
-    // Return success
-    return toFormState('SUCCESS', 'Nutrition plan created successfully');
   } catch (error) {
     return fromErrorToFormState(error);
   }
 }
 
-/**
- * Update an existing characteristic with validation
- */
 export async function updateCharacteristic(
   prevState: FormState,
   formData: FormData,
@@ -299,12 +279,10 @@ export async function updateCharacteristic(
 
     const formDataObject = Object.fromEntries(formData.entries());
 
-    // Validate form data
     const validationResult = characteristicsSchema.safeParse(formDataObject);
     const macrosValidation = macroDistributionSchema.safeParse(formDataObject);
 
     if (!validationResult.success || !macrosValidation.success) {
-      // Combine all validation errors
       const fieldErrors = {
         ...(validationResult.error?.flatten().fieldErrors || {}),
         ...(macrosValidation.error?.flatten().fieldErrors || {}),
@@ -321,7 +299,6 @@ export async function updateCharacteristic(
       };
     }
 
-    // Ensure targetDailyCalories is a valid number
     const targetDailyCaloriesValue = formData.get('targetDailyCalories');
     const targetDailyCalories = targetDailyCaloriesValue
       ? Number(targetDailyCaloriesValue)
@@ -336,8 +313,7 @@ export async function updateCharacteristic(
       };
     }
 
-    // Create characteristic data - conform to MealCharacteristicDto with id
-    const characteristicData = {
+    const characteristicData: UpdateMealCharacteristicRequestDto = {
       id,
       planName: formData.get('planName') as string,
       gender: formData.get('gender') as Gender,
@@ -367,27 +343,23 @@ export async function updateCharacteristic(
       additionalPreferences,
     };
 
-    // Send request to API
-    const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/meal-characteristics/${id}`;
-    const response = await fetch(url, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Cookie: (await cookies()).toString(),
-      },
-      body: JSON.stringify(characteristicData),
-    });
+    try {
+      console.log('characteristicData', characteristicData);
+      await nestServerMealCharacteristicsApi.update(id, characteristicData);
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      return toFormState('ERROR', errorData.message || 'Failed to update meal characteristic');
+      revalidatePath('/cabinet/characteristics');
+
+      return toFormState('SUCCESS', 'Nutrition plan updated successfully');
+    } catch (error) {
+      console.log('error', error);
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        if (axiosError.response?.data?.message) {
+          return toFormState('ERROR', axiosError.response.data.message);
+        }
+      }
+      return fromErrorToFormState(error);
     }
-
-    // Revalidate the characteristics list page
-    revalidatePath('/cabinet/characteristics');
-
-    // Return success
-    return toFormState('SUCCESS', 'Nutrition plan updated successfully');
   } catch (error) {
     return fromErrorToFormState(error);
   }

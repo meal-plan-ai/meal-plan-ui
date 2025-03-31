@@ -1,44 +1,35 @@
 'use client';
 
 import { useFormState } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button, TextField, Paper, Typography, Box, Container, Alert } from '@mui/material';
 import { registerAction, RegisterValidationResult } from '@/actions/auth.actions';
 import { EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
-import { useRegisterWithRedirect } from '@/hooks/useAuthWithRedirect';
 import { useEffect, useRef } from 'react';
 
 const initialState: RegisterValidationResult = {
   success: false,
+  redirectUrl: '',
   data: null,
   formState: EMPTY_FORM_STATE,
 };
 
 export default function RegisterPage() {
-  const processedDataRef = useRef<Record<string, string> | null>(null);
+  const router = useRouter();
   const [validationResult, action, pending] = useFormState(registerAction, initialState);
   const { formState } = validationResult;
   const formRef = useFormReset(formState);
-  const { mutateAsync: register, isPending, errorMessage } = useRegisterWithRedirect();
+  const redirectedRef = useRef(false);
 
+  // Автоматическое перенаправление после успешной регистрации
   useEffect(() => {
-    if (
-      validationResult.success &&
-      validationResult.data &&
-      !isPending &&
-      JSON.stringify(processedDataRef.current) !== JSON.stringify(validationResult.data)
-    ) {
-      processedDataRef.current = validationResult.data;
-      register(validationResult.data);
+    if (validationResult.success && validationResult.redirectUrl && !redirectedRef.current) {
+      redirectedRef.current = true;
+      router.push(validationResult.redirectUrl);
     }
-  }, [validationResult, register, isPending]);
-
-  useEffect(() => {
-    if (errorMessage) {
-      processedDataRef.current = null;
-    }
-  }, [errorMessage]);
+  }, [validationResult, router]);
 
   return (
     <Container maxWidth="sm">
@@ -48,9 +39,9 @@ export default function RegisterPage() {
             Create an Account
           </Typography>
 
-          {errorMessage && (
+          {formState.status === 'ERROR' && formState.message && (
             <Alert severity="error" sx={{ mb: 3 }}>
-              {errorMessage}
+              {formState.message}
             </Alert>
           )}
 
@@ -65,7 +56,7 @@ export default function RegisterPage() {
               error={Boolean(formState.fieldErrors?.firstName)}
               helperText={formState.fieldErrors?.firstName?.[0]}
               autoFocus
-              disabled={isPending || pending}
+              disabled={pending}
             />
 
             <TextField
@@ -77,7 +68,7 @@ export default function RegisterPage() {
               variant="outlined"
               error={Boolean(formState.fieldErrors?.lastName)}
               helperText={formState.fieldErrors?.lastName?.[0]}
-              disabled={isPending || pending}
+              disabled={pending}
             />
 
             <TextField
@@ -89,7 +80,7 @@ export default function RegisterPage() {
               variant="outlined"
               error={Boolean(formState.fieldErrors?.email)}
               helperText={formState.fieldErrors?.email?.[0]}
-              disabled={isPending || pending}
+              disabled={pending}
             />
 
             <TextField
@@ -101,7 +92,7 @@ export default function RegisterPage() {
               variant="outlined"
               error={Boolean(formState.fieldErrors?.password)}
               helperText={formState.fieldErrors?.password?.[0]}
-              disabled={isPending || pending}
+              disabled={pending}
             />
 
             <TextField
@@ -113,7 +104,7 @@ export default function RegisterPage() {
               variant="outlined"
               error={Boolean(formState.fieldErrors?.confirmPassword)}
               helperText={formState.fieldErrors?.confirmPassword?.[0]}
-              disabled={isPending || pending}
+              disabled={pending}
             />
 
             <Button
@@ -123,9 +114,9 @@ export default function RegisterPage() {
               fullWidth
               size="large"
               sx={{ py: 1.5, mt: 3 }}
-              disabled={isPending || pending}
+              disabled={pending}
             >
-              {isPending || pending ? 'Creating Account...' : 'Register'}
+              {pending ? 'Creating Account...' : 'Register'}
             </Button>
           </form>
 

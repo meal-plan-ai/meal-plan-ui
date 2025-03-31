@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -35,24 +35,27 @@ import {
   Scale as ScaleIcon,
 } from '@mui/icons-material';
 import {
-  MealCharacteristicDto,
   ActivityLevel,
   Goal,
   CookingComplexity,
   Gender,
-} from '@/api/query/meal-characteristics/meal-characteristics.dto';
+} from '@/api/next-client-api/meal-characteristics/meal-characteristics.dto';
+import {
+  useMealCharacteristic,
+  useDeleteMealCharacteristic,
+} from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
 
 export default function ViewCharacteristicsPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { id } = params;
 
-  const [isDeleting, setIsDeleting] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [error, setError] = useState('');
-  const [plan, setPlan] = useState<MealCharacteristicDto | null>(null);
-  const [loading, setLoading] = useState(true);
 
-  // Use useCallback for all functions
+  const { data: plan, isLoading, isError, error: fetchError } = useMealCharacteristic(id);
+
+  const deleteMutation = useDeleteMealCharacteristic();
+
   const handleBack = useCallback(() => {
     router.push('/cabinet/characteristics');
   }, [router]);
@@ -70,28 +73,16 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
   }, []);
 
   const confirmDelete = useCallback(async () => {
-    setIsDeleting(true);
     try {
-      const response = await fetch(`/api/meal-characteristics/${id}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to delete meal characteristic');
-      }
-
+      await deleteMutation.mutateAsync(id);
       router.push('/cabinet/characteristics');
     } catch (error) {
       console.error('Error deleting plan:', error);
       setError('Failed to delete the nutrition plan. Please try again later.');
-      setIsDeleting(false);
     }
     setDeleteDialogOpen(false);
-  }, [id, router]);
+  }, [id, router, deleteMutation]);
 
-  // Memoize activity level text
   const activityLevelText = useMemo(() => {
     if (!plan?.activityLevel) return 'Not specified';
 
@@ -111,7 +102,6 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
     }
   }, [plan?.activityLevel]);
 
-  // Memoize goal text
   const goalText = useMemo(() => {
     if (!plan?.goal) return 'Not specified';
 
@@ -127,7 +117,6 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
     }
   }, [plan?.goal]);
 
-  // Memoize gender text
   const genderText = useMemo(() => {
     if (!plan?.gender) return 'Not specified';
 
@@ -143,7 +132,6 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
     }
   }, [plan?.gender]);
 
-  // Memoize cooking complexity text
   const complexityText = useMemo(() => {
     if (!plan?.cookingComplexity) return 'Not specified';
 
@@ -159,7 +147,6 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
     }
   }, [plan?.cookingComplexity]);
 
-  // Memoized macro calculations
   const macroGrams = useMemo(() => {
     if (!plan) return { protein: 0, carbs: 0, fat: 0 };
 
@@ -170,7 +157,6 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
     };
   }, [plan]);
 
-  // Get the color for activity level chips
   const getActivityLevelColor = useMemo(() => {
     if (!plan?.activityLevel) return '#6c757d';
 
@@ -190,7 +176,6 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
     }
   }, [plan?.activityLevel]);
 
-  // Get the color for goal chips
   const getGoalColor = useMemo(() => {
     if (!plan?.goal) return '#6c757d';
 
@@ -206,32 +191,15 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
     }
   }, [plan?.goal]);
 
-  useEffect(() => {
-    const fetchPlan = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`/api/meal-characteristics/${id}`, {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch meal characteristic');
-        }
-
-        const data = await response.json();
-        setPlan(data);
-      } catch (error) {
-        console.error('Error fetching plan:', error);
-        setError('Failed to load the nutrition plan. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPlan();
-  }, [id]);
+  if (isError) {
+    const errorMessage =
+      fetchError instanceof Error ? fetchError.message : 'An unknown error occurred';
+    return (
+      <Alert severity="error" sx={{ mt: 2 }}>
+        Failed to load the nutrition plan: {errorMessage}
+      </Alert>
+    );
+  }
 
   if (error) {
     return (
@@ -241,7 +209,7 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
     );
   }
 
-  if (loading) {
+  if (isLoading) {
     return (
       <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mt: 4, gap: 2 }}>
         <CircularProgress />
@@ -260,7 +228,6 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
 
   return (
     <Box sx={{ bgcolor: '#f8f9fa', minHeight: '100vh', p: { xs: 1, sm: 2 } }}>
-      {/* Header Section */}
       <Box
         sx={{
           display: 'flex',
@@ -321,10 +288,10 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
             color="error"
             startIcon={<DeleteIcon />}
             onClick={handleDeleteClick}
-            disabled={isDeleting}
+            disabled={deleteMutation.isPending}
             sx={{ borderRadius: 2 }}
           >
-            {isDeleting ? 'DELETING...' : 'DELETE'}
+            {deleteMutation.isPending ? 'DELETING...' : 'DELETE'}
           </Button>
         </Box>
       </Box>
@@ -900,8 +867,8 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
           <Button onClick={handleCloseDialog} color="primary">
             Cancel
           </Button>
-          <Button onClick={confirmDelete} color="error" disabled={isDeleting}>
-            {isDeleting ? 'Deleting...' : 'Delete'}
+          <Button onClick={confirmDelete} color="error" disabled={deleteMutation.isPending}>
+            {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogActions>
       </Dialog>

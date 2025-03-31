@@ -2,6 +2,8 @@
 
 import { z } from 'zod';
 import { FormState, fromErrorToFormState, toFormState } from '@/utils/form-state';
+import { nestServerAuthApi } from '@/api/nest-server-api';
+import { cookies } from 'next/headers';
 
 const loginSchema = z.object({
   email: z.string().email('Please enter a valid email address'),
@@ -23,12 +25,14 @@ const registerSchema = z
 
 export type LoginValidationResult = {
   success: boolean;
+  redirectUrl: string;
   data: { email: string; password: string } | null;
   formState: FormState;
 };
 
 export type RegisterValidationResult = {
   success: boolean;
+  redirectUrl: string;
   data: { firstName: string; lastName: string; email: string; password: string } | null;
   formState: FormState;
 };
@@ -43,16 +47,39 @@ export async function loginAction(
       password: formData.get('password'),
     });
 
-    return {
-      success: true,
-      data: validatedData,
-      formState: toFormState('SUCCESS', 'Validation successful'),
-    };
-  } catch (error) {
+    try {
+      await nestServerAuthApi.login(validatedData);
+
+      const cookieStore = await cookies();
+
+      cookieStore.set('isAuthenticated', 'true', {
+        httpOnly: false,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 60 * 60 * 24,
+        path: '/',
+      });
+
+      return {
+        success: true,
+        redirectUrl: '/cabinet',
+        data: validatedData,
+        formState: toFormState('SUCCESS', 'Login successful'),
+      };
+    } catch (apiError) {
+      console.error('Login API error:', apiError);
+      return {
+        success: false,
+        redirectUrl: '',
+        data: null,
+        formState: toFormState('ERROR', 'Login failed. Please check your credentials.'),
+      };
+    }
+  } catch (validationError) {
     return {
       success: false,
+      redirectUrl: '',
       data: null,
-      formState: fromErrorToFormState(error),
+      formState: fromErrorToFormState(validationError),
     };
   }
 }
@@ -73,16 +100,30 @@ export async function registerAction(
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { confirmPassword, ...userData } = validatedData;
 
-    return {
-      success: true,
-      data: userData,
-      formState: toFormState('SUCCESS', 'Validation successful'),
-    };
-  } catch (error) {
+    try {
+      await nestServerAuthApi.register(userData);
+
+      return {
+        success: true,
+        redirectUrl: '/cabinet',
+        data: userData,
+        formState: toFormState('SUCCESS', 'Registration successful'),
+      };
+    } catch (apiError) {
+      console.error('Registration API error:', apiError);
+      return {
+        success: false,
+        redirectUrl: '',
+        data: null,
+        formState: toFormState('ERROR', 'Registration failed. Please try again.'),
+      };
+    }
+  } catch (validationError) {
     return {
       success: false,
+      redirectUrl: '',
       data: null,
-      formState: fromErrorToFormState(error),
+      formState: fromErrorToFormState(validationError),
     };
   }
 }

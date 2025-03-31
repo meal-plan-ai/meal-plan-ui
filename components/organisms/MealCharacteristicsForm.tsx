@@ -37,7 +37,7 @@ import {
   Goal,
   CookingComplexity,
   MealCharacteristicDto,
-} from '@/api/query/meal-characteristics/meal-characteristics.dto';
+} from '@/api/next-client-api/meal-characteristics/meal-characteristics.dto';
 import ChipInputSection from '@/components/molecules/ChipInputSection';
 
 // List of additional preferences

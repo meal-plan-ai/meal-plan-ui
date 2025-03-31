@@ -31,22 +31,19 @@ import {
   Visibility as ViewIcon,
 } from '@mui/icons-material';
 import {
-  useMealCharacteristics,
-  useDeleteMealCharacteristic,
-} from '@/api/query/meal-characteristics/meal-characteristics.query';
-import {
   MealCharacteristicResponseDto,
   Goal,
-} from '@/api/query/meal-characteristics/meal-characteristics.dto';
+} from '@/api/next-client-api/meal-characteristics/meal-characteristics.dto';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import {
+  useDeleteMealCharacteristic,
+  useMealCharacteristics,
+} from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
 
-// Create a client
 const queryClient = new QueryClient();
 
-// Define type for Chip color to fix linter error
 type ChipColor = 'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
 
-// Wrapper component to provide QueryClient
 function CharacteristicsListPageWrapper() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -55,7 +52,6 @@ function CharacteristicsListPageWrapper() {
   );
 }
 
-// Main component content
 function CharacteristicsListPageContent() {
   const router = useRouter();
   const [page, setPage] = useState(0);
@@ -63,9 +59,7 @@ function CharacteristicsListPageContent() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [planToDelete, setPlanToDelete] = useState<string | null>(null);
 
-  // Use react-query hook for fetching meal characteristics
   const { data, isLoading, refetch } = useMealCharacteristics(page + 1, rowsPerPage);
-  console.log(data);
   const deleteMutation = useDeleteMealCharacteristic();
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -97,9 +91,7 @@ function CharacteristicsListPageContent() {
   const handleDeleteConfirm = async () => {
     if (planToDelete) {
       try {
-        // Use the react-query mutation
         await deleteMutation.mutateAsync(planToDelete);
-        // Refresh the data after successful deletion
         refetch();
       } catch (error) {
         console.error('Error deleting plan:', error);
