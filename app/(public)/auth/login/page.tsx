@@ -3,13 +3,13 @@
 import { useFormState } from 'react-dom';
 import Link from 'next/link';
 import { Button, TextField, Paper, Typography, Box, Container } from '@mui/material';
-import { loginAction, ValidationResult } from '@/actions/auth.actions';
+import { loginAction } from '@/actions/auth.actions';
 import { EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
 import { useLoginWithRedirect } from '@/hooks/useAuthWithRedirect';
 import { useEffect, useRef } from 'react';
 
-const initialState: ValidationResult = {
+const initialState = {
   success: false,
   data: null,
   formState: EMPTY_FORM_STATE,
