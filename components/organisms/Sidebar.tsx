@@ -9,11 +9,10 @@ import {
   AccountCircle as AccountIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
+import { useDrawer } from '../providers/DrawerController';
 
 interface SidebarProps {
   variant: 'permanent' | 'temporary';
-  open?: boolean;
-  onClose?: () => void;
 }
 
 const menuItems = [
@@ -23,16 +22,17 @@ const menuItems = [
   { title: 'Profile', icon: <AccountIcon />, path: '/cabinet/profile' },
 ];
 
-export default function Sidebar({ variant, open = false, onClose }: SidebarProps) {
+export default function Sidebar({ variant }: SidebarProps) {
   const pathname = usePathname();
+  const { drawerOpen, toggleDrawer } = useDrawer();
 
   const isMenuItemActive = (path: string) => pathname === path;
 
   const drawerProps =
     variant === 'temporary'
       ? {
-          open,
-          onClose,
+          open: drawerOpen,
+          onClose: toggleDrawer,
           sx: {
             display: { xs: 'block', sm: 'none' },
             [`& .MuiDrawer-paper`]: { width: 240, boxSizing: 'border-box' },
@@ -56,7 +56,7 @@ export default function Sidebar({ variant, open = false, onClose }: SidebarProps
             key={item.title}
             component={Link}
             href={item.path}
-            onClick={onClose}
+            onClick={variant === 'temporary' ? toggleDrawer : undefined}
             sx={{
               bgcolor: isMenuItemActive(item.path) ? 'rgba(0, 0, 0, 0.04)' : 'transparent',
               color: isMenuItemActive(item.path) ? 'primary.main' : 'text.primary',

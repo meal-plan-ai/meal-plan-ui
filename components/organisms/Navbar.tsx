@@ -4,19 +4,18 @@ import { AppBar, Toolbar, IconButton, Typography, Box } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
 import ThemeToggle from '../atoms/ThemeToggle';
 import ProfileMenu from '../molecules/ProfileMenu';
+import { useDrawer } from '../providers/DrawerController';
 
-interface NavbarProps {
-  onMenuClick: () => void;
-}
+export default function Navbar() {
+  const { toggleDrawer } = useDrawer();
 
-export default function Navbar({ onMenuClick }: NavbarProps) {
   return (
     <AppBar position="fixed" sx={{ zIndex: theme => theme.zIndex.drawer + 1 }}>
       <Toolbar>
         <IconButton
           color="inherit"
           edge="start"
-          onClick={onMenuClick}
+          onClick={toggleDrawer}
           sx={{ mr: 2, display: { sm: 'none' } }}
         >
           <MenuIcon />
