@@ -1,44 +1,34 @@
 'use client';
 
 import { useFormState } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Button, TextField, Paper, Typography, Box, Container } from '@mui/material';
+import { Button, TextField, Paper, Typography, Box, Container, Alert } from '@mui/material';
 import { loginAction } from '@/actions/auth.actions';
 import { EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
-import { useLoginWithRedirect } from '@/hooks/useAuthWithRedirect';
 import { useEffect, useRef } from 'react';
 
 const initialState = {
   success: false,
+  redirectUrl: '',
   data: null,
   formState: EMPTY_FORM_STATE,
 };
 
 export default function LoginPage() {
-  const processedDataRef = useRef<Record<string, string> | null>(null);
+  const router = useRouter();
   const [validationResult, action, pending] = useFormState(loginAction, initialState);
   const { formState } = validationResult;
   const formRef = useFormReset(formState);
-  const { mutateAsync: login, isPending, errorMessage } = useLoginWithRedirect();
+  const redirectedRef = useRef(false);
 
   useEffect(() => {
-    if (
-      validationResult.success &&
-      validationResult.data &&
-      !isPending &&
-      JSON.stringify(processedDataRef.current) !== JSON.stringify(validationResult.data)
-    ) {
-      processedDataRef.current = validationResult.data;
-      login(validationResult.data);
+    if (validationResult.success && validationResult.redirectUrl && !redirectedRef.current) {
+      redirectedRef.current = true;
+      router.push(validationResult.redirectUrl);
     }
-  }, [validationResult, login, isPending]);
-
-  useEffect(() => {
-    if (errorMessage) {
-      processedDataRef.current = null;
-    }
-  }, [errorMessage]);
+  }, [validationResult, router]);
 
   return (
     <Container maxWidth="sm">
@@ -47,6 +37,13 @@ export default function LoginPage() {
           <Typography variant="h4" component="h1" gutterBottom>
             Login
           </Typography>
+
+          {formState.status === 'ERROR' && formState.message && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {formState.message}
+            </Alert>
+          )}
+
           <form action={action} ref={formRef}>
             <TextField
               label="Email"
@@ -76,9 +73,9 @@ export default function LoginPage() {
               fullWidth
               size="large"
               sx={{ py: 1.5 }}
-              disabled={isPending || pending}
+              disabled={pending}
             >
-              {isPending || pending ? 'Logging in...' : 'Log In'}
+              {pending ? 'Logging in...' : 'Log In'}
             </Button>
           </form>
 

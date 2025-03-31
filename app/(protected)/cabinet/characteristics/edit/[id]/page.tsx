@@ -7,58 +7,38 @@ import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { updateCharacteristic } from '../../actions';
 import { FormState, EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
-import { MealCharacteristicDto } from '@/api/query/meal-characteristics/meal-characteristics.dto';
 import MealCharacteristicsForm from '@/components/organisms/MealCharacteristicsForm';
+import {
+  useMealCharacteristic,
+  useUpdateMealCharacteristic,
+} from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
 
-// Initial form state for validation
 const initialState: FormState = EMPTY_FORM_STATE;
 
 export default function EditCharacteristicsPage({ params }: { params: { id: string } }) {
   const router = useRouter();
   const { id } = params;
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const [redirecting, setRedirecting] = useState(false);
-  const [characteristicData, setCharacteristicData] = useState<MealCharacteristicDto | null>(null);
 
-  // Setup form state with server validation action
+  const {
+    data: characteristicData,
+    isLoading,
+    isError,
+    error: fetchError,
+  } = useMealCharacteristic(id);
+
+  const updateMutation = useUpdateMealCharacteristic(id);
+
   const [formState, action, isPending] = useActionState(
     (prevState: FormState, formData: FormData) => updateCharacteristic(prevState, formData, id),
     initialState
   );
   const formRef = useFormReset(formState);
 
-  // Fetch the characteristic data by ID
-  useEffect(() => {
-    const fetchCharacteristic = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/meal-characteristics/${id}`, {
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch characteristic data');
-        }
-
-        const data = await response.json();
-        setCharacteristicData(data);
-      } catch (error) {
-        console.error('Error fetching characteristic:', error);
-        setError('Failed to load the characteristic. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCharacteristic();
-  }, [id]);
-
-  // Check if submission was successful
   useEffect(() => {
     if (formState.status === 'SUCCESS' && !redirecting) {
       setRedirecting(true);
-      // Redirect after a successful submission
+
       const timer = setTimeout(() => {
         router.push('/cabinet/characteristics');
       }, 1500);
@@ -70,18 +50,12 @@ export default function EditCharacteristicsPage({ params }: { params: { id: stri
     router.push('/cabinet/characteristics');
   }, [router]);
 
-  if (loading) {
-    return (
-      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
+  if (isError) {
+    const errorMessage =
+      fetchError instanceof Error ? fetchError.message : 'An unknown error occurred';
     return (
       <Box sx={{ mt: 3 }}>
-        <Alert severity="error">{error}</Alert>
+        <Alert severity="error">Failed to load the characteristic: {errorMessage}</Alert>
         <Button
           variant="outlined"
           onClick={handleCancel}
@@ -90,6 +64,15 @@ export default function EditCharacteristicsPage({ params }: { params: { id: stri
         >
           Back to List
         </Button>
+      </Box>
+    );
+  }
+
+  // Show loading state from React Query
+  if (isLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
+        <CircularProgress />
       </Box>
     );
   }
@@ -122,12 +105,18 @@ export default function EditCharacteristicsPage({ params }: { params: { id: stri
         </Alert>
       )}
 
+      {updateMutation.isPending && (
+        <Alert severity="info" sx={{ mb: 3 }}>
+          Updating nutrition plan...
+        </Alert>
+      )}
+
       {characteristicData && (
         <MealCharacteristicsForm
           isEditMode={true}
           initialData={characteristicData}
           formState={formState}
-          isPending={isPending || redirecting}
+          isPending={isPending || redirecting || updateMutation.isPending}
           action={action}
           formRef={formRef}
           onCancel={handleCancel}

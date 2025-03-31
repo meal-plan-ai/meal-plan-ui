@@ -1,10 +1,10 @@
 'use client';
 
 import { Typography, Box, Paper, Avatar, CircularProgress, Alert } from '@mui/material';
-import { useProfile } from '@/api/query/profile/profile.query';
-import { useCurrentUser } from '@/api/query/users/users.query';
 import ProfileInfoForm from './components/ProfileInfoForm';
 import PasswordChangeForm from './components/PasswordChangeForm';
+import { useCurrentUser } from '@/api/next-client-api/users/users.hooks';
+import { useProfile } from '@/api/next-client-api/profile/profile.hooks';
 
 export default function ProfilePage() {
   const { data: profile, isLoading, error } = useProfile();

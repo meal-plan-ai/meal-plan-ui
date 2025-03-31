@@ -12,15 +12,14 @@ import {
 } from '@mui/material';
 import { AccountCircle as AccountIcon, Logout as LogoutIcon } from '@mui/icons-material';
 import Link from 'next/link';
-import { useCurrentUser } from '@/api/query/users/users.query';
-import { useLogoutWithRedirect } from '@/hooks/useAuthWithRedirect';
-import { useProfile } from '@/api/query/profile/profile.query';
-
+import { useProfile } from '@/api/next-client-api/profile/profile.hooks';
+import { useCurrentUser } from '@/api/next-client-api/users/users.hooks';
+import { useLogout } from '@/api/next-client-api/auth/auth.hooks';
 export default function ProfileMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { data: user } = useCurrentUser();
   const { data: profile } = useProfile();
-  const { mutateAsync: logout } = useLogoutWithRedirect();
+  const { mutateAsync: logout } = useLogout();
 
   const handleProfileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);

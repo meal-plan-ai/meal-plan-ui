@@ -1,65 +1,27 @@
 import { NextResponse } from 'next/server';
-import { handleLogoutCookies } from '@/utils/cookies';
-import { LogoutResponseDto } from '@/api/query/auth/auth.dto';
-import { ResponseError } from '@/api/api.types';
+import { cookies } from 'next/headers';
+import { nestServerAuthApi } from '@/api/nest-server-api';
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
-    const cookie = request.headers.get('cookie') || '';
+    await nestServerAuthApi.logout();
 
-    const backendResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api'}/auth/logout`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Cookie: cookie,
-        },
-        credentials: 'include',
-      }
-    );
+    const cookieStore = await cookies();
 
-    if (!backendResponse.ok) {
-      const errorData = (await backendResponse.json()) as ResponseError;
-
-      return NextResponse.json(
-        { error: errorData.message || 'Authentication failed' },
-        {
-          status: backendResponse.status,
-          headers: {
-            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-            Pragma: 'no-cache',
-            Expires: '0',
-            'Surrogate-Control': 'no-store',
-          },
-        }
-      );
-    }
-
-    const responseData = (await backendResponse.json()) as LogoutResponseDto;
-    const response = NextResponse.json(responseData, {
-      headers: {
-        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-        Pragma: 'no-cache',
-        Expires: '0',
-        'Surrogate-Control': 'no-store',
-      },
+    cookieStore.set('token', '', {
+      expires: new Date(0),
+      path: '/',
     });
 
-    return handleLogoutCookies(response, backendResponse);
+    cookieStore.set('isAuthenticated', '', {
+      httpOnly: false,
+      expires: new Date(0),
+      path: '/',
+    });
+
+    return NextResponse.json({ success: true }, { status: 200 });
   } catch (error) {
     console.error('Logout error:', error);
-    return NextResponse.json(
-      { error: 'Failed to logout' },
-      {
-        status: 500,
-        headers: {
-          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-          Pragma: 'no-cache',
-          Expires: '0',
-          'Surrogate-Control': 'no-store',
-        },
-      }
-    );
+    return NextResponse.json({ error: 'Failed to logout' }, { status: 500 });
   }
 }
