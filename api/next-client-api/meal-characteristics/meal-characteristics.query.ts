@@ -1,18 +1,11 @@
-import { AxiosResponse } from 'axios';
+import { IBaseResponse } from '@/api/api.types';
 import nextClientApiClient from '../nextClientApiClient';
 import { NEXT_CLIENT_MEAL_CHARACTERISTICS_ENDPOINTS } from './meal-characteristics.constants';
-import {
-  MealCharacteristicResponseDto,
-  PaginatedMealCharacteristicsResponseDto,
-  DeleteMealCharacteristicResponseDto,
-} from './meal-characteristics.dto';
+import { IMealCharacteristic } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
 
 export const nextClientMealCharacteristicsApi = {
-  getAll: (
-    page: number = 1,
-    limit: number = 10
-  ): Promise<AxiosResponse<PaginatedMealCharacteristicsResponseDto>> => {
-    return nextClientApiClient.get<PaginatedMealCharacteristicsResponseDto>(
+  getAll: (page: number = 1, limit: number = 10) => {
+    return nextClientApiClient.get<IBaseResponse<IMealCharacteristic[]>>(
       NEXT_CLIENT_MEAL_CHARACTERISTICS_ENDPOINTS.GET_ALL,
       {
         params: { page, limit },
@@ -20,14 +13,14 @@ export const nextClientMealCharacteristicsApi = {
     );
   },
 
-  getById: (id: string): Promise<AxiosResponse<MealCharacteristicResponseDto>> => {
-    return nextClientApiClient.get<MealCharacteristicResponseDto>(
+  getById: (id: string) => {
+    return nextClientApiClient.get<IBaseResponse<IMealCharacteristic>>(
       NEXT_CLIENT_MEAL_CHARACTERISTICS_ENDPOINTS.GET_BY_ID(id)
     );
   },
 
-  delete: (id: string): Promise<AxiosResponse<DeleteMealCharacteristicResponseDto>> => {
-    return nextClientApiClient.delete<DeleteMealCharacteristicResponseDto>(
+  delete: (id: string) => {
+    return nextClientApiClient.delete<IBaseResponse<number | null | undefined>>(
       NEXT_CLIENT_MEAL_CHARACTERISTICS_ENDPOINTS.DELETE(id)
     );
   },

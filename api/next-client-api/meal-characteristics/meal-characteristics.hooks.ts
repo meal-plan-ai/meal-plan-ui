@@ -24,7 +24,9 @@ export function useMealCharacteristic(id: string) {
   return useQuery({
     queryKey: mealCharacteristicsKeys.detail(id),
     queryFn: async () => {
-      const { data } = await nextClientMealCharacteristicsApi.getById(id);
+      const {
+        data: { data },
+      } = await nextClientMealCharacteristicsApi.getById(id);
       return data;
     },
     enabled: !!id,

@@ -1,50 +1,38 @@
 import backendApiClient from '../nestServerApiClient';
-import { AxiosResponse } from 'axios';
 import { NEST_SERVER_MEAL_CHARACTERISTICS_ENDPOINTS } from './meal-characteristics.constants';
-import {
-  CreateMealCharacteristicRequestDto,
-  UpdateMealCharacteristicRequestDto,
-  MealCharacteristicResponseDto,
-  PaginatedMealCharacteristicsResponseDto,
-} from './meal-characteristics.types';
+import { IMealCharacteristic, IMealCharacteristicCreate } from './meal-characteristics.types';
+import { IBaseResponse } from '@/api/api.types';
 
 export const nestServerMealCharacteristicsApi = {
-  getAll: (
-    page = 1,
-    limit = 10
-  ): Promise<AxiosResponse<PaginatedMealCharacteristicsResponseDto>> => {
-    return backendApiClient.get<PaginatedMealCharacteristicsResponseDto>(
+  getAll: (page = 1, limit = 10) => {
+    return backendApiClient.get<IBaseResponse<IMealCharacteristic[]>>(
       `${NEST_SERVER_MEAL_CHARACTERISTICS_ENDPOINTS.BASE}?page=${page}&limit=${limit}`
     );
   },
 
-  getById: (id: string): Promise<AxiosResponse<MealCharacteristicResponseDto>> => {
-    return backendApiClient.get<MealCharacteristicResponseDto>(
+  getById: (id: IMealCharacteristic['id']) => {
+    return backendApiClient.get<IBaseResponse<IMealCharacteristic>>(
       NEST_SERVER_MEAL_CHARACTERISTICS_ENDPOINTS.BY_ID(id)
     );
   },
 
-  create: (
-    data: CreateMealCharacteristicRequestDto
-  ): Promise<AxiosResponse<MealCharacteristicResponseDto>> => {
-    return backendApiClient.post<MealCharacteristicResponseDto>(
+  create: (data: IMealCharacteristicCreate) => {
+    return backendApiClient.post<IBaseResponse<IMealCharacteristic>>(
       NEST_SERVER_MEAL_CHARACTERISTICS_ENDPOINTS.BASE,
       data
     );
   },
 
-  update: (
-    id: string,
-    data: UpdateMealCharacteristicRequestDto
-  ): Promise<AxiosResponse<MealCharacteristicResponseDto>> => {
-    console.log('data 222', data);
-    return backendApiClient.patch<MealCharacteristicResponseDto>(
+  update: (id: IMealCharacteristic['id'], data: Partial<IMealCharacteristic>) => {
+    return backendApiClient.patch<IBaseResponse<IMealCharacteristic>>(
       NEST_SERVER_MEAL_CHARACTERISTICS_ENDPOINTS.BY_ID(id),
       data
     );
   },
 
-  delete: (id: string): Promise<AxiosResponse<void>> => {
-    return backendApiClient.delete<void>(NEST_SERVER_MEAL_CHARACTERISTICS_ENDPOINTS.BY_ID(id));
+  delete: (id: IMealCharacteristic['id']) => {
+    return backendApiClient.delete<IBaseResponse<number | null | undefined>>(
+      NEST_SERVER_MEAL_CHARACTERISTICS_ENDPOINTS.BY_ID(id)
+    );
   },
 };

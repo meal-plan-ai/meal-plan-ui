@@ -8,6 +8,7 @@ import { createCharacteristic } from '../actions';
 import { FormState, EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
 import MealCharacteristicsForm from '@/components/organisms/MealCharacteristicsForm';
+import toast from 'react-hot-toast';
 
 const initialState: FormState = EMPTY_FORM_STATE;
 
@@ -21,10 +22,8 @@ export default function CreateCharacteristicsPage() {
   useEffect(() => {
     if (formState.status === 'SUCCESS' && !redirecting) {
       setRedirecting(true);
-      const timer = setTimeout(() => {
-        router.push('/cabinet/characteristics');
-      }, 1500);
-      return () => clearTimeout(timer);
+      toast.success('Nutrition plan created successfully');
+      router.push('/cabinet/characteristics');
     }
   }, [formState.status, redirecting, router]);
 

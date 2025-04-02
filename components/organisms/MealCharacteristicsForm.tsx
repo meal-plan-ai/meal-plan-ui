@@ -31,14 +31,14 @@ import {
 } from '@mui/icons-material';
 import { FormState } from '@/utils/form-state';
 import { calculateCalories } from '@/utils/calorieCalculations';
+import ChipInputSection from '@/components/molecules/ChipInputSection';
 import {
   ActivityLevel,
+  IMealCharacteristic,
   Gender,
   Goal,
   CookingComplexity,
-  MealCharacteristicDto,
-} from '@/api/next-client-api/meal-characteristics/meal-characteristics.dto';
-import ChipInputSection from '@/components/molecules/ChipInputSection';
+} from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
 
 // List of additional preferences
 const preferences = [
@@ -50,7 +50,11 @@ const preferences = [
 ];
 
 // Default empty characteristics state
-const defaultCharacteristics: MealCharacteristicDto = {
+const defaultCharacteristics: IMealCharacteristic = {
+  id: '',
+  userId: '',
+  createdAt: '',
+  updatedAt: '',
   // Basic information
   planName: 'My New Nutrition Plan',
   gender: Gender.MALE,
@@ -93,7 +97,7 @@ const defaultCharacteristics: MealCharacteristicDto = {
 
 interface MealCharacteristicsFormProps {
   isEditMode: boolean;
-  initialData?: MealCharacteristicDto;
+  initialData?: IMealCharacteristic;
   formState: FormState;
   isPending: boolean;
   action: (formData: FormData) => void;
@@ -113,7 +117,7 @@ export default function MealCharacteristicsForm({
   submitButtonText = isEditMode ? 'Update Plan' : 'Save Plan',
 }: MealCharacteristicsFormProps) {
   // Use initial data if provided (for edit mode), otherwise use defaults
-  const [characteristics, setCharacteristics] = useState<MealCharacteristicDto>(
+  const [characteristics, setCharacteristics] = useState<IMealCharacteristic>(
     initialData || defaultCharacteristics
   );
 

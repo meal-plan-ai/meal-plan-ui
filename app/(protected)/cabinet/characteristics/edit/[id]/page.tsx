@@ -9,7 +9,7 @@ import { FormState, EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
 import MealCharacteristicsForm from '@/components/organisms/MealCharacteristicsForm';
 import { useMealCharacteristic } from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
-
+import toast from 'react-hot-toast';
 const initialState: FormState = EMPTY_FORM_STATE;
 
 export default function EditCharacteristicsPage() {
@@ -34,11 +34,8 @@ export default function EditCharacteristicsPage() {
   useEffect(() => {
     if (formState.status === 'SUCCESS' && !redirecting) {
       setRedirecting(true);
-
-      const timer = setTimeout(() => {
-        router.push('/cabinet/characteristics');
-      }, 1500);
-      return () => clearTimeout(timer);
+      toast.success('Nutrition plan updated successfully');
+      router.push('/cabinet/characteristics');
     }
   }, [formState.status, redirecting, router]);
 
@@ -72,7 +69,7 @@ export default function EditCharacteristicsPage() {
       </Box>
     );
   }
-
+  console.log('characteristicData', characteristicData);
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>

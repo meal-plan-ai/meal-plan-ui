@@ -35,15 +35,15 @@ import {
   Scale as ScaleIcon,
 } from '@mui/icons-material';
 import {
-  ActivityLevel,
-  Goal,
-  CookingComplexity,
-  Gender,
-} from '@/api/next-client-api/meal-characteristics/meal-characteristics.dto';
-import {
   useMealCharacteristic,
   useDeleteMealCharacteristic,
 } from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
+import {
+  CookingComplexity,
+  Gender,
+  Goal,
+} from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
+import { ActivityLevel } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
 
 export default function ViewCharacteristicsPage() {
   const router = useRouter();

@@ -1,7 +1,5 @@
-import {
-  ActivityLevel,
-  Goal,
-} from '@/api/next-client-api/meal-characteristics/meal-characteristics.dto';
+import { Goal } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
+import { ActivityLevel } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
 
 interface CalorieCalculationParams {
   weight?: number;

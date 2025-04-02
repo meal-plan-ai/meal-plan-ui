@@ -30,15 +30,16 @@ import {
   Add as AddIcon,
   Visibility as ViewIcon,
 } from '@mui/icons-material';
-import {
-  MealCharacteristicResponseDto,
-  Goal,
-} from '@/api/next-client-api/meal-characteristics/meal-characteristics.dto';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import {
   useDeleteMealCharacteristic,
   useMealCharacteristics,
 } from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
+import {
+  Goal,
+  IMealCharacteristic,
+} from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
+import { toast } from 'react-hot-toast';
 
 const queryClient = new QueryClient();
 
@@ -92,6 +93,7 @@ function CharacteristicsListPageContent() {
     if (planToDelete) {
       try {
         await deleteMutation.mutateAsync(planToDelete);
+        toast.success('Plan deleted successfully');
         refetch();
       } catch (error) {
         console.error('Error deleting plan:', error);
@@ -179,14 +181,14 @@ function CharacteristicsListPageContent() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {!data || data.items.length === 0 ? (
+                  {!data || data.data.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} align="center">
                         No nutrition plans found. Create your first plan!
                       </TableCell>
                     </TableRow>
                   ) : (
-                    data.items.map((plan: MealCharacteristicResponseDto) => (
+                    data.data.map((plan: IMealCharacteristic) => (
                       <TableRow key={plan.id}>
                         <TableCell component="th" scope="row">
                           {plan.planName}

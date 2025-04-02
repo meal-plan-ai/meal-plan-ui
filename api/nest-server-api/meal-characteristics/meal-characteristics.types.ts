@@ -24,7 +24,9 @@ export enum CookingComplexity {
   GOURMET = 'Gourmet',
 }
 
-export interface CreateMealCharacteristicRequestDto {
+export interface IMealCharacteristic {
+  id: string;
+  userId: string;
   planName: string;
   gender?: Gender;
   age?: number;
@@ -46,24 +48,11 @@ export interface CreateMealCharacteristicRequestDto {
   nutrientTargets?: Record<string, number>;
   cookingComplexity?: CookingComplexity;
   additionalPreferences?: string[];
-}
-
-export interface UpdateMealCharacteristicRequestDto extends CreateMealCharacteristicRequestDto {
-  id: string;
-}
-
-export interface MealCharacteristicResponseDto extends CreateMealCharacteristicRequestDto {
-  id: string;
-  userId?: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface PaginatedMealCharacteristicsResponseDto {
-  items: MealCharacteristicResponseDto[];
-  totalItems: number;
-  page: number;
-  totalPages: number;
-  hasNextPage: boolean;
-  hasPreviousPage: boolean;
-}
+export type IMealCharacteristicCreate = Omit<
+  IMealCharacteristic,
+  'id' | 'userId' | 'createdAt' | 'updatedAt'
+>;

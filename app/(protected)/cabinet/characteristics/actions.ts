@@ -4,14 +4,12 @@ import { z } from 'zod';
 import { FormState, fromErrorToFormState, toFormState } from '@/utils/form-state';
 import { revalidatePath } from 'next/cache';
 import {
+  IMealCharacteristic,
   ActivityLevel,
   Gender,
   Goal,
   CookingComplexity,
-} from '@/api/next-client-api/meal-characteristics/meal-characteristics.dto';
-import {
-  CreateMealCharacteristicRequestDto,
-  UpdateMealCharacteristicRequestDto,
+  IMealCharacteristicCreate,
 } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
 import { nestServerMealCharacteristicsApi } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.api';
 
@@ -181,7 +179,7 @@ export async function createCharacteristic(
       };
     }
 
-    const characteristicData: CreateMealCharacteristicRequestDto = {
+    const characteristicData: IMealCharacteristicCreate = {
       planName: formData.get('planName') as string,
       gender: formData.get('gender') as Gender,
       age: formData.get('age') ? Number(formData.get('age')) : undefined,
@@ -211,9 +209,7 @@ export async function createCharacteristic(
     };
     try {
       await nestServerMealCharacteristicsApi.create(characteristicData);
-
       revalidatePath('/cabinet/characteristics');
-
       return toFormState('SUCCESS', 'Nutrition plan created successfully');
     } catch (error) {
       if (error && typeof error === 'object' && 'response' in error) {
@@ -313,7 +309,7 @@ export async function updateCharacteristic(
       };
     }
 
-    const characteristicData: UpdateMealCharacteristicRequestDto = {
+    const characteristicData: Partial<IMealCharacteristic> = {
       id,
       planName: formData.get('planName') as string,
       gender: formData.get('gender') as Gender,
@@ -344,11 +340,8 @@ export async function updateCharacteristic(
     };
 
     try {
-      console.log('characteristicData', characteristicData);
       await nestServerMealCharacteristicsApi.update(id, characteristicData);
-
       revalidatePath('/cabinet/characteristics');
-
       return toFormState('SUCCESS', 'Nutrition plan updated successfully');
     } catch (error) {
       console.log('error', error);
