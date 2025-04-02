@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import {
   Box,
   Button,
@@ -45,14 +45,14 @@ import {
   useDeleteMealCharacteristic,
 } from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
 
-export default function ViewCharacteristicsPage({ params }: { params: { id: string } }) {
+export default function ViewCharacteristicsPage() {
   const router = useRouter();
-  const { id } = params;
+  const { id } = useParams();
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [error, setError] = useState('');
 
-  const { data: plan, isLoading, isError, error: fetchError } = useMealCharacteristic(id);
+  const { data: plan, isLoading, isError, error: fetchError } = useMealCharacteristic(id as string);
 
   const deleteMutation = useDeleteMealCharacteristic();
 
@@ -74,7 +74,7 @@ export default function ViewCharacteristicsPage({ params }: { params: { id: stri
 
   const confirmDelete = useCallback(async () => {
     try {
-      await deleteMutation.mutateAsync(id);
+      await deleteMutation.mutateAsync(id as string);
       router.push('/cabinet/characteristics');
     } catch (error) {
       console.error('Error deleting plan:', error);

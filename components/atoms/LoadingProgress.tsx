@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { usePathname } from 'next/navigation';
 import NProgress from 'nprogress';
 import 'nprogress/nprogress.css';
 
@@ -14,7 +14,12 @@ NProgress.configure({
 
 export default function LoadingProgress() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
+  const [searchParamValue, setSearchParamValue] = useState('');
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    setSearchParamValue(searchParams.toString());
+  }, []);
 
   useEffect(() => {
     NProgress.start();
@@ -26,7 +31,7 @@ export default function LoadingProgress() {
     return () => {
       clearTimeout(timer);
     };
-  }, [pathname, searchParams]);
+  }, [pathname, searchParamValue]);
 
   return null;
 }

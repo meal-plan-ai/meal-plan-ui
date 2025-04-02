@@ -179,14 +179,14 @@ function CharacteristicsListPageContent() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {!data || data.length === 0 ? (
+                  {!data || data.items.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} align="center">
                         No nutrition plans found. Create your first plan!
                       </TableCell>
                     </TableRow>
                   ) : (
-                    data.map((plan: MealCharacteristicResponseDto) => (
+                    data.items.map((plan: MealCharacteristicResponseDto) => (
                       <TableRow key={plan.id}>
                         <TableCell component="th" scope="row">
                           {plan.planName}

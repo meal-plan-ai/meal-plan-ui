@@ -8,7 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
-    "prepare": "husky"
+    "prepare": "husky",
+    "type-check": "tsc --noEmit",
+    "prebuild": "npm run type-check",
+    "validate": "npm run lint && npm run type-check"
   },
   "dependencies": {
     "@emotion/react": "^11.11.0",

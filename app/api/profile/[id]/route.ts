@@ -2,15 +2,9 @@ import { NextResponse } from 'next/server';
 import { nestServerProfileApi } from '@/api/nest-server-api';
 import { AxiosError } from 'axios';
 
-interface Params {
-  params: {
-    id: string;
-  };
-}
-
-export async function PATCH(request: Request, { params }: Params) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const data = await request.json();
 
     try {

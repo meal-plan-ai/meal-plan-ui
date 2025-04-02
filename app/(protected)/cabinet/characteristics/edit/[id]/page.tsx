@@ -1,23 +1,20 @@
 'use client';
 
 import { useActionState, useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Box, Typography, Button, Alert, CircularProgress } from '@mui/material';
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { updateCharacteristic } from '../../actions';
 import { FormState, EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
 import MealCharacteristicsForm from '@/components/organisms/MealCharacteristicsForm';
-import {
-  useMealCharacteristic,
-  useUpdateMealCharacteristic,
-} from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
+import { useMealCharacteristic } from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
 
 const initialState: FormState = EMPTY_FORM_STATE;
 
-export default function EditCharacteristicsPage({ params }: { params: { id: string } }) {
+export default function EditCharacteristicsPage() {
   const router = useRouter();
-  const { id } = params;
+  const { id } = useParams();
   const [redirecting, setRedirecting] = useState(false);
 
   const {
@@ -25,12 +22,11 @@ export default function EditCharacteristicsPage({ params }: { params: { id: stri
     isLoading,
     isError,
     error: fetchError,
-  } = useMealCharacteristic(id);
-
-  const updateMutation = useUpdateMealCharacteristic(id);
+  } = useMealCharacteristic(id as string);
 
   const [formState, action, isPending] = useActionState(
-    (prevState: FormState, formData: FormData) => updateCharacteristic(prevState, formData, id),
+    (prevState: FormState, formData: FormData) =>
+      updateCharacteristic(prevState, formData, id as string),
     initialState
   );
   const formRef = useFormReset(formState);
@@ -105,7 +101,7 @@ export default function EditCharacteristicsPage({ params }: { params: { id: stri
         </Alert>
       )}
 
-      {updateMutation.isPending && (
+      {isPending && (
         <Alert severity="info" sx={{ mb: 3 }}>
           Updating nutrition plan...
         </Alert>
@@ -116,7 +112,7 @@ export default function EditCharacteristicsPage({ params }: { params: { id: stri
           isEditMode={true}
           initialData={characteristicData}
           formState={formState}
-          isPending={isPending || redirecting || updateMutation.isPending}
+          isPending={isPending || redirecting}
           action={action}
           formRef={formRef}
           onCancel={handleCancel}
