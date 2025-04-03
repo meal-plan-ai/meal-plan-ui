@@ -1,5 +1,8 @@
 export * from './auth/index';
 
+export * from './meal-characteristics/index';
+export * from './meal-plan/index';
+
 export * from './profile/profile.query';
 export * from './profile/profile.dto';
 export * from './profile/profile.types';

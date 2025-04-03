@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Box,
@@ -15,7 +15,6 @@ import {
   TablePagination,
   Button,
   IconButton,
-  Chip,
   Tooltip,
   Dialog,
   DialogActions,
@@ -23,6 +22,7 @@ import {
   DialogContentText,
   DialogTitle,
   CircularProgress,
+  Alert,
 } from '@mui/material';
 import {
   Edit as EditIcon,
@@ -30,35 +30,22 @@ import {
   Add as AddIcon,
   Visibility as ViewIcon,
 } from '@mui/icons-material';
-import { getMealPlans, deleteMealPlan } from './actions';
-import { MealPlan } from '@/lib/generateMealPlans';
+import { useDeleteMealPlan, useMealPlans } from '@/api/next-client-api/meal-plan/meal-plan.hooks';
+import toast from 'react-hot-toast';
 
 export default function MealPlansListPage() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
-  const [plans, setPlans] = useState<MealPlan[]>([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalCount, setTotalCount] = useState(0);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [planToDelete, setPlanToDelete] = useState<string | null>(null);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
-  const fetchPlans = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await getMealPlans(page + 1, rowsPerPage);
-      setPlans(response.data);
-      setTotalCount(response.pagination.total);
-    } catch (error) {
-      console.error('Error fetching plans:', error);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, rowsPerPage]);
+  const { data: plansData, isLoading: loading, refetch } = useMealPlans(page + 1, rowsPerPage);
+  const deleteMutation = useDeleteMealPlan();
 
-  useEffect(() => {
-    fetchPlans();
-  }, [page, rowsPerPage, fetchPlans]);
+  const plans = plansData?.data || [];
+  const totalCount = plans.length;
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -84,27 +71,27 @@ export default function MealPlansListPage() {
   const handleDeleteClick = (id: string) => {
     setPlanToDelete(id);
     setDeleteDialogOpen(true);
+    setDeleteError(null);
   };
 
   const handleDeleteConfirm = async () => {
     if (planToDelete) {
       try {
-        const result = await deleteMealPlan(planToDelete);
-        if (result.success) {
-          fetchPlans();
-        }
+        await deleteMutation.mutateAsync(planToDelete);
+        toast.success('Plan deleted successfully');
+        refetch();
       } catch (error) {
         console.error('Error deleting plan:', error);
-      } finally {
-        setDeleteDialogOpen(false);
-        setPlanToDelete(null);
       }
     }
+    setDeleteDialogOpen(false);
+    setPlanToDelete(null);
   };
 
   const handleDeleteCancel = () => {
     setDeleteDialogOpen(false);
     setPlanToDelete(null);
+    setDeleteError(null);
   };
 
   const formatDate = (dateString: string) => {
@@ -140,10 +127,7 @@ export default function MealPlansListPage() {
                 <TableHead>
                   <TableRow>
                     <TableCell>Name</TableCell>
-                    <TableCell>Diet Type</TableCell>
-                    <TableCell>Duration</TableCell>
-                    <TableCell>Calories</TableCell>
-                    <TableCell>Status</TableCell>
+                    <TableCell>Duration (days)</TableCell>
                     <TableCell>Created</TableCell>
                     <TableCell align="right">Actions</TableCell>
                   </TableRow>
@@ -151,7 +135,7 @@ export default function MealPlansListPage() {
                 <TableBody>
                   {plans.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={7} align="center">
+                      <TableCell colSpan={4} align="center">
                         No meal plans found. Create your first plan!
                       </TableCell>
                     </TableRow>
@@ -159,16 +143,7 @@ export default function MealPlansListPage() {
                     plans.map(plan => (
                       <TableRow key={plan.id} hover>
                         <TableCell>{plan.name}</TableCell>
-                        <TableCell>{plan.dietType}</TableCell>
-                        <TableCell>{plan.duration} days</TableCell>
-                        <TableCell>{plan.targetCalories} kcal</TableCell>
-                        <TableCell>
-                          <Chip
-                            label={plan.isActive ? 'Active' : 'Inactive'}
-                            color={plan.isActive ? 'success' : 'default'}
-                            size="small"
-                          />
-                        </TableCell>
+                        <TableCell>{plan.durationInDays}</TableCell>
                         <TableCell>{formatDate(plan.createdAt)}</TableCell>
                         <TableCell align="right">
                           <Tooltip title="View Plan">
@@ -213,6 +188,11 @@ export default function MealPlansListPage() {
           <DialogContentText>
             Are you sure you want to delete this meal plan? This action cannot be undone.
           </DialogContentText>
+          {deleteError && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {deleteError}
+            </Alert>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDeleteCancel} color="primary">
