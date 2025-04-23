@@ -42,4 +42,11 @@ export const nestServerMealPlanApi = {
       NEST_SERVER_MEAL_PLAN_ENDPOINTS.BY_ID(id)
     );
   },
+
+  generateAiPlan: (id: IMealPlan['id']) => {
+    return backendApiClient.post<IBaseResponse<IMealPlan>>(
+      NEST_SERVER_MEAL_PLAN_ENDPOINTS.GENERATE_AI_PLAN(id),
+      {}
+    );
+  },
 };

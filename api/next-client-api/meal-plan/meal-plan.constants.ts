@@ -6,4 +6,5 @@ export const NEXT_CLIENT_MEAL_PLAN_ENDPOINTS = {
   UPDATE: (id: string) => `/meal-plan/${id}`,
   DELETE: (id: string) => `/meal-plan/${id}`,
   GET_USER_PLANS: '/meal-plan/user',
+  GENERATE_AI_PLAN: (id: string) => `/meal-plan/${id}/generate-ai-plan`,
 };

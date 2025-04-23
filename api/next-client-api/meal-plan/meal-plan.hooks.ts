@@ -51,3 +51,12 @@ export function useDeleteMealPlan() {
     },
   });
 }
+
+export function useGenerateAiPlan() {
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const response = await nextClientMealPlanApi.generateAiPlan(id);
+      return response.data;
+    },
+  });
+}

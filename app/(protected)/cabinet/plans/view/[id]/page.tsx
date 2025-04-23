@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   Box,
   Typography,
@@ -14,57 +13,58 @@ import {
   Divider,
 } from '@mui/material';
 import { ArrowBack as ArrowBackIcon, Edit as EditIcon } from '@mui/icons-material';
-import { useMealPlan } from '@/api/next-client-api/meal-plan/meal-plan.hooks';
-import { IMealCharacteristic } from '@/api/nest-server-api';
+import { useMealPlan, useGenerateAiPlan } from '@/api/next-client-api/meal-plan/meal-plan.hooks';
 import { useMealCharacteristics } from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
+import { IMealCharacteristic } from '@/api/nest-server-api';
+import { use } from 'react';
 
-interface ViewMealPlanPageProps {
-  params: {
-    id: string;
+// Client-side component for interactive elements
+const ActionButtons = ({ id }: { id: string }) => {
+  const { mutate: generateAiPlan } = useGenerateAiPlan();
+
+  const handleCreateAI = () => {
+    generateAiPlan(id);
   };
-}
 
-export default function ViewMealPlanPage({ params }: ViewMealPlanPageProps) {
-  const router = useRouter();
-  const { id } = params;
+  return (
+    <>
+      <Button
+        variant="contained"
+        color="warning"
+        startIcon={<EditIcon />}
+        onClick={handleCreateAI}
+        sx={{ mr: 2 }}
+      >
+        Create AI Plan
+      </Button>
+      <Link href={`/cabinet/plans/edit/${id}`} passHref>
+        <Button variant="contained" color="primary" startIcon={<EditIcon />}>
+          Edit Plan
+        </Button>
+      </Link>
+    </>
+  );
+};
 
+// Client component wrapper for data fetching
+function MealPlanContent({ id }: { id: string }) {
   const { data: mealPlan, isLoading: loading, error: fetchError } = useMealPlan(id);
   const { data: characteristicsData, isLoading: loadingAllCharacteristics } =
     useMealCharacteristics();
-  const [mealCharacteristic, setMealCharacteristic] = useState<IMealCharacteristic | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    // Если план загружен и имеет ID характеристики, находим характеристику в полученных данных
-    if (mealPlan?.mealCharacteristicId && characteristicsData?.data) {
-      const characteristic = characteristicsData.data.find(
-        c => c.id === mealPlan.mealCharacteristicId
-      );
-      if (characteristic) {
-        setMealCharacteristic(characteristic);
-      }
-    }
-  }, [mealPlan, characteristicsData]);
-
-  // Обработка ошибок
-  useEffect(() => {
-    if (fetchError) {
-      setError('Failed to load meal plan data. Please try again.');
-    }
-  }, [fetchError]);
-
-  const handleBack = () => {
-    router.push('/cabinet/plans');
-  };
-
-  const handleEdit = () => {
-    router.push(`/cabinet/plans/edit/${id}`);
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
   };
+
+  // Find meal characteristic
+  let mealCharacteristic: IMealCharacteristic | null = null;
+  if (mealPlan?.mealCharacteristicId && characteristicsData?.data) {
+    mealCharacteristic =
+      characteristicsData.data.find(
+        (c: { id: string }) => c.id === mealPlan.mealCharacteristicId
+      ) || null;
+  }
 
   if (loading || loadingAllCharacteristics) {
     return (
@@ -74,13 +74,15 @@ export default function ViewMealPlanPage({ params }: ViewMealPlanPageProps) {
     );
   }
 
-  if (error || !mealPlan) {
+  if (fetchError || !mealPlan) {
     return (
       <Box>
-        <Button startIcon={<ArrowBackIcon />} onClick={handleBack} sx={{ mb: 2 }}>
-          Back to Plans
-        </Button>
-        <Alert severity="error">{error || 'Failed to load meal plan'}</Alert>
+        <Link href="/cabinet/plans" passHref>
+          <Button startIcon={<ArrowBackIcon />} sx={{ mb: 2 }}>
+            Back to Plans
+          </Button>
+        </Link>
+        <Alert severity="error">Failed to load meal plan</Alert>
       </Box>
     );
   }
@@ -88,16 +90,16 @@ export default function ViewMealPlanPage({ params }: ViewMealPlanPageProps) {
   return (
     <Box>
       <Box sx={{ mb: 4 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={handleBack} sx={{ mb: 2 }}>
-          Back to Plans
-        </Button>
+        <Link href="/cabinet/plans" passHref>
+          <Button startIcon={<ArrowBackIcon />} sx={{ mb: 2 }}>
+            Back to Plans
+          </Button>
+        </Link>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h4" component="h1">
             {mealPlan.name}
           </Typography>
-          <Button variant="contained" color="primary" startIcon={<EditIcon />} onClick={handleEdit}>
-            Edit Plan
-          </Button>
+          <ActionButtons id={id} />
         </Box>
       </Box>
 
@@ -216,4 +218,9 @@ export default function ViewMealPlanPage({ params }: ViewMealPlanPageProps) {
       </Grid>
     </Box>
   );
+}
+
+export default function ViewMealPlanPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params);
+  return <MealPlanContent id={id} />;
 }

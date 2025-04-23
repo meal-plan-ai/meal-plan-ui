@@ -30,4 +30,10 @@ export const nextClientMealPlanApi = {
       NEXT_CLIENT_MEAL_PLAN_ENDPOINTS.DELETE(id)
     );
   },
+
+  generateAiPlan: (id: string) => {
+    return nextClientApiClient.post<IBaseResponse<IMealPlan>>(
+      NEXT_CLIENT_MEAL_PLAN_ENDPOINTS.GENERATE_AI_PLAN(id)
+    );
+  },
 };
