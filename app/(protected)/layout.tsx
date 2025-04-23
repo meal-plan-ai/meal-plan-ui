@@ -1,6 +1,8 @@
+'use server';
+
 import ProtectedRoute from '@/components/templates/ProtectedRoute';
 import { ReactNode } from 'react';
 
-export default function ProtectedLayout({ children }: { children: ReactNode }) {
+export default async function ProtectedLayout({ children }: { children: ReactNode }) {
   return <ProtectedRoute>{children}</ProtectedRoute>;
 }

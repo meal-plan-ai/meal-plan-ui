@@ -1,3 +1,5 @@
+'use server';
+
 import { ReactNode } from 'react';
 import { Box, Container } from '@mui/material';
 import Navbar from '@/components/organisms/Navbar';
@@ -8,7 +10,7 @@ interface CabinetLayoutProps {
   children: ReactNode;
 }
 
-export default function CabinetLayout({ children }: CabinetLayoutProps) {
+export default async function CabinetLayout({ children }: CabinetLayoutProps) {
   return (
     <DrawerProvider>
       <Box sx={{ display: 'flex', minHeight: '100vh' }}>

@@ -113,7 +113,7 @@ export default function EditMealPlanPage() {
               <Select
                 labelId="meal-characteristic-label"
                 name="mealCharacteristicId"
-                defaultValue={mealPlan?.mealCharacteristicId}
+                defaultValue={mealPlan?.mealCharacteristicId ?? ''}
                 label="Meal Characteristic"
               >
                 <MenuItem value="">
