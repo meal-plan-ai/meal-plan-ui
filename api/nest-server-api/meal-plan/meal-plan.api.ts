@@ -1,6 +1,6 @@
 import backendApiClient from '../nestServerApiClient';
 import { NEST_SERVER_MEAL_PLAN_ENDPOINTS } from './meal-plan.constants';
-import { IMealPlan, IMealPlanCreate } from './meal-plan.types';
+import { IAiGeneratedMealPlan, IMealPlan, IMealPlanCreate } from './meal-plan.types';
 import { IBaseResponse } from '@/api/api.types';
 
 export const nestServerMealPlanApi = {
@@ -43,7 +43,7 @@ export const nestServerMealPlanApi = {
   },
 
   generateAiPlan: (id: IMealPlan['id']) => {
-    return backendApiClient.post<IBaseResponse<IMealPlan>>(
+    return backendApiClient.post<IBaseResponse<IAiGeneratedMealPlan>>(
       NEST_SERVER_MEAL_PLAN_ENDPOINTS.GENERATE_AI_PLAN(id),
       {}
     );
