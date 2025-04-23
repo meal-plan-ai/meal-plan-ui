@@ -344,7 +344,6 @@ export async function updateCharacteristic(
       revalidatePath('/cabinet/characteristics');
       return toFormState('SUCCESS', 'Nutrition plan updated successfully');
     } catch (error) {
-      console.log('error', error);
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as { response?: { data?: { message?: string } } };
         if (axiosError.response?.data?.message) {

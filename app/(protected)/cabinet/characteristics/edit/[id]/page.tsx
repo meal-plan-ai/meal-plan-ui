@@ -69,7 +69,7 @@ export default function EditCharacteristicsPage() {
       </Box>
     );
   }
-  console.log('characteristicData', characteristicData);
+
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>

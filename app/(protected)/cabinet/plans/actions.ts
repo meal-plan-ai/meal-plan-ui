@@ -61,7 +61,6 @@ export async function updateMealPlan(
   formData: FormData,
   id: string
 ): Promise<FormState> {
-  console.log('updateMealPlan', id, formData);
   try {
     const name = formData.get('name') as string;
     const durationInDays = Number(formData.get('durationInDays'));

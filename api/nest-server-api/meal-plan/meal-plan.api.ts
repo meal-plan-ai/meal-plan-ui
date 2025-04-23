@@ -30,7 +30,6 @@ export const nestServerMealPlanApi = {
   },
 
   update: (id: IMealPlan['id'], data: Partial<IMealPlan>) => {
-    console.log('update', id, data, NEST_SERVER_MEAL_PLAN_ENDPOINTS.BY_ID(id));
     return backendApiClient.patch<IBaseResponse<IMealPlan>>(
       NEST_SERVER_MEAL_PLAN_ENDPOINTS.BY_ID(id),
       data
