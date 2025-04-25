@@ -7,6 +7,9 @@ const publicPaths = [
   '/auth/register',
   '/auth/forgot-password',
   '/auth/reset-password',
+  '/how-it-works',
+  '/pricing',
+  '/blog',
   '/',
 ];
 
