@@ -46,8 +46,8 @@ export interface IAiGeneratedMealPlan {
   mealPlanId: string;
   userId: string;
   generatedPlan: IAiMealPlanResponse;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IMealPlan {
@@ -55,8 +55,8 @@ export interface IMealPlan {
   name: string;
   userId?: string;
   durationInDays: number;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   mealCharacteristicId?: string;
   mealCharacteristic?: IMealCharacteristic;
   aiGeneratedMealPlanId?: string;

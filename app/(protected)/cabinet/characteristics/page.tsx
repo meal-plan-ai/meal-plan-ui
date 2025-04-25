@@ -151,7 +151,7 @@ function CharacteristicsListPageContent() {
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
         <Box>
           <Typography variant="h4" component="h1">
-            My Nutrition Profiles
+            Nutrition Profiles
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
             Nutrition profiles define your dietary goals and calorie targets that will be used as

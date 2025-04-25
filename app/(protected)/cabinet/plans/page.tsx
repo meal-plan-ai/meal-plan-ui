@@ -101,17 +101,23 @@ export default function MealPlansListPage() {
 
   return (
     <Box>
-      <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between' }}>
-        <Typography variant="h4" component="h1">
-          Meal Plans
-        </Typography>
+      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+        <Box>
+          <Typography variant="h4" component="h1">
+            Meal Plans
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 1, maxWidth: '70%' }}>
+            These are your personalized meal plans with daily recipes based on your nutrition
+            profiles. Each plan includes specific meals and recipes for the entire duration.
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
           onClick={handleCreateClick}
         >
-          Create New Plan
+          Create New Meal Plan
         </Button>
       </Box>
 
@@ -126,7 +132,7 @@ export default function MealPlansListPage() {
               <Table stickyHeader>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Name</TableCell>
+                    <TableCell>Plan Name</TableCell>
                     <TableCell>Duration (days)</TableCell>
                     <TableCell>Created</TableCell>
                     <TableCell align="right">Actions</TableCell>
@@ -136,7 +142,8 @@ export default function MealPlansListPage() {
                   {plans.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={4} align="center">
-                        No meal plans found. Create your first plan!
+                        No meal plans found. Create your first complete meal plan based on a
+                        nutrition profile!
                       </TableCell>
                     </TableRow>
                   ) : (
