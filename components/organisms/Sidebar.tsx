@@ -17,8 +17,8 @@ interface SidebarProps {
 
 const menuItems = [
   { title: 'Dashboard', icon: <DashboardIcon />, path: '/cabinet' },
-  { title: 'My Characterisitcs', icon: <RestaurantIcon />, path: '/cabinet/characteristics' },
-  { title: 'My Meal Plans', icon: <CalendarIcon />, path: '/cabinet/plans' },
+  { title: 'Nutrition Profiles', icon: <RestaurantIcon />, path: '/cabinet/characteristics' },
+  { title: 'Meal Plans', icon: <CalendarIcon />, path: '/cabinet/plans' },
   { title: 'Profile', icon: <AccountIcon />, path: '/cabinet/profile' },
 ];
 

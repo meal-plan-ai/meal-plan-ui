@@ -149,16 +149,22 @@ function CharacteristicsListPageContent() {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-        <Typography variant="h4" component="h1">
-          My Nutrition Plans
-        </Typography>
+        <Box>
+          <Typography variant="h4" component="h1">
+            My Nutrition Profiles
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mb: 1 }}>
+            Nutrition profiles define your dietary goals and calorie targets that will be used as
+            the foundation for creating complete meal plans.
+          </Typography>
+        </Box>
         <Button
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
           onClick={handleCreateClick}
         >
-          Create New Plan
+          Create New Profile
         </Button>
       </Box>
 
@@ -173,7 +179,7 @@ function CharacteristicsListPageContent() {
               <Table sx={{ minWidth: 650 }}>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Plan Name</TableCell>
+                    <TableCell>Profile Name</TableCell>
                     <TableCell>Goal</TableCell>
                     <TableCell>Calories</TableCell>
                     <TableCell>Created</TableCell>
@@ -184,7 +190,7 @@ function CharacteristicsListPageContent() {
                   {!data || data.data.length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={5} align="center">
-                        No nutrition plans found. Create your first plan!
+                        No nutrition profiles found. Create your first profile!
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -240,10 +246,10 @@ function CharacteristicsListPageContent() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onClose={handleDeleteCancel}>
-        <DialogTitle>Delete Nutrition Plan</DialogTitle>
+        <DialogTitle>Delete Nutrition Profile</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this nutrition plan? This action cannot be undone.
+            Are you sure you want to delete this nutrition profile? This action cannot be undone.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
