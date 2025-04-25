@@ -18,6 +18,9 @@ import {
   MonetizationOnOutlined,
   ShoppingCartOutlined,
   SmartToyOutlined,
+  ComputerOutlined,
+  Apple,
+  Android,
 } from '@mui/icons-material';
 import Header from '../components/organisms/Header';
 import Footer from '../components/organisms/Footer';
@@ -26,6 +29,7 @@ import StatsCounter from '../components/atoms/StatsCounter';
 import FeatureCard from '../components/molecules/FeatureCard';
 import TestimonialCard from '../components/molecules/TestimonialCard';
 import StepCard from '../components/atoms/StepCard';
+import PlatformCard from '../components/molecules/PlatformCard';
 
 export default function LandingPage() {
   const { theme } = useTheme();
@@ -324,6 +328,66 @@ export default function LandingPage() {
                   />
                 </Grid>
               ))}
+            </Grid>
+          </Container>
+        </section>
+
+        {/* Platforms Section */}
+        <section className="py-16">
+          <Container maxWidth="lg">
+            <Typography
+              variant="h2"
+              component="h2"
+              align="center"
+              className="text-3xl font-bold mb-3"
+              sx={{ color: theme === 'dark' ? 'primary.light' : 'primary.dark' }}
+            >
+              Available on All Platforms
+            </Typography>
+            <Typography
+              variant="subtitle1"
+              align="center"
+              className="mb-12 max-w-2xl mx-auto"
+              sx={{ color: theme === 'dark' ? 'grey.300' : 'grey.700' }}
+            >
+              Access NutriPlan whenever and wherever you need it
+            </Typography>
+
+            <Grid container spacing={4}>
+              <Grid item xs={12} md={4}>
+                <PlatformCard
+                  icon={<ComputerOutlined fontSize="large" />}
+                  title="Web App"
+                  description="Access NutriPlan from any device with a web browser. No installation required."
+                  image="/images/web-platform.jpg"
+                  buttonText="Open Web App"
+                  buttonLink="/auth/register"
+                />
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <PlatformCard
+                  icon={<Apple fontSize="large" />}
+                  title="iOS App"
+                  description="Experience NutriPlan on your iPhone or iPad with our dedicated native app."
+                  image="/images/ios-platform.jpg"
+                  buttonText="Download on App Store"
+                  buttonLink="#"
+                  disabled={true}
+                />
+              </Grid>
+
+              <Grid item xs={12} md={4}>
+                <PlatformCard
+                  icon={<Android fontSize="large" />}
+                  title="Android App"
+                  description="Take NutriPlan with you on your Android phone or tablet."
+                  image="/images/android-platform.jpg"
+                  buttonText="Get on Google Play"
+                  buttonLink="#"
+                  disabled={true}
+                />
+              </Grid>
             </Grid>
           </Container>
         </section>
