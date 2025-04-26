@@ -12,7 +12,7 @@ const PlanDetails = ({ mealPlan }: { mealPlan: IMealPlan }) => {
   const router = useRouter();
 
   const handleEditPlan = () => {
-    router.push(`/cabinet/plans/edit/${mealPlan.id}`);
+    router.push(`/plans/edit/${mealPlan.id}`);
   };
 
   return (

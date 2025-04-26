@@ -16,10 +16,10 @@ interface SidebarProps {
 }
 
 const menuItems = [
-  { title: 'Dashboard', icon: <DashboardIcon />, path: '/cabinet' },
-  { title: 'Nutrition Profiles', icon: <RestaurantIcon />, path: '/cabinet/characteristics' },
-  { title: 'Meal Plans', icon: <CalendarIcon />, path: '/cabinet/plans' },
-  { title: 'Profile', icon: <AccountIcon />, path: '/cabinet/profile' },
+  { title: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+  { title: 'Nutrition Profiles', icon: <RestaurantIcon />, path: '/characteristics' },
+  { title: 'Meal Plans', icon: <CalendarIcon />, path: '/plans' },
+  { title: 'Profile', icon: <AccountIcon />, path: '/profile' },
 ];
 
 function Sidebar({ variant }: SidebarProps) {

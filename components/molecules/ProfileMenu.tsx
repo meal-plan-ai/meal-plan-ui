@@ -62,7 +62,7 @@ function ProfileMenu() {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem component={Link} href="/cabinet/profile" onClick={handleProfileMenuClose}>
+        <MenuItem component={Link} href="/profile" onClick={handleProfileMenuClose}>
           <ListItemIcon>
             <AccountIcon fontSize="small" />
           </ListItemIcon>

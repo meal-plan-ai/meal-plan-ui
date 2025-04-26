@@ -60,7 +60,7 @@ interface PlanSelectionProps {
   ) => void;
 }
 
-export default function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelectionProps) {
+function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelectionProps) {
   const { theme } = useTheme();
   const [annually, setAnnually] = useState(false);
 
@@ -194,7 +194,7 @@ export default function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelect
   };
 
   useEffect(() => {
-    // Если переключили на ежегодный план и выбран месячный - переключаем на ежегодный
+    // If switched to annual plan and a monthly plan is selected - switch to annual
     if (annually && selectedPlan?.interval === 'monthly' && selectedPlan?.id !== 'free') {
       const annualPlan = plans.find(p => p.id === 'premium-annually');
       if (annualPlan) {
@@ -207,7 +207,7 @@ export default function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelect
         });
       }
     }
-    // Если переключили на месячный план и выбран годовой - переключаем на месячный
+    // If switched to monthly plan and an annual plan is selected - switch to monthly
     else if (!annually && selectedPlan?.interval === 'annually') {
       const monthlyPlan = plans.find(p => p.id === 'premium-monthly');
       if (monthlyPlan) {
@@ -225,7 +225,7 @@ export default function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelect
   return (
     <Box>
       <Typography variant="h5" gutterBottom align="center" sx={{ mb: 3 }}>
-        Выберите подходящий план
+        Choose a suitable plan
       </Typography>
 
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
@@ -251,7 +251,7 @@ export default function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelect
               mr: 1,
             }}
           >
-            Ежемесячно
+            Monthly
           </Typography>
           <Typography
             variant="body1"
@@ -269,9 +269,9 @@ export default function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelect
               alignItems: 'center',
             }}
           >
-            Ежегодно
+            Annually
             <Chip
-              label={`Сэкономьте ${savingsPercentage}%`}
+              label={`Save ${savingsPercentage}%`}
               color="primary"
               size="small"
               sx={{ ml: 1 }}
@@ -331,7 +331,7 @@ export default function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelect
                         fontSize: '0.8rem',
                       }}
                     >
-                      Выбрано
+                      Selected
                     </Box>
                   )}
 
@@ -401,10 +401,11 @@ export default function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelect
                               color: theme === 'dark' ? 'grey.400' : 'grey.600',
                             }}
                           >
-                            /мес
+                            /month
                           </Typography>
                         )}
                       </Box>
+
                       {plan.interval === 'annually' && (
                         <Typography
                           variant="body2"
@@ -413,7 +414,7 @@ export default function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelect
                             mt: 1,
                           }}
                         >
-                          ${formatPrice(plan.price)} в год
+                          ${formatPrice(plan.price)} per year
                           <Typography
                             component="span"
                             variant="body2"
@@ -423,7 +424,7 @@ export default function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelect
                               fontWeight: 'bold',
                             }}
                           >
-                            (Экономия ${formatPrice(monthlyPremiumPrice * 12 - plan.price)})
+                            (Save ${formatPrice(monthlyPremiumPrice * 12 - plan.price)})
                           </Typography>
                         </Typography>
                       )}
@@ -450,3 +451,5 @@ export default function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelect
     </Box>
   );
 }
+
+export { PlanSelection };

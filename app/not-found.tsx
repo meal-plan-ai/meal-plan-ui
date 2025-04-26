@@ -37,7 +37,7 @@ export default function NotFound() {
             Go to Homepage
           </Button>
 
-          <Button variant="outlined" component={Link} href="/cabinet" size="large">
+          <Button variant="outlined" component={Link} href="/dashboard" size="large">
             Go to Dashboard
           </Button>
         </Box>

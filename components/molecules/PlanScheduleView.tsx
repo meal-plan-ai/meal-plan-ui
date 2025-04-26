@@ -65,7 +65,7 @@ const PlanScheduleView: React.FC<PlanScheduleViewProps> = ({
 
   // Navigate to detailed day view page
   const handleDayClick = (dayNumber: number) => {
-    router.push(`/cabinet/meal-plan/${mealPlan.id}/day/${dayNumber}`);
+    router.push(`/meal-plan/${mealPlan.id}/day/${dayNumber}`);
   };
 
   useEffect(() => {

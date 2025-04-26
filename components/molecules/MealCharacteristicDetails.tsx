@@ -13,7 +13,7 @@ const MealCharacteristicDetails = ({
   const router = useRouter();
 
   const onClick = useCallback(() => {
-    router.push(`/cabinet/characteristics/view/${mealCharacteristic.id}`);
+    router.push(`/characteristics/view/${mealCharacteristic.id}`);
   }, [router, mealCharacteristic.id]);
 
   return (
