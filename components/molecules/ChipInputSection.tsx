@@ -65,4 +65,4 @@ const ChipInputSection: React.FC<ChipInputSectionProps> = ({
   );
 };
 
-export default ChipInputSection;
+export { ChipInputSection };

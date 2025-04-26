@@ -5,7 +5,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { Box, Container, Grid, Typography, Divider, Stack, IconButton } from '@mui/material';
 import { Facebook, Twitter, Instagram, LinkedIn } from '@mui/icons-material';
 
-export default function Footer() {
+function Footer() {
   const { theme } = useTheme();
 
   const footerLinks = [
@@ -205,3 +205,5 @@ export default function Footer() {
     </Box>
   );
 }
+
+export { Footer };

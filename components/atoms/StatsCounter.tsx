@@ -10,12 +10,7 @@ interface StatsCounterProps {
   iconColor?: string;
 }
 
-export default function StatsCounter({
-  icon,
-  value,
-  label,
-  iconColor = 'primary.main',
-}: StatsCounterProps) {
+function StatsCounter({ icon, value, label, iconColor = 'primary.main' }: StatsCounterProps) {
   const { theme } = useTheme();
 
   return (
@@ -52,3 +47,5 @@ export default function StatsCounter({
     </Box>
   );
 }
+
+export { StatsCounter };

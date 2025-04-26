@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useTheme } from '../../contexts/ThemeContext';
+import Link from 'next/link';
 import {
   Container,
   Typography,
@@ -23,104 +22,52 @@ import {
   PersonOutline,
   CalendarTodayOutlined,
 } from '@mui/icons-material';
-import Header from '../../components/organisms/Header';
-import Footer from '../../components/organisms/Footer';
-import Link from 'next/link';
+import { useTheme } from '@/contexts/ThemeContext';
+import { useSearchParams } from 'next/navigation';
+import blogPostsData from '@/data/blogPosts.json';
+import categoriesData from '@/data/blogCategories.json';
+
+// Define a type for the blog post
+interface BlogPost {
+  id: number;
+  title: string;
+  excerpt: string;
+  image: string;
+  category: string;
+  author: string;
+  date: string;
+  readTime: string;
+  slug: string;
+  content: string;
+}
+
+// Define a type for categories
+interface BlogCategory {
+  name: string;
+  count: number;
+}
+
+// Data fetching function
+function getBlogData() {
+  // In a real app, this would fetch from an API or database
+  // For now, we're using the static JSON data
+  const featured = blogPostsData.slice(0, 2) as BlogPost[];
+  const regular = blogPostsData.slice(2) as BlogPost[];
+
+  return {
+    featuredPosts: featured,
+    regularPosts: regular,
+    categories: categoriesData as BlogCategory[],
+  };
+}
 
 export default function BlogPage() {
   const { theme } = useTheme();
-  const [searchQuery, setSearchQuery] = useState('');
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams?.get('query') || '';
+  const isDarkTheme = theme === 'dark';
 
-  // Mock blog post data
-  const blogPosts = [
-    {
-      id: 1,
-      title: 'How to Plan a Week of Healthy Meals in 30 Minutes',
-      excerpt:
-        'Discover our efficient method for planning a full week of nutritious meals in just half an hour, saving you time and improving your diet.',
-      image: '/images/blog/meal-prep.jpg',
-      category: 'Meal Planning',
-      author: 'Emma Wilson',
-      date: 'June 15, 2023',
-      readTime: '5 min read',
-      slug: 'plan-week-healthy-meals-30-minutes',
-    },
-    {
-      id: 2,
-      title: '10 Plant-Based Protein Sources You Should Include in Your Diet',
-      excerpt:
-        'Explore these powerful plant-based protein sources that can help you meet your nutritional needs while following a vegetarian or vegan diet.',
-      image: '/images/blog/plant-protein.jpg',
-      category: 'Nutrition',
-      author: 'Dr. Michael Chen',
-      date: 'May 28, 2023',
-      readTime: '7 min read',
-      slug: 'plant-based-protein-sources',
-    },
-    {
-      id: 3,
-      title: 'Budget-Friendly Meal Planning: Eat Well for Less',
-      excerpt:
-        'Learn how strategic meal planning can cut your grocery bill by up to 40% while still enjoying delicious, nutritious meals every day.',
-      image: '/images/blog/budget-meals.jpg',
-      category: 'Budgeting',
-      author: 'Sarah Johnson',
-      date: 'May 10, 2023',
-      readTime: '6 min read',
-      slug: 'budget-friendly-meal-planning',
-    },
-    {
-      id: 4,
-      title: 'The Science Behind Meal Timing: When Should You Eat?',
-      excerpt:
-        'Explore the research on meal timing and learn how adjusting when you eat can impact your metabolism, energy levels, and overall health.',
-      image: '/images/blog/meal-timing.jpg',
-      category: 'Nutrition Science',
-      author: 'Dr. James Martinez',
-      date: 'April 22, 2023',
-      readTime: '8 min read',
-      slug: 'science-behind-meal-timing',
-    },
-    {
-      id: 5,
-      title: 'Meal Prep 101: A Beginner&apos;s Guide to Efficient Cooking',
-      excerpt:
-        'Get started with meal prepping with our comprehensive guide covering essential techniques, time-saving tips, and beginner-friendly recipes.',
-      image: '/images/blog/meal-prep-guide.jpg',
-      category: 'Cooking Tips',
-      author: 'Chef Anna Lopez',
-      date: 'April 5, 2023',
-      readTime: '10 min read',
-      slug: 'meal-prep-beginners-guide',
-    },
-    {
-      id: 6,
-      title: 'Family Meal Planning: Meals That Please Everyone',
-      excerpt:
-        'Discover strategies for creating meal plans that satisfy different taste preferences and nutritional needs within your family.',
-      image: '/images/blog/family-meals.jpg',
-      category: 'Family Nutrition',
-      author: 'David Williams',
-      date: 'March 18, 2023',
-      readTime: '6 min read',
-      slug: 'family-meal-planning-guide',
-    },
-  ];
-
-  // Mock categories
-  const categories = [
-    { name: 'Meal Planning', count: 12 },
-    { name: 'Nutrition', count: 18 },
-    { name: 'Recipes', count: 24 },
-    { name: 'Cooking Tips', count: 9 },
-    { name: 'Family Nutrition', count: 7 },
-    { name: 'Budgeting', count: 5 },
-    { name: 'Nutrition Science', count: 11 },
-  ];
-
-  // Mock featured posts
-  const featuredPosts = blogPosts.slice(0, 2);
-  const regularPosts = blogPosts.slice(2);
+  const { featuredPosts, regularPosts, categories } = getBlogData();
 
   // Filter posts based on search query
   const filteredPosts = searchQuery
@@ -134,10 +81,9 @@ export default function BlogPage() {
 
   return (
     <>
-      <Header />
       <main
         className={`min-h-screen ${
-          theme === 'dark'
+          isDarkTheme
             ? 'bg-gradient-to-b from-gray-900 to-gray-800 text-white'
             : 'bg-gradient-to-b from-blue-50 to-white text-gray-800'
         }`}
@@ -150,7 +96,7 @@ export default function BlogPage() {
               component="h1"
               className="text-4xl md:text-5xl font-bold mb-4"
               sx={{
-                color: theme === 'dark' ? 'primary.light' : 'primary.dark',
+                color: isDarkTheme ? 'primary.light' : 'primary.dark',
                 fontWeight: 800,
                 textAlign: 'center',
               }}
@@ -161,7 +107,7 @@ export default function BlogPage() {
               variant="h2"
               className="text-xl md:text-2xl mb-8"
               sx={{
-                color: theme === 'dark' ? 'grey.300' : 'grey.700',
+                color: isDarkTheme ? 'grey.300' : 'grey.700',
                 fontWeight: 400,
                 maxWidth: '800px',
                 mx: 'auto',
@@ -171,14 +117,25 @@ export default function BlogPage() {
               Expert tips, healthy recipes, and nutrition insights to transform your meal planning
             </Typography>
 
-            {/* Search Bar */}
-            <Box sx={{ maxWidth: 600, mx: 'auto', mb: 8, mt: 6 }}>
+            {/* Search Form */}
+            <Box
+              component="form"
+              action="/blog"
+              method="get"
+              sx={{
+                maxWidth: 600,
+                mx: 'auto',
+                mb: 8,
+                mt: 6,
+                display: 'flex',
+              }}
+            >
               <TextField
                 fullWidth
+                name="query"
                 placeholder="Search for articles..."
                 variant="outlined"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
+                defaultValue={searchQuery}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
@@ -187,25 +144,28 @@ export default function BlogPage() {
                   ),
                 }}
                 sx={{
-                  backgroundColor: theme === 'dark' ? 'rgba(255,255,255,0.05)' : 'white',
+                  backgroundColor: isDarkTheme ? 'rgba(255,255,255,0.05)' : 'white',
                   borderRadius: 2,
                   '& .MuiOutlinedInput-root': {
                     borderRadius: 2,
                   },
                 }}
               />
+              <Button type="submit" variant="contained" sx={{ ml: 1 }}>
+                Search
+              </Button>
             </Box>
           </Container>
         </section>
 
         {/* Featured Articles */}
-        <section className={`py-12 ${theme === 'dark' ? 'bg-gray-800' : 'bg-blue-50'}`}>
+        <section className={`py-12 ${isDarkTheme ? 'bg-gray-800' : 'bg-blue-50'}`}>
           <Container maxWidth="lg">
             <Typography
               variant="h2"
               component="h2"
               className="text-3xl font-bold mb-6"
-              sx={{ color: theme === 'dark' ? 'primary.light' : 'primary.dark' }}
+              sx={{ color: isDarkTheme ? 'primary.light' : 'primary.dark' }}
             >
               Featured Articles
             </Typography>
@@ -226,7 +186,7 @@ export default function BlogPage() {
                         transform: 'translateY(-4px)',
                         boxShadow: 6,
                       },
-                      bgcolor: theme === 'dark' ? 'rgba(38, 41, 45, 0.9)' : 'white',
+                      bgcolor: isDarkTheme ? 'rgba(38, 41, 45, 0.9)' : 'white',
                     }}
                   >
                     <CardMedia
@@ -247,7 +207,7 @@ export default function BlogPage() {
                         />
                         <Typography
                           variant="caption"
-                          sx={{ color: theme === 'dark' ? 'grey.400' : 'grey.600' }}
+                          sx={{ color: isDarkTheme ? 'grey.400' : 'grey.600' }}
                         >
                           {post.readTime}
                         </Typography>
@@ -258,7 +218,7 @@ export default function BlogPage() {
                         gutterBottom
                         sx={{
                           fontWeight: 700,
-                          color: theme === 'dark' ? 'white' : 'text.primary',
+                          color: isDarkTheme ? 'white' : 'text.primary',
                           mb: 2,
                         }}
                       >
@@ -267,7 +227,7 @@ export default function BlogPage() {
                       <Typography
                         variant="body2"
                         paragraph
-                        sx={{ color: theme === 'dark' ? 'grey.300' : 'text.secondary', mb: 3 }}
+                        sx={{ color: isDarkTheme ? 'grey.300' : 'text.secondary', mb: 3 }}
                       >
                         {post.excerpt}
                       </Typography>
@@ -284,7 +244,7 @@ export default function BlogPage() {
                             sx={{
                               display: 'flex',
                               alignItems: 'center',
-                              color: theme === 'dark' ? 'grey.400' : 'grey.600',
+                              color: 'grey.600',
                               fontSize: '0.875rem',
                               mr: 2,
                             }}
@@ -296,7 +256,7 @@ export default function BlogPage() {
                             sx={{
                               display: 'flex',
                               alignItems: 'center',
-                              color: theme === 'dark' ? 'grey.400' : 'grey.600',
+                              color: 'grey.600',
                               fontSize: '0.875rem',
                             }}
                           >
@@ -333,7 +293,7 @@ export default function BlogPage() {
                   variant="h2"
                   component="h2"
                   className="text-3xl font-bold mb-6"
-                  sx={{ color: theme === 'dark' ? 'primary.light' : 'primary.dark' }}
+                  sx={{ color: isDarkTheme ? 'primary.light' : 'primary.dark' }}
                 >
                   {searchQuery ? 'Search Results' : 'Latest Articles'}
                 </Typography>
@@ -355,7 +315,7 @@ export default function BlogPage() {
                               transform: 'translateY(-4px)',
                               boxShadow: 4,
                             },
-                            bgcolor: theme === 'dark' ? 'rgba(38, 41, 45, 0.7)' : 'white',
+                            bgcolor: isDarkTheme ? 'rgba(38, 41, 45, 0.9)' : 'white',
                           }}
                         >
                           <CardMedia
@@ -379,7 +339,7 @@ export default function BlogPage() {
                               gutterBottom
                               sx={{
                                 fontWeight: 600,
-                                color: theme === 'dark' ? 'white' : 'text.primary',
+                                color: isDarkTheme ? 'white' : 'text.primary',
                                 mb: 1.5,
                               }}
                             >
@@ -389,7 +349,7 @@ export default function BlogPage() {
                               variant="body2"
                               paragraph
                               sx={{
-                                color: theme === 'dark' ? 'grey.300' : 'text.secondary',
+                                color: isDarkTheme ? 'grey.300' : 'text.secondary',
                                 mb: 2,
                                 overflow: 'hidden',
                                 textOverflow: 'ellipsis',
@@ -405,7 +365,7 @@ export default function BlogPage() {
                             >
                               <Typography
                                 variant="caption"
-                                sx={{ color: theme === 'dark' ? 'grey.400' : 'grey.600' }}
+                                sx={{ color: isDarkTheme ? 'grey.400' : 'grey.600' }}
                               >
                                 {post.date} • {post.readTime}
                               </Typography>
@@ -431,20 +391,17 @@ export default function BlogPage() {
                       p: 4,
                       textAlign: 'center',
                       borderRadius: 2,
-                      backgroundColor: theme === 'dark' ? 'rgba(38, 41, 45, 0.7)' : 'white',
+                      backgroundColor: isDarkTheme ? 'rgba(38, 41, 45, 0.7)' : 'white',
                     }}
                   >
                     <Typography variant="h6">
                       No articles found matching &quot;{searchQuery}&quot;
                     </Typography>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      sx={{ mt: 2 }}
-                      onClick={() => setSearchQuery('')}
-                    >
-                      Clear Search
-                    </Button>
+                    <Link href="/blog">
+                      <Button variant="contained" color="primary" sx={{ mt: 2 }}>
+                        Clear Search
+                      </Button>
+                    </Link>
                   </Paper>
                 )}
 
@@ -472,7 +429,7 @@ export default function BlogPage() {
                       p: 3,
                       mb: 4,
                       borderRadius: 2,
-                      backgroundColor: theme === 'dark' ? 'rgba(38, 41, 45, 0.7)' : 'white',
+                      backgroundColor: isDarkTheme ? 'rgba(38, 41, 45, 0.7)' : 'white',
                     }}
                   >
                     <Typography
@@ -481,21 +438,19 @@ export default function BlogPage() {
                       sx={{
                         fontWeight: 700,
                         mb: 2,
-                        color: theme === 'dark' ? 'primary.light' : 'primary.dark',
+                        color: isDarkTheme ? 'primary.light' : 'primary.dark',
                       }}
                     >
                       Categories
                     </Typography>
                     <Box component="ul" sx={{ listStyle: 'none', p: 0, m: 0 }}>
-                      {categories.map(category => (
+                      {categories.map((category: BlogCategory) => (
                         <Box
                           key={category.name}
                           component="li"
                           sx={{
                             py: 1,
-                            borderBottom: `1px solid ${
-                              theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
-                            }`,
+                            borderBottom: `1px solid ${isDarkTheme ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
                             '&:last-child': { borderBottom: 'none' },
                           }}
                         >
@@ -507,7 +462,7 @@ export default function BlogPage() {
                               sx={{
                                 display: 'flex',
                                 justifyContent: 'space-between',
-                                color: theme === 'dark' ? 'grey.300' : 'text.primary',
+                                color: isDarkTheme ? 'grey.300' : 'text.primary',
                                 '&:hover': { color: 'primary.main' },
                                 textDecoration: 'none',
                               }}
@@ -529,7 +484,7 @@ export default function BlogPage() {
                       p: 3,
                       mb: 4,
                       borderRadius: 2,
-                      backgroundColor: theme === 'dark' ? 'primary.dark' : 'primary.light',
+                      backgroundColor: isDarkTheme ? 'primary.dark' : 'primary.light',
                       color: 'white',
                     }}
                   >
@@ -588,7 +543,7 @@ export default function BlogPage() {
                     sx={{
                       p: 3,
                       borderRadius: 2,
-                      backgroundColor: theme === 'dark' ? 'rgba(38, 41, 45, 0.7)' : 'white',
+                      backgroundColor: isDarkTheme ? 'rgba(38, 41, 45, 0.7)' : 'white',
                     }}
                   >
                     <Typography
@@ -597,7 +552,7 @@ export default function BlogPage() {
                       sx={{
                         fontWeight: 700,
                         mb: 2,
-                        color: theme === 'dark' ? 'primary.light' : 'primary.dark',
+                        color: isDarkTheme ? 'primary.light' : 'primary.dark',
                       }}
                     >
                       Popular Tags
@@ -621,12 +576,14 @@ export default function BlogPage() {
                           size="small"
                           clickable
                           sx={{
-                            backgroundColor:
-                              theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
-                            color: theme === 'dark' ? 'grey.300' : 'text.primary',
+                            backgroundColor: isDarkTheme
+                              ? 'rgba(255,255,255,0.1)'
+                              : 'rgba(0,0,0,0.05)',
+                            color: isDarkTheme ? 'grey.300' : 'text.primary',
                             '&:hover': {
-                              backgroundColor:
-                                theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)',
+                              backgroundColor: isDarkTheme
+                                ? 'rgba(255,255,255,0.2)'
+                                : 'rgba(0,0,0,0.1)',
                             },
                           }}
                         />
@@ -640,21 +597,21 @@ export default function BlogPage() {
         </section>
 
         {/* CTA Section */}
-        <section className={`py-16 ${theme === 'dark' ? 'bg-gray-700' : 'bg-blue-100'}`}>
+        <section className={`py-16 ${isDarkTheme ? 'bg-gray-700' : 'bg-blue-100'}`}>
           <Container maxWidth="md">
             <Box className="text-center p-8 rounded-xl">
               <Typography
                 variant="h3"
                 component="h2"
                 className="text-2xl md:text-3xl font-bold mb-4"
-                sx={{ color: theme === 'dark' ? 'primary.light' : 'primary.dark' }}
+                sx={{ color: isDarkTheme ? 'primary.light' : 'primary.dark' }}
               >
                 Ready to Start Your Meal Planning Journey?
               </Typography>
               <Typography
                 variant="subtitle1"
                 className="mb-8 max-w-2xl mx-auto"
-                sx={{ color: theme === 'dark' ? 'grey.300' : 'grey.700' }}
+                sx={{ color: isDarkTheme ? 'grey.300' : 'grey.700' }}
               >
                 Join thousands of satisfied users and transform your eating habits with NutriPlan
               </Typography>
@@ -672,7 +629,6 @@ export default function BlogPage() {
           </Container>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

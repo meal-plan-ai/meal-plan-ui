@@ -11,13 +11,7 @@ interface TestimonialCardProps {
   rating: number;
 }
 
-export default function TestimonialCard({
-  name,
-  avatar,
-  role,
-  review,
-  rating,
-}: TestimonialCardProps) {
+function TestimonialCard({ name, avatar, role, review, rating }: TestimonialCardProps) {
   const { theme } = useTheme();
 
   return (
@@ -49,3 +43,5 @@ export default function TestimonialCard({
     </Paper>
   );
 }
+
+export { TestimonialCard };

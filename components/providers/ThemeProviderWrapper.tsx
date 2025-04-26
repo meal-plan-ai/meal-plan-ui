@@ -4,9 +4,8 @@ import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme } from '@mui/material/styles';
 import { Inter } from 'next/font/google';
-import { ThemeProvider } from '@/contexts/ThemeContext';
-import { useTheme } from '@/contexts/ThemeContext';
-import LoadingProgress from '@/components/atoms/LoadingProgress';
+import { ThemeProvider, useTheme } from '@/contexts';
+import { LoadingProgress } from '@/components';
 interface ThemeProviderWrapperProps {
   children: React.ReactNode;
 }

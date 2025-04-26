@@ -9,7 +9,7 @@ interface PublicRouteProps {
   redirectPath?: string;
 }
 
-export default function PublicRoute({ children, redirectPath = '/' }: PublicRouteProps) {
+function PublicRoute({ children, redirectPath = '/' }: PublicRouteProps) {
   const router = useRouter();
   const { data: user, isLoading } = useCurrentUser();
 
@@ -25,3 +25,5 @@ export default function PublicRoute({ children, redirectPath = '/' }: PublicRout
 
   return <>{children}</>;
 }
+
+export { PublicRoute };

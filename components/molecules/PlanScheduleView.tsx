@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState, useRef, useEffect } from 'react';
 import {
   Box,
@@ -9,10 +11,11 @@ import {
   Paper,
 } from '@mui/material';
 import { ChevronLeft, ChevronRight } from '@mui/icons-material';
-import DayPlanCard from './DayPlanCard';
+
 import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import { IMealPlan } from '@/api/nest-server-api/meal-plan/meal-plan.types';
+import DayPlanCard from './DayPlanCard';
 
 interface PlanScheduleViewProps {
   mealPlan: IMealPlan;

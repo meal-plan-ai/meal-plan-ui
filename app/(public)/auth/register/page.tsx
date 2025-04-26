@@ -1,13 +1,12 @@
 'use client';
 
-import { useFormState } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button, TextField, Paper, Typography, Box, Container, Alert } from '@mui/material';
 import { registerAction, RegisterValidationResult } from '@/actions/auth.actions';
 import { EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useActionState } from 'react';
 
 const initialState: RegisterValidationResult = {
   success: false,
@@ -18,7 +17,7 @@ const initialState: RegisterValidationResult = {
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [validationResult, action, pending] = useFormState(registerAction, initialState);
+  const [validationResult, action, pending] = useActionState(registerAction, initialState);
   const { formState } = validationResult;
   const formRef = useFormReset(formState);
   const redirectedRef = useRef(false);
@@ -33,7 +32,7 @@ export default function RegisterPage() {
 
   return (
     <Container maxWidth="sm">
-      <Box sx={{ mt: 8 }}>
+      <Box sx={{ my: 8 }}>
         <Paper sx={{ p: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom>
             Create an Account

@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import { Menu as MenuIcon, DarkMode, LightMode, Close } from '@mui/icons-material';
 
-export default function Header() {
+function Header() {
   const { theme, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -168,3 +168,5 @@ export default function Header() {
     </AppBar>
   );
 }
+
+export { Header };

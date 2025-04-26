@@ -1,6 +1,5 @@
 'use client';
 
-import { useTheme } from '../../contexts/ThemeContext';
 import {
   Container,
   Typography,
@@ -22,8 +21,7 @@ import {
   FormatListBulletedOutlined,
   CheckCircleOutline,
 } from '@mui/icons-material';
-import Header from '../../components/organisms/Header';
-import Footer from '../../components/organisms/Footer';
+import { useTheme } from '@/contexts';
 
 export default function HowItWorksPage() {
   const { theme } = useTheme();
@@ -154,7 +152,6 @@ export default function HowItWorksPage() {
 
   return (
     <>
-      <Header />
       <main
         className={`min-h-screen ${theme === 'dark' ? 'bg-gradient-to-b from-gray-900 to-gray-800 text-white' : 'bg-gradient-to-b from-blue-50 to-white text-gray-800'}`}
       >
@@ -521,7 +518,6 @@ export default function HowItWorksPage() {
           </Container>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

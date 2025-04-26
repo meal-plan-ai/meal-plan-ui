@@ -1,3 +1,5 @@
+'use client';
+
 import { IMealPlan } from '@/api/nest-server-api';
 import { Box, Button, CardContent, Divider, Grid, Typography } from '@mui/material';
 import { Edit as EditIcon } from '@mui/icons-material';

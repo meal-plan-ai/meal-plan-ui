@@ -386,4 +386,4 @@ const DayPlanDetailView: React.FC<DayPlanDetailViewProps> = ({ dayPlan }) => {
   );
 };
 
-export default DayPlanDetailView;
+export { DayPlanDetailView };

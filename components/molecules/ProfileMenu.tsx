@@ -15,7 +15,8 @@ import Link from 'next/link';
 import { useProfile } from '@/api/next-client-api/profile/profile.hooks';
 import { useCurrentUser } from '@/api/next-client-api/users/users.hooks';
 import { useLogout } from '@/api/next-client-api/auth/auth.hooks';
-export default function ProfileMenu() {
+
+function ProfileMenu() {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const { data: user } = useCurrentUser();
   const { data: profile } = useProfile();
@@ -80,3 +81,5 @@ export default function ProfileMenu() {
     </>
   );
 }
+
+export { ProfileMenu };

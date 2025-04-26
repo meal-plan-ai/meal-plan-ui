@@ -2,11 +2,10 @@
 
 import { AppBar, Toolbar, IconButton, Typography, Box } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
-import ThemeToggle from '../atoms/ThemeToggle';
-import ProfileMenu from '../molecules/ProfileMenu';
+import { ThemeToggle, ProfileMenu } from '@/components';
 import { useDrawer } from '../providers/DrawerController';
 
-export default function Navbar() {
+function Navbar() {
   const { toggleDrawer } = useDrawer();
 
   return (
@@ -33,3 +32,5 @@ export default function Navbar() {
     </AppBar>
   );
 }
+
+export { Navbar };

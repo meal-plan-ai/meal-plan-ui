@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '../../../contexts/ThemeContext';
 import {
   Container,
   Typography,
@@ -28,8 +28,6 @@ import {
   ShoppingCartOutlined,
   TagOutlined,
 } from '@mui/icons-material';
-import Header from '../../components/organisms/Header';
-import Footer from '../../components/organisms/Footer';
 import Link from 'next/link';
 
 export default function PricingPage() {
@@ -159,13 +157,12 @@ export default function PricingPage() {
         },
       ],
       ctaText: annually ? 'Get Premium Annually' : 'Get Premium Monthly',
-      ctaLink: '/auth/register?plan=premium',
+      ctaLink: '/cabinet/payment',
     },
   ];
 
   return (
     <>
-      <Header />
       <main
         className={`min-h-screen ${theme === 'dark' ? 'bg-gradient-to-b from-gray-900 to-gray-800 text-white' : 'bg-gradient-to-b from-blue-50 to-white text-gray-800'}`}
       >
@@ -701,7 +698,7 @@ export default function PricingPage() {
                     Start Free
                   </Button>
                 </Link>
-                <Link href="/auth/register?plan=premium" passHref>
+                <Link href="/cabinet/payment" passHref>
                   <Button
                     variant="contained"
                     color="primary"
@@ -716,7 +713,6 @@ export default function PricingPage() {
           </Container>
         </section>
       </main>
-      <Footer />
     </>
   );
 }

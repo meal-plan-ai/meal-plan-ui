@@ -1,3 +1,4 @@
+import { EMealType } from '../../../../meal-plan-server/src/modules/ai-meal-generator/entities/ai-generated-meal-plan.interface';
 import { IMealCharacteristic } from '../meal-characteristics/meal-characteristics.types';
 
 export interface IAiMealPlanResponse {
@@ -17,7 +18,7 @@ export interface IAiDayPlan {
 }
 
 export interface IAiMeal {
-  mealType: 'breakfast' | 'lunch' | 'dinner' | 'snack';
+  mealType: EMealType;
   name: string;
   description: string;
   nutrition: {

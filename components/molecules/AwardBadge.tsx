@@ -11,7 +11,7 @@ interface AwardBadgeProps {
   accentColor?: string;
 }
 
-export default function AwardBadge({
+function AwardBadge({
   icon,
   title,
   organization,
@@ -56,3 +56,5 @@ export default function AwardBadge({
     </Paper>
   );
 }
+
+export { AwardBadge };

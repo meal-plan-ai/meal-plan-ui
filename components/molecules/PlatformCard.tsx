@@ -13,7 +13,7 @@ interface PlatformCardProps {
   disabled?: boolean;
 }
 
-export default function PlatformCard({
+function PlatformCard({
   icon,
   title,
   description,
@@ -111,3 +111,5 @@ export default function PlatformCard({
     </Paper>
   );
 }
+
+export { PlatformCard };

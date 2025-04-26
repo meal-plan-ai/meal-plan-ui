@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "title": "How to Plan a Week of Healthy Meals in 30 Minutes",
+    "excerpt": "Discover our efficient method for planning a full week of nutritious meals in just half an hour, saving you time and improving your diet.",
+    "image": "/images/blog/meal-prep.jpg",
+    "category": "Meal Planning",
+    "author": "Emma Wilson",
+    "date": "June 15, 2023",
+    "readTime": "5 min read",
+    "slug": "plan-week-healthy-meals-30-minutes",
+    "content": "This is the full content of the blog post. It would contain multiple paragraphs, headings, and possibly images. This is just a placeholder for the actual content that would be displayed on the blog post page."
+  },
+  {
+    "id": 2,
+    "title": "10 Plant-Based Protein Sources You Should Include in Your Diet",
+    "excerpt": "Explore these powerful plant-based protein sources that can help you meet your nutritional needs while following a vegetarian or vegan diet.",
+    "image": "/images/blog/plant-protein.jpg",
+    "category": "Nutrition",
+    "author": "Dr. Michael Chen",
+    "date": "May 28, 2023",
+    "readTime": "7 min read",
+    "slug": "plant-based-protein-sources",
+    "content": "This is the full content of the blog post about plant-based protein sources. It would include descriptions of different protein sources, their nutritional profiles, and how to incorporate them into your diet."
+  },
+  {
+    "id": 3,
+    "title": "Budget-Friendly Meal Planning: Eat Well for Less",
+    "excerpt": "Learn how strategic meal planning can cut your grocery bill by up to 40% while still enjoying delicious, nutritious meals every day.",
+    "image": "/images/blog/budget-meals.jpg",
+    "category": "Budgeting",
+    "author": "Sarah Johnson",
+    "date": "May 10, 2023",
+    "readTime": "6 min read",
+    "slug": "budget-friendly-meal-planning",
+    "content": "This article would provide practical tips on how to plan meals on a budget, including shopping strategies, affordable ingredients, and sample meal plans."
+  },
+  {
+    "id": 4,
+    "title": "The Science Behind Meal Timing: When Should You Eat?",
+    "excerpt": "Explore the research on meal timing and learn how adjusting when you eat can impact your metabolism, energy levels, and overall health.",
+    "image": "/images/blog/meal-timing.jpg",
+    "category": "Nutrition Science",
+    "author": "Dr. James Martinez",
+    "date": "April 22, 2023",
+    "readTime": "8 min read",
+    "slug": "science-behind-meal-timing",
+    "content": "This article would discuss the scientific research on meal timing, including topics like intermittent fasting, eating windows, and how meal timing affects metabolism and other bodily functions."
+  },
+  {
+    "id": 5,
+    "title": "Meal Prep 101: A Beginner's Guide to Efficient Cooking",
+    "excerpt": "Get started with meal prepping with our comprehensive guide covering essential techniques, time-saving tips, and beginner-friendly recipes.",
+    "image": "/images/blog/meal-prep-guide.jpg",
+    "category": "Cooking Tips",
+    "author": "Chef Anna Lopez",
+    "date": "April 5, 2023",
+    "readTime": "10 min read",
+    "slug": "meal-prep-beginners-guide",
+    "content": "This guide would walk beginners through the process of meal prepping, including planning, shopping, preparation techniques, storage solutions, and sample recipes to get started."
+  },
+  {
+    "id": 6,
+    "title": "Family Meal Planning: Meals That Please Everyone",
+    "excerpt": "Discover strategies for creating meal plans that satisfy different taste preferences and nutritional needs within your family.",
+    "image": "/images/blog/family-meals.jpg",
+    "category": "Family Nutrition",
+    "author": "David Williams",
+    "date": "March 18, 2023",
+    "readTime": "6 min read",
+    "slug": "family-meal-planning-guide",
+    "content": "This article would address the challenges of cooking for a family with different preferences and dietary needs, offering strategies for creating flexible meal plans and recipes that can be customized."
+  }
+]

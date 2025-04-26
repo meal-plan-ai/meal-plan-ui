@@ -9,7 +9,7 @@ interface StepCardProps {
   description: string;
 }
 
-export default function StepCard({ number, title, description }: StepCardProps) {
+function StepCard({ number, title, description }: StepCardProps) {
   const { theme } = useTheme();
 
   return (
@@ -42,3 +42,5 @@ export default function StepCard({ number, title, description }: StepCardProps) 
     </Box>
   );
 }
+
+export { StepCard };

@@ -1,13 +1,12 @@
 'use client';
 
-import { useFormState } from 'react-dom';
+import { useEffect, useRef, useActionState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button, TextField, Paper, Typography, Box, Container, Alert } from '@mui/material';
 import { loginAction } from '@/actions/auth.actions';
 import { EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
-import { useEffect, useRef } from 'react';
 
 const initialState = {
   success: false,
@@ -18,7 +17,7 @@ const initialState = {
 
 export default function LoginPage() {
   const router = useRouter();
-  const [validationResult, action, pending] = useFormState(loginAction, initialState);
+  const [validationResult, action, pending] = useActionState(loginAction, initialState);
   const { formState } = validationResult;
   const formRef = useFormReset(formState);
   const redirectedRef = useRef(false);
@@ -32,7 +31,7 @@ export default function LoginPage() {
 
   return (
     <Container maxWidth="sm">
-      <Box sx={{ mt: 8 }}>
+      <Box sx={{ my: 8 }}>
         <Paper sx={{ p: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom>
             Login

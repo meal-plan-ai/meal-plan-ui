@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { Box } from '@mui/material';
+import { Footer, Header } from '@/components/organisms';
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
@@ -13,7 +14,9 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         bgcolor: 'background.default',
       }}
     >
+      <Header />
       {children}
+      <Footer />
     </Box>
   );
 }

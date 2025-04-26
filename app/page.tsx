@@ -22,14 +22,16 @@ import {
   Apple,
   Android,
 } from '@mui/icons-material';
-import Header from '../components/organisms/Header';
-import Footer from '../components/organisms/Footer';
-import AwardBadge from '../components/molecules/AwardBadge';
-import StatsCounter from '../components/atoms/StatsCounter';
-import FeatureCard from '../components/molecules/FeatureCard';
-import TestimonialCard from '../components/molecules/TestimonialCard';
-import StepCard from '../components/atoms/StepCard';
-import PlatformCard from '../components/molecules/PlatformCard';
+import {
+  Header,
+  Footer,
+  AwardBadge,
+  StatsCounter,
+  FeatureCard,
+  TestimonialCard,
+  StepCard,
+  PlatformCard,
+} from '@/components';
 
 export default function LandingPage() {
   const { theme } = useTheme();

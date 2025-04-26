@@ -22,7 +22,7 @@ const menuItems = [
   { title: 'Profile', icon: <AccountIcon />, path: '/cabinet/profile' },
 ];
 
-export default function Sidebar({ variant }: SidebarProps) {
+function Sidebar({ variant }: SidebarProps) {
   const pathname = usePathname();
   const { drawerOpen, toggleDrawer } = useDrawer();
 
@@ -77,3 +77,5 @@ export default function Sidebar({ variant }: SidebarProps) {
     </Drawer>
   );
 }
+
+export { Sidebar };

@@ -10,7 +10,7 @@ interface FeatureCardProps {
   bgColor?: string;
 }
 
-export default function FeatureCard({ icon, title, description, bgColor }: FeatureCardProps) {
+function FeatureCard({ icon, title, description, bgColor }: FeatureCardProps) {
   const { theme } = useTheme();
 
   return (
@@ -54,3 +54,5 @@ export default function FeatureCard({ icon, title, description, bgColor }: Featu
     </Paper>
   );
 }
+
+export { FeatureCard };

@@ -31,7 +31,7 @@ import {
 } from '@mui/icons-material';
 import { FormState } from '@/utils/form-state';
 import { calculateCalories } from '@/utils/calorieCalculations';
-import ChipInputSection from '@/components/molecules/ChipInputSection';
+import { ChipInputSection } from '@/components';
 import {
   ActivityLevel,
   IMealCharacteristic,
@@ -106,7 +106,7 @@ interface MealCharacteristicsFormProps {
   submitButtonText?: string;
 }
 
-export default function MealCharacteristicsForm({
+function MealCharacteristicsForm({
   isEditMode,
   initialData,
   formState,
@@ -721,7 +721,9 @@ export default function MealCharacteristicsForm({
               onAdd={handleAddDietType}
               onRemove={handleRemoveDietType}
               inputValue={newDietType}
-              onInputChange={e => setNewDietType(e.target.value)}
+              onInputChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setNewDietType(e.target.value)
+              }
               inputLabel="Add Diet Type"
             />
           </Grid>
@@ -731,14 +733,16 @@ export default function MealCharacteristicsForm({
               description="Select vitamins and minerals you want to prioritize in your meal plan:"
               items={characteristics.vitaminsAndMinerals || []}
               onAdd={handleAddVitamin}
-              onRemove={vitamin => {
+              onRemove={(vitamin: string) => {
                 const index = characteristics.vitaminsAndMinerals?.indexOf(vitamin) || -1;
                 if (index !== -1) {
                   handleRemoveVitamin(index);
                 }
               }}
               inputValue={newVitamin}
-              onInputChange={e => setNewVitamin(e.target.value)}
+              onInputChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setNewVitamin(e.target.value)
+              }
               inputLabel="Add Vitamin or Mineral"
             />
           </Grid>
@@ -750,7 +754,9 @@ export default function MealCharacteristicsForm({
               onAdd={handleAddIngredient}
               onRemove={handleRemoveIngredient}
               inputValue={newIngredient}
-              onInputChange={e => setNewIngredient(e.target.value)}
+              onInputChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setNewIngredient(e.target.value)
+              }
               inputLabel="Add Ingredient to Avoid"
             />
           </Grid>
@@ -901,3 +907,5 @@ export default function MealCharacteristicsForm({
     </form>
   );
 }
+
+export { MealCharacteristicsForm };

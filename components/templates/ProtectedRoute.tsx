@@ -9,10 +9,7 @@ interface ProtectedRouteProps {
   fallbackPath?: string;
 }
 
-export default function ProtectedRoute({
-  children,
-  fallbackPath = '/auth/login',
-}: ProtectedRouteProps) {
+function ProtectedRoute({ children, fallbackPath = '/auth/login' }: ProtectedRouteProps) {
   const router = useRouter();
   const { data: user, isLoading } = useCurrentUser();
 
@@ -32,3 +29,5 @@ export default function ProtectedRoute({
 
   return <>{children}</>;
 }
+
+export { ProtectedRoute };

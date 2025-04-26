@@ -12,7 +12,7 @@ NProgress.configure({
   showSpinner: false,
 });
 
-export default function LoadingProgress() {
+function LoadingProgress() {
   const pathname = usePathname();
   const [searchParamValue, setSearchParamValue] = useState('');
 
@@ -35,3 +35,5 @@ export default function LoadingProgress() {
 
   return null;
 }
+
+export { LoadingProgress };

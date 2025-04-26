@@ -20,7 +20,10 @@ export function middleware(request: NextRequest) {
   const isAuthenticated = !!token?.value;
 
   // Check if the path is public (auth pages)
-  const isPublicPath = publicPaths.some(path => pathname === path);
+  // Now also supports paths that start with '/blog/' for dynamic blog post pages
+  const isPublicPath = publicPaths.some(
+    path => pathname === path || (path === '/blog' && pathname.startsWith('/blog/'))
+  );
 
   // If trying to access auth pages while logged in, redirect to cabinet
   if (isPublicPath && isAuthenticated) {
