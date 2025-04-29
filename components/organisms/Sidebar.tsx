@@ -7,6 +7,7 @@ import {
   Restaurant as RestaurantIcon,
   CalendarMonth as CalendarIcon,
   AccountCircle as AccountIcon,
+  CreditCard as CreditCardIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { useDrawer } from '../providers/DrawerController';
@@ -19,6 +20,7 @@ const menuItems = [
   { title: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
   { title: 'Nutrition Profiles', icon: <RestaurantIcon />, path: '/characteristics' },
   { title: 'Meal Plans', icon: <CalendarIcon />, path: '/plans' },
+  { title: 'Subscription', icon: <CreditCardIcon />, path: '/subscription' },
   { title: 'Profile', icon: <AccountIcon />, path: '/profile' },
 ];
 

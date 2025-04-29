@@ -1,10 +1,11 @@
 'use client';
 
-import { AppBar, Toolbar, IconButton, Typography, Box, Button } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
+import { AppBar, Toolbar, IconButton, Typography, Box, Button, Chip } from '@mui/material';
+import { Menu as MenuIcon, CheckCircle } from '@mui/icons-material';
 import { ThemeToggle, ProfileMenu } from '@/components';
 import { useDrawer } from '../providers/DrawerController';
 import { useRouter } from 'next/navigation';
+import { useGetUserSubscription } from '@/api/next-client-api/users/users.hooks';
 
 function Navbar() {
   const { toggleDrawer } = useDrawer();
@@ -13,6 +14,8 @@ function Navbar() {
   const handleBuyPremium = () => {
     router.push('/checkout');
   };
+
+  const { data: userSubscription } = useGetUserSubscription();
 
   return (
     <AppBar position="fixed" sx={{ zIndex: theme => theme.zIndex.drawer + 1 }}>
@@ -31,19 +34,37 @@ function Navbar() {
         </Typography>
 
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <Button
-            variant="contained"
-            color="secondary"
-            onClick={handleBuyPremium}
-            sx={{
-              fontWeight: 'bold',
-              '&:hover': {
-                backgroundColor: theme => theme.palette.secondary.dark,
-              },
-            }}
-          >
-            Buy Premium
-          </Button>
+          {userSubscription?.hasActiveSubscription ? (
+            <Chip
+              icon={<CheckCircle />}
+              label="Premium Active"
+              color="success"
+              variant="outlined"
+              size="small"
+              sx={{
+                borderRadius: '16px',
+                fontWeight: 'medium',
+                color: 'white',
+                borderColor: 'success.light',
+                '& .MuiChip-icon': { color: 'success.light' },
+              }}
+            />
+          ) : (
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={handleBuyPremium}
+              sx={{
+                fontWeight: 'bold',
+                '&:hover': {
+                  backgroundColor: theme => theme.palette.secondary.dark,
+                },
+              }}
+            >
+              Buy Premium
+            </Button>
+          )}
+
           <ThemeToggle />
           <ProfileMenu />
         </Box>

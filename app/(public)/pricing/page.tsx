@@ -236,13 +236,13 @@ export default function PricingPage() {
                     }}
                   >
                     Annual Billing
-                    <Chip
-                      label={`Save ${savingsPercentage}%`}
-                      color="primary"
-                      size="small"
-                      sx={{ ml: 1 }}
-                    />
                   </Typography>
+                  <Chip
+                    label={`Save ${savingsPercentage}%`}
+                    color="primary"
+                    size="small"
+                    sx={{ ml: 1 }}
+                  />
                 </Box>
               </Box>
             </Box>
