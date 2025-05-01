@@ -16,8 +16,7 @@ import {
   Divider,
   InputAdornment,
 } from '@mui/material';
-import { CreditCard, AccountBalanceWallet, Lock } from '@mui/icons-material';
-import Image from 'next/image';
+import { Lock } from '@mui/icons-material';
 
 export type CardDetails = {
   cardNumber: string;
@@ -35,7 +34,7 @@ export type PaymentMethodProps = {
   onPaypalEmailChange: (email: string) => void;
 };
 
-export default function PaymentMethod({
+function PaymentMethod({
   selectedMethod,
   cardDetails,
   paypalEmail,
@@ -144,11 +143,11 @@ export default function PaymentMethod({
   return (
     <Box>
       <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-        Способ оплаты
+        Payment Method
       </Typography>
 
       <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-        Выберите предпочитаемый способ оплаты для вашей подписки
+        Choose your preferred payment method for your subscription
       </Typography>
 
       <FormControl component="fieldset" sx={{ width: '100%' }}>
@@ -181,9 +180,8 @@ export default function PaymentMethod({
                     control={<Radio />}
                     label={
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <CreditCard sx={{ mr: 1, color: 'primary.main' }} />
                         <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                          Банковская карта
+                          Credit Card
                         </Typography>
                       </Box>
                     }
@@ -203,46 +201,13 @@ export default function PaymentMethod({
                         <Grid item xs={12}>
                           <TextField
                             fullWidth
-                            label="Номер карты"
+                            label="Card Number"
                             variant="outlined"
                             value={currentCardDetails.cardNumber}
                             onChange={e => handleCardDetailChange('cardNumber', e.target.value)}
                             error={errors.cardNumber}
-                            helperText={errors.cardNumber ? 'Введите корректный номер карты' : ''}
+                            helperText={errors.cardNumber ? 'Enter a valid card number' : ''}
                             placeholder="0000 0000 0000 0000"
-                            InputProps={{
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  <Lock color="action" fontSize="small" />
-                                </InputAdornment>
-                              ),
-                            }}
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <TextField
-                            fullWidth
-                            label="Срок действия"
-                            variant="outlined"
-                            value={currentCardDetails.expiryDate}
-                            onChange={e => handleCardDetailChange('expiryDate', e.target.value)}
-                            error={errors.expiryDate}
-                            helperText={errors.expiryDate ? 'Формат: ММ/ГГ' : ''}
-                            placeholder="MM/YY"
-                          />
-                        </Grid>
-
-                        <Grid item xs={6}>
-                          <TextField
-                            fullWidth
-                            label="CVV/CVC"
-                            variant="outlined"
-                            value={currentCardDetails.cvv}
-                            onChange={e => handleCardDetailChange('cvv', e.target.value)}
-                            error={errors.cvv}
-                            helperText={errors.cvv ? 'Введите 3-4 цифры' : ''}
-                            placeholder="123"
                             InputProps={{
                               endAdornment: (
                                 <InputAdornment position="end">
@@ -256,16 +221,57 @@ export default function PaymentMethod({
                         <Grid item xs={12}>
                           <TextField
                             fullWidth
-                            label="Имя держателя карты"
+                            label="Cardholder Name"
                             variant="outlined"
                             value={currentCardDetails.name}
                             onChange={e => handleCardDetailChange('name', e.target.value)}
                             error={errors.name}
-                            helperText={errors.name ? 'Введите имя как на карте' : ''}
-                            placeholder="IVAN IVANOV"
+                            helperText={
+                              errors.name ? 'Enter the name as it appears on the card' : ''
+                            }
+                            placeholder="JOHN DOE"
+                          />
+                        </Grid>
+
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            label="Expiry Date"
+                            variant="outlined"
+                            value={currentCardDetails.expiryDate}
+                            onChange={e => handleCardDetailChange('expiryDate', e.target.value)}
+                            error={errors.expiryDate}
+                            helperText={errors.expiryDate ? 'Format: MM/YY' : ''}
+                            placeholder="MM/YY"
+                          />
+                        </Grid>
+
+                        <Grid item xs={6}>
+                          <TextField
+                            fullWidth
+                            label="CVV/CVC"
+                            variant="outlined"
+                            value={currentCardDetails.cvv}
+                            onChange={e => handleCardDetailChange('cvv', e.target.value)}
+                            error={errors.cvv}
+                            helperText={errors.cvv ? 'Enter 3-4 digits' : ''}
+                            placeholder="123"
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <Lock color="action" fontSize="small" />
+                                </InputAdornment>
+                              ),
+                            }}
                           />
                         </Grid>
                       </Grid>
+
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="caption" color="text.secondary">
+                          Your payment information is secure and encrypted
+                        </Typography>
+                      </Box>
                     </Box>
                   )}
                 </CardContent>
@@ -296,7 +302,6 @@ export default function PaymentMethod({
                     control={<Radio />}
                     label={
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <AccountBalanceWallet sx={{ mr: 1, color: '#0070ba' }} />
                         <Typography variant="h6" sx={{ fontWeight: 600 }}>
                           PayPal
                         </Typography>
@@ -314,31 +319,26 @@ export default function PaymentMethod({
                     <Box sx={{ mt: 2 }}>
                       <Divider sx={{ mb: 3 }} />
 
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                        Вы будете перенаправлены на сайт PayPal для завершения оплаты после нажатия
-                        на кнопку &quot;Оплатить&quot;.
-                      </Typography>
+                      <Grid container spacing={2}>
+                        <Grid item xs={12}>
+                          <TextField
+                            fullWidth
+                            label="PayPal Email"
+                            variant="outlined"
+                            value={paypalEmail || ''}
+                            onChange={handlePaypalEmailChange}
+                            error={errors.email}
+                            helperText={errors.email ? 'Enter a valid email address' : ''}
+                            placeholder="email@example.com"
+                          />
+                        </Grid>
+                      </Grid>
 
-                      <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
-                        <Image
-                          src="/images/paypal-color.svg"
-                          alt="PayPal"
-                          width={120}
-                          height={60}
-                        />
+                      <Box sx={{ mt: 2 }}>
+                        <Typography variant="caption" color="text.secondary">
+                          You will be redirected to PayPal to complete your payment
+                        </Typography>
                       </Box>
-
-                      <TextField
-                        fullWidth
-                        label="Email для PayPal"
-                        variant="outlined"
-                        value={paypalEmail || ''}
-                        onChange={handlePaypalEmailChange}
-                        error={errors.email}
-                        helperText={errors.email ? 'Введите корректный email' : ''}
-                        placeholder="your-email@example.com"
-                        sx={{ mt: 2 }}
-                      />
                     </Box>
                   )}
                 </CardContent>
@@ -348,12 +348,14 @@ export default function PaymentMethod({
         </RadioGroup>
       </FormControl>
 
-      <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <Lock sx={{ fontSize: 16, mr: 1, color: 'success.main' }} />
+      <Box sx={{ mt: 4 }}>
         <Typography variant="body2" color="text.secondary">
-          Безопасная оплата с шифрованием SSL
+          Your payment information is processed securely. We do not store your card details on our
+          servers.
         </Typography>
       </Box>
     </Box>
   );
 }
+
+export { PaymentMethod };

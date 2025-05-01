@@ -46,4 +46,4 @@ nextClientApiClient.interceptors.response.use(
   }
 );
 
-export default nextClientApiClient;
+export { nextClientApiClient };

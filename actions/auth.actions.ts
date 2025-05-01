@@ -61,7 +61,7 @@ export async function loginAction(
 
       return {
         success: true,
-        redirectUrl: '/cabinet',
+        redirectUrl: '/dashboard',
         data: validatedData,
         formState: toFormState('SUCCESS', 'Login successful'),
       };
@@ -105,7 +105,7 @@ export async function registerAction(
 
       return {
         success: true,
-        redirectUrl: '/cabinet',
+        redirectUrl: '/dashboard',
         data: userData,
         formState: toFormState('SUCCESS', 'Registration successful'),
       };

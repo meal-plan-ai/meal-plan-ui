@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import nextClientApiClient from '../nextClientApiClient';
+import { nextClientApiClient } from '../nextClientApiClient';
 import { NEXT_CLIENT_USERS_ENDPOINTS } from './users.constants';
 import { ChangePasswordDto, ChangePasswordResponseDto, UserResponseDto } from './users.dto';
 

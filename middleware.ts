@@ -25,9 +25,9 @@ export function middleware(request: NextRequest) {
     path => pathname === path || (path === '/blog' && pathname.startsWith('/blog/'))
   );
 
-  // If trying to access auth pages while logged in, redirect to cabinet
+  // If trying to access auth pages while logged in, redirect to dashboard
   if (isPublicPath && isAuthenticated) {
-    return NextResponse.redirect(new URL('/cabinet', request.url));
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   // If trying to access protected pages while logged out, redirect to login

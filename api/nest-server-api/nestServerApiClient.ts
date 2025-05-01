@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
 
-const backendApiClient = axios.create({
+const nestServerApiClient = axios.create({
   baseURL: BASE_URL,
   headers: {
     'Content-Type': 'application/json',
@@ -11,7 +11,7 @@ const backendApiClient = axios.create({
   withCredentials: true,
 });
 
-backendApiClient.interceptors.request.use(
+nestServerApiClient.interceptors.request.use(
   async config => {
     if (typeof window === 'undefined') {
       try {
@@ -35,7 +35,7 @@ backendApiClient.interceptors.request.use(
   }
 );
 
-backendApiClient.interceptors.response.use(
+nestServerApiClient.interceptors.response.use(
   async response => {
     if (typeof window === 'undefined') {
       const setCookieHeaders = response.headers['set-cookie'];
@@ -126,4 +126,4 @@ backendApiClient.interceptors.response.use(
   }
 );
 
-export default backendApiClient;
+export { nestServerApiClient };

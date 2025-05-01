@@ -37,20 +37,14 @@ interface PaymentSummaryProps {
   error: string | null;
 }
 
-export default function PaymentSummary({
-  plan,
-  paymentMethod,
-  onSubmit,
-  loading,
-  error,
-}: PaymentSummaryProps) {
+function PaymentSummary({ plan, paymentMethod, onSubmit, loading, error }: PaymentSummaryProps) {
   const { theme } = useTheme();
 
   if (!plan) {
     return (
       <Card elevation={2} sx={{ p: 3, borderRadius: 2 }}>
         <Typography variant="h6" color="error" textAlign="center">
-          Выберите план подписки перед оформлением заказа
+          Please select a subscription plan before checkout
         </Typography>
       </Card>
     );
@@ -60,7 +54,7 @@ export default function PaymentSummary({
     return (
       <Card elevation={2} sx={{ p: 3, borderRadius: 2 }}>
         <Typography variant="h6" color="error" textAlign="center">
-          Выберите способ оплаты перед оформлением заказа
+          Please select a payment method before checkout
         </Typography>
       </Card>
     );
@@ -80,7 +74,7 @@ export default function PaymentSummary({
   return (
     <Box>
       <Typography variant="h5" gutterBottom sx={{ fontWeight: 600 }}>
-        Детали заказа
+        Order Details
       </Typography>
 
       {error && (
@@ -100,13 +94,13 @@ export default function PaymentSummary({
         <CardContent>
           <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center' }}>
             <ReceiptLong sx={{ mr: 1, color: 'primary.main' }} />
-            Детали подписки
+            Subscription Details
           </Typography>
 
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={6}>
               <Typography variant="body2" color="text.secondary">
-                План:
+                Plan:
               </Typography>
             </Grid>
             <Grid item xs={6}>
@@ -117,18 +111,18 @@ export default function PaymentSummary({
 
             <Grid item xs={6}>
               <Typography variant="body2" color="text.secondary">
-                Период:
+                Period:
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                {plan.interval === 'monthly' ? 'Ежемесячно' : 'Ежегодно'}
+                {plan.interval === 'monthly' ? 'Monthly' : 'Annually'}
               </Typography>
             </Grid>
 
             <Grid item xs={6}>
               <Typography variant="body2" color="text.secondary">
-                Описание:
+                Description:
               </Typography>
             </Grid>
             <Grid item xs={6}>
@@ -141,17 +135,17 @@ export default function PaymentSummary({
           <Grid container spacing={2}>
             <Grid item xs={6}>
               <Typography variant="body2" color="text.secondary">
-                Стоимость:
+                Price:
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="h6" sx={{ fontWeight: 600, color: 'primary.main' }}>
                 ${formatPrice(plan.price)}
-                {plan.interval === 'monthly' ? '/месяц' : '/год'}
+                {plan.interval === 'monthly' ? '/month' : '/year'}
               </Typography>
               {plan.interval === 'annually' && (
                 <Typography variant="body2" color="success.main">
-                  ${formatPrice(plan.price / 12)}/месяц (при годовой оплате)
+                  ${formatPrice(plan.price / 12)}/month (with annual payment)
                 </Typography>
               )}
             </Grid>
@@ -174,18 +168,18 @@ export default function PaymentSummary({
             ) : (
               <AccountBalanceWallet sx={{ mr: 1, color: '#0070ba' }} />
             )}
-            Способ оплаты
+            Payment Method
           </Typography>
 
           <Grid container spacing={2} sx={{ mt: 1 }}>
             <Grid item xs={6}>
               <Typography variant="body2" color="text.secondary">
-                Метод:
+                Method:
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Typography variant="body1" sx={{ fontWeight: 500 }}>
-                {paymentMethod.type === 'card' ? 'Банковская карта' : 'PayPal'}
+                {paymentMethod.type === 'card' ? 'Credit Card' : 'PayPal'}
               </Typography>
             </Grid>
 
@@ -193,7 +187,7 @@ export default function PaymentSummary({
               <>
                 <Grid item xs={6}>
                   <Typography variant="body2" color="text.secondary">
-                    Номер карты:
+                    Card Number:
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
@@ -204,7 +198,7 @@ export default function PaymentSummary({
 
                 <Grid item xs={6}>
                   <Typography variant="body2" color="text.secondary">
-                    Имя держателя:
+                    Cardholder Name:
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
@@ -222,7 +216,7 @@ export default function PaymentSummary({
                 </Grid>
                 <Grid item xs={6}>
                   <Typography variant="body1">
-                    {paymentMethod.paypalEmail || 'Не указан'}
+                    {paymentMethod.paypalEmail || 'Not provided'}
                   </Typography>
                 </Grid>
               </>
@@ -244,46 +238,56 @@ export default function PaymentSummary({
       >
         <Grid container spacing={2} alignItems="center">
           <Grid item xs={6}>
-            <Typography variant="h6">Итого к оплате:</Typography>
+            <Typography variant="h6">Total Payment:</Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography
-              variant="h5"
-              sx={{ fontWeight: 700, color: 'primary.main', textAlign: 'right' }}
+              variant="h4"
+              component="div"
+              sx={{ fontWeight: 700, color: 'primary.main' }}
             >
               ${formatPrice(plan.price)}
-              <Typography component="span" variant="body1" sx={{ ml: 1 }}>
-                {plan.interval === 'monthly' ? '/месяц' : '/год'}
-              </Typography>
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {plan.interval === 'monthly' ? 'per month' : 'per year'}
             </Typography>
           </Grid>
         </Grid>
       </Paper>
 
-      <Box sx={{ mt: 3, textAlign: 'center' }}>
-        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Нажимая кнопку &quot;Оплатить&quot;, вы соглашаетесь с условиями подписки и правилами
-          сервиса.
-        </Typography>
-
+      <Box sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
         <Button
           variant="contained"
-          color="primary"
           size="large"
           onClick={onSubmit}
           disabled={loading}
-          sx={{ minWidth: 200, py: 1.5 }}
+          sx={{
+            py: 1.5,
+            px: 4,
+            fontWeight: 600,
+            fontSize: '1rem',
+            borderRadius: 2,
+            width: { xs: '100%', sm: 'auto' },
+          }}
         >
           {loading ? (
             <>
-              <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
-              Обработка...
+              <CircularProgress size={24} color="inherit" sx={{ mr: 1 }} />
+              Processing...
             </>
           ) : (
-            'Оплатить'
+            'Complete Payment'
           )}
         </Button>
+      </Box>
+
+      <Box sx={{ mt: 3, textAlign: 'center' }}>
+        <Typography variant="body2" color="text.secondary">
+          By completing this payment, you agree to our Terms of Service and Privacy Policy.
+        </Typography>
       </Box>
     </Box>
   );
 }
+
+export { PaymentSummary };

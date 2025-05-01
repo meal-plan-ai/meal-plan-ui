@@ -15,7 +15,7 @@ interface PaymentSuccessProps {
   } | null;
 }
 
-export default function PaymentSuccess({ plan }: PaymentSuccessProps) {
+function PaymentSuccess({ plan }: PaymentSuccessProps) {
   const { theme } = useTheme();
   const router = useRouter();
 
@@ -28,7 +28,7 @@ export default function PaymentSuccess({ plan }: PaymentSuccessProps) {
   };
 
   const formatDate = (date: Date) => {
-    return new Intl.DateTimeFormat('ru-RU', {
+    return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -46,7 +46,7 @@ export default function PaymentSuccess({ plan }: PaymentSuccessProps) {
   };
 
   const handleGoToDashboard = () => {
-    router.push('/cabinet');
+    router.push('/dashboard');
   };
 
   return (
@@ -151,7 +151,7 @@ export default function PaymentSuccess({ plan }: PaymentSuccessProps) {
               <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
                 ${formatPrice(plan.price)}
                 <Typography component="span" variant="body2" sx={{ ml: 0.5 }}>
-                  {plan.interval === 'monthly' ? '/месяц' : '/год'}
+                  {plan.interval === 'monthly' ? '/month' : '/year'}
                 </Typography>
               </Typography>
               {plan.interval === 'annually' && (
@@ -186,7 +186,7 @@ export default function PaymentSuccess({ plan }: PaymentSuccessProps) {
         }}
       >
         <Typography variant="body2" sx={{ mb: 1 }}>
-          <strong>Advice:</strong> You can manage your subscription in your personal account in the
+          <strong>Tip:</strong> You can manage your subscription in your dashboard in the
           &quot;Subscription&quot; section.
         </Typography>
         <Typography variant="body2">
@@ -201,8 +201,10 @@ export default function PaymentSuccess({ plan }: PaymentSuccessProps) {
         onClick={handleGoToDashboard}
         sx={{ minWidth: 200, py: 1.5 }}
       >
-        Go to personal account
+        Go to Dashboard
       </Button>
     </Box>
   );
 }
+
+export { PaymentSuccess };

@@ -157,7 +157,7 @@ export default function PricingPage() {
         },
       ],
       ctaText: annually ? 'Get Premium Annually' : 'Get Premium Monthly',
-      ctaLink: '/cabinet/payment',
+      ctaLink: '/payment',
     },
   ];
 
@@ -236,13 +236,13 @@ export default function PricingPage() {
                     }}
                   >
                     Annual Billing
-                    <Chip
-                      label={`Save ${savingsPercentage}%`}
-                      color="primary"
-                      size="small"
-                      sx={{ ml: 1 }}
-                    />
                   </Typography>
+                  <Chip
+                    label={`Save ${savingsPercentage}%`}
+                    color="primary"
+                    size="small"
+                    sx={{ ml: 1 }}
+                  />
                 </Box>
               </Box>
             </Box>
@@ -698,7 +698,7 @@ export default function PricingPage() {
                     Start Free
                   </Button>
                 </Link>
-                <Link href="/cabinet/payment" passHref>
+                <Link href="/payment" passHref>
                   <Button
                     variant="contained"
                     color="primary"

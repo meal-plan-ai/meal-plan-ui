@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import nextClientApiClient from '../nextClientApiClient';
+import { nextClientApiClient } from '../nextClientApiClient';
 import { NEXT_CLIENT_AUTH_ENDPOINTS } from './auth.constants';
 import { LogoutResponseDto } from './auth.types';
 
