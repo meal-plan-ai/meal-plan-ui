@@ -1,5 +1,5 @@
 import { IBaseResponse } from '@/api/api.types';
-import nextClientApiClient from '../nextClientApiClient';
+import { nextClientApiClient } from '../nextClientApiClient';
 import { NEXT_CLIENT_MEAL_CHARACTERISTICS_ENDPOINTS } from './meal-characteristics.constants';
 import { IMealCharacteristic } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
 

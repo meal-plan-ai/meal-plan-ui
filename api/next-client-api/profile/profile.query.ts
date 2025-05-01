@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import nextClientApiClient from '../nextClientApiClient';
+import { nextClientApiClient } from '../nextClientApiClient';
 import { NEXT_CLIENT_PROFILE_ENDPOINTS } from './profile.constants';
 import { ProfileResponseDto, UpdateProfileDto } from './profile.dto';
 

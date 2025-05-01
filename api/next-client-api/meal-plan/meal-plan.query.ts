@@ -1,5 +1,5 @@
 import { IBaseResponse } from '@/api/api.types';
-import nextClientApiClient from '../nextClientApiClient';
+import { nextClientApiClient } from '../nextClientApiClient';
 import { NEXT_CLIENT_MEAL_PLAN_ENDPOINTS } from './meal-plan.constants';
 import { IMealPlan } from '@/api/nest-server-api/meal-plan/meal-plan.types';
 
