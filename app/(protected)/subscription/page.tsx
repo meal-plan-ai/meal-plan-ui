@@ -2,8 +2,8 @@
 
 import { Box, Typography, Paper, Grid, Chip, Button, CircularProgress, Alert } from '@mui/material';
 import { CreditCard as CreditCardIcon } from '@mui/icons-material';
-import { useGetUserSubscription } from '@/api/next-client-api/users/users.hooks';
-import { ESubscriptionStatus } from '@/api/nest-server-api/users/users.types';
+import { useGetUserSubscription } from '@/api/next-client-api/subscription/subscription.hooks';
+import { ESubscriptionStatus } from '@/api/nest-server-api/subscription/subscription.types';
 import { formatDate } from '@/utils';
 
 function getStatusColor(status: ESubscriptionStatus) {

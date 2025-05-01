@@ -5,7 +5,7 @@ import { Menu as MenuIcon, CheckCircle } from '@mui/icons-material';
 import { ThemeToggle, ProfileMenu } from '@/components';
 import { useDrawer } from '../providers/DrawerController';
 import { useRouter } from 'next/navigation';
-import { useGetUserSubscription } from '@/api/next-client-api/users/users.hooks';
+import { useGetUserSubscription } from '@/api/next-client-api/subscription/subscription.hooks';
 
 function Navbar() {
   const { toggleDrawer } = useDrawer();

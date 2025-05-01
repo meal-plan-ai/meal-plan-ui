@@ -1,12 +1,7 @@
 import { nestServerApiClient } from '../nestServerApiClient';
 import { AxiosResponse } from 'axios';
 import { NEST_SERVER_USERS_ENDPOINTS } from './users.constants';
-import {
-  UserResponseDto,
-  CurrentUserResponseDto,
-  PaginatedUsersResponseDto,
-  SubscriptionResponseDto,
-} from './users.types';
+import { UserResponseDto, CurrentUserResponseDto, PaginatedUsersResponseDto } from './users.types';
 
 export const nestServerUsersApi = {
   getCurrentUser: (): Promise<AxiosResponse<CurrentUserResponseDto>> => {
@@ -21,11 +16,5 @@ export const nestServerUsersApi = {
 
   getUserById: (id: string): Promise<AxiosResponse<UserResponseDto>> => {
     return nestServerApiClient.get<UserResponseDto>(NEST_SERVER_USERS_ENDPOINTS.BY_ID(id));
-  },
-
-  getUserSubscription: (): Promise<AxiosResponse<SubscriptionResponseDto>> => {
-    return nestServerApiClient.get<SubscriptionResponseDto>(
-      NEST_SERVER_USERS_ENDPOINTS.GET_USER_SUBSCRIPTION
-    );
   },
 };

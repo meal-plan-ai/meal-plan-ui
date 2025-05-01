@@ -13,7 +13,10 @@ import {
 
 export const nestServerAuthApi = {
   login: (credentials: LoginRequestDto): Promise<AxiosResponse<LoginResponseDto>> => {
-    return nestServerApiClient.post<LoginResponseDto>(NEST_SERVER_AUTH_ENDPOINTS.LOGIN, credentials);
+    return nestServerApiClient.post<LoginResponseDto>(
+      NEST_SERVER_AUTH_ENDPOINTS.LOGIN,
+      credentials
+    );
   },
 
   register: (userData: RegisterRequestDto): Promise<AxiosResponse<RegisterResponseDto>> => {
