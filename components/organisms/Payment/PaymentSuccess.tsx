@@ -4,6 +4,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 import { Typography, Box, Paper, Button, Card, CardContent, Divider } from '@mui/material';
 import { CheckCircleOutline, AccessTime, CalendarToday, Email } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
+import { PurchaseSubscriptionResponse } from '@/api/next-client-api/subscription/subscription.types';
 
 interface PaymentSuccessProps {
   plan: {
@@ -13,9 +14,10 @@ interface PaymentSuccessProps {
     interval: 'monthly' | 'annually';
     description: string;
   } | null;
+  subscriptionData?: PurchaseSubscriptionResponse;
 }
 
-function PaymentSuccess({ plan }: PaymentSuccessProps) {
+function PaymentSuccess({ plan, subscriptionData }: PaymentSuccessProps) {
   const { theme } = useTheme();
   const router = useRouter();
 
@@ -24,7 +26,11 @@ function PaymentSuccess({ plan }: PaymentSuccessProps) {
   }
 
   const formatPrice = (price: number) => {
-    return price.toFixed(2);
+    if (typeof price === 'number') {
+      return price.toFixed(2);
+    } else {
+      return Number(price).toFixed(2);
+    }
   };
 
   const formatDate = (date: Date) => {
@@ -36,8 +42,13 @@ function PaymentSuccess({ plan }: PaymentSuccessProps) {
   };
 
   const getSubscriptionEndDate = () => {
-    const today = new Date();
+    // If we have subscription data from the API, use that
+    if (subscriptionData && subscriptionData.subscription) {
+      return new Date(subscriptionData.subscription.endDate);
+    }
 
+    // Otherwise calculate based on current date
+    const today = new Date();
     if (plan.interval === 'monthly') {
       return new Date(today.setMonth(today.getMonth() + 1));
     } else {
@@ -109,7 +120,7 @@ function PaymentSuccess({ plan }: PaymentSuccessProps) {
               </Typography>
             </Box>
             <Typography variant="body1" sx={{ fontWeight: 500 }}>
-              {plan.name}
+              {subscriptionData?.subscription?.plan?.name || plan.name}
             </Typography>
           </Box>
 
@@ -149,7 +160,10 @@ function PaymentSuccess({ plan }: PaymentSuccessProps) {
             </Typography>
             <Box sx={{ textAlign: 'right' }}>
               <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
-                ${formatPrice(plan.price)}
+                $
+                {subscriptionData?.payment?.amount
+                  ? formatPrice(subscriptionData.payment.amount)
+                  : formatPrice(plan.price)}
                 <Typography component="span" variant="body2" sx={{ ml: 0.5 }}>
                   {plan.interval === 'monthly' ? '/month' : '/year'}
                 </Typography>
