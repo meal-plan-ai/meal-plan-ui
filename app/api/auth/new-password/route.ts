@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { NewPasswordRequestDto } from '@/api/nest-server-api/auth/auth.types';
 import { nestServerAuthApi } from '@/api/nest-server-api';
+
 export async function POST(request: Request) {
   try {
     const data = (await request.json()) as NewPasswordRequestDto;

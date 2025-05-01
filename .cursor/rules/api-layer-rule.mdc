@@ -1,0 +1,58 @@
+---
+description: API Layer Architecture for Meal Plan UI
+globs:
+alwaysApply: false
+---
+
+The meal-plan-ui project follows a specific API layer architecture to handle feature requests. Each new feature should be implemented in BOTH API layers:
+
+## 1. Primary Flow: Next.JS Server → nest-server-api
+- API requests from the Next.JS Server(actions for instance) call `nestServerApiClient` client methods
+- `nestServerApiClient` client communicates with the backend NestJS server
+
+## 2. Secondary Flow: Next.JS Client → next-client-api → app/api → nest-server-api
+- API requests from the Next.JS Client go through the `nextClientApiClient` client (used with `@tanstack/react-query` for client-side data fetching)
+- `nextClientApiClient` calls the Next.JS Server API routes (app/api)
+- Next.JS Server API routes call `nestServerApiClient` methods as in the first flow
+
+## IMPORTANT RULE:
+**All features implemented in `nest-server-api` MUST be mirrored in `next-client-api` and in `app/api` as well to ensure both direct server calls and React Query hooks can access the same functionality**
+
+## Implementation Structure for New Features
+
+### 1. in nest-server-api/{feature}/
+- `{feature}.api.ts`: API client methods to call backend endpoints using `nestServerApiClient`
+- `{feature}.constants.ts`: Constants like endpoint paths with snake_case names
+- `{feature}.types.ts`: TypeScript types for request/response DTOs
+- `index.ts`: Export all from the feature files
+
+### 2. in next-client-api/{feature}/
+- `{feature}.query.ts`: Client methods that call Next.js API routes using `nextClientApiClient`
+- `{feature}.constants.ts`: Constants for endpoints with snake_case names
+- `{feature}.dto.ts`: Data transfer objects
+- `{feature}.types.ts`: TypeScript interfaces
+- `{feature}.hooks.ts`: React Query hooks for use with @tanstack/react-query
+- `index.ts`: Export all from the feature files
+
+### 3. in app/api/{feature}/
+- Create API route files for each endpoint needed by the feature (Next.js server API implementation)
+- Each route should call the corresponding `nestServerApi` method
+
+## API Naming Conventions
+
+- Use snake_case for endpoint paths and service names
+- Use camelCase for method names
+- All API clients should be named as:
+  - `nestServer{Feature}Api` in nest-server-api/{feature}/feature.api.ts
+  - `nextClient{Feature}Api` in next-client-api/{feature}/feature.query.ts
+- Constants should follow pattern:
+  - `NEST_SERVER_{FEATURE}_ENDPOINTS` in nest-server-api
+  - `NEXT_CLIENT_{FEATURE}_ENDPOINTS` in next-client-api
+
+## Example Structure Reference:
+
+@/home/alexander/Documents/repos/meal-plan/meal-plan-ui/api/nest-server-api/users/users.api.ts
+@/home/alexander/Documents/repos/meal-plan/meal-plan-ui/api/nest-server-api/users/users.constants.ts
+@/home/alexander/Documents/repos/meal-plan/meal-plan-ui/api/next-client-api/users/users.query.ts
+@/home/alexander/Documents/repos/meal-plan/meal-plan-ui/api/next-client-api/users/users.constants.ts
+@/home/alexander/Documents/repos/meal-plan/meal-plan-ui/app/api/users/me/route.ts

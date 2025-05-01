@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   Container,
@@ -18,6 +18,7 @@ import {
   PaymentMethod,
   PaymentSummary,
   PaymentSuccess,
+  CardDetails,
 } from '@/components/organisms/Payment';
 // Define interface for our plan structure
 interface PlanData {
@@ -97,7 +98,7 @@ export default function CheckoutPage() {
   const [paypalEmail, setPaypalEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [orderComplete, setOrderComplete] = useState(false);
+  const [orderComplete] = useState(false);
 
   // Set initial plan from URL if available
   useEffect(() => {
@@ -158,10 +159,10 @@ export default function CheckoutPage() {
     setError(null);
   };
 
-  const handlePlanSelect = (plan: PlanData | null) => {
+  const handlePlanSelect = useCallback((plan: PlanData | null) => {
     setSelectedPlan(plan);
     setError(null);
-  };
+  }, []);
 
   const handlePaymentMethodChange = (method: string) => {
     setPaymentMethod(method);
@@ -183,11 +184,12 @@ export default function CheckoutPage() {
     setError(null);
 
     try {
+      console.log('handleSubmitPayment selectedPlan', selectedPlan);
       // In a real application, this would be an API call to process payment
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Payment successful, redirect to dashboard or show success page
-      setOrderComplete(true);
+      // setOrderComplete(true);
 
       // Track conversion (in a real app)
       // analytics.track('payment_completed', { plan: selectedPlan.id, amount: selectedPlan.price });

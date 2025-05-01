@@ -7,7 +7,7 @@ import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { updateCharacteristic } from '../../actions';
 import { FormState, EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
-import MealCharacteristicsForm from '@/components/organisms/MealCharacteristicsForm';
+import { MealCharacteristicsForm } from '@/components/organisms/MealCharacteristicsForm';
 import { useMealCharacteristic } from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
 import toast from 'react-hot-toast';
 const initialState: FormState = EMPTY_FORM_STATE;

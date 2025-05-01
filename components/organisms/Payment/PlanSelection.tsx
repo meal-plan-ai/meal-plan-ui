@@ -222,6 +222,10 @@ function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelectionProps) {
     }
   }, [annually, selectedPlan, onSelectPlan, plans]);
 
+  useEffect(() => {
+    onSelectPlan(plans.find(p => p.id === 'free') || null);
+  }, [onSelectPlan, plans]);
+
   return (
     <Box>
       <Typography variant="h5" gutterBottom align="center" sx={{ mb: 3 }}>

@@ -16,8 +16,7 @@ import {
   Divider,
   InputAdornment,
 } from '@mui/material';
-import { CreditCard, Lock } from '@mui/icons-material';
-import Image from 'next/image';
+import { Lock } from '@mui/icons-material';
 
 export type CardDetails = {
   cardNumber: string;
@@ -181,7 +180,6 @@ function PaymentMethod({
                     control={<Radio />}
                     label={
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <CreditCard sx={{ mr: 1, color: 'primary.main' }} />
                         <Typography variant="h6" sx={{ fontWeight: 600 }}>
                           Credit Card
                         </Typography>
@@ -304,25 +302,6 @@ function PaymentMethod({
                     control={<Radio />}
                     label={
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                        <Box
-                          sx={{
-                            mr: 1,
-                            position: 'relative',
-                            width: 24,
-                            height: 24,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                          }}
-                        >
-                          <Image
-                            src="/images/paypal-icon.png"
-                            alt="PayPal"
-                            width={24}
-                            height={24}
-                            style={{ objectFit: 'contain' }}
-                          />
-                        </Box>
                         <Typography variant="h6" sx={{ fontWeight: 600 }}>
                           PayPal
                         </Typography>

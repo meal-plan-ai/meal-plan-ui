@@ -7,9 +7,8 @@ import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { createCharacteristic } from '../actions';
 import { FormState, EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
-import MealCharacteristicsForm from '@/components/organisms/MealCharacteristicsForm';
 import toast from 'react-hot-toast';
-
+import { MealCharacteristicsForm } from '@/components/organisms/MealCharacteristicsForm';
 const initialState: FormState = EMPTY_FORM_STATE;
 
 export default function CreateCharacteristicsPage() {
