@@ -274,13 +274,8 @@ function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelectionProps) {
             }}
           >
             Annually
-            <Chip
-              label={`Save ${savingsPercentage}%`}
-              color="primary"
-              size="small"
-              sx={{ ml: 1 }}
-            />
           </Typography>
+          <Chip label={`Save ${savingsPercentage}%`} color="primary" size="small" sx={{ ml: 1 }} />
         </Box>
       </Box>
 
@@ -344,7 +339,7 @@ function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelectionProps) {
                       value={plan.id}
                       control={<Radio />}
                       label={
-                        <Box>
+                        <div>
                           <Typography
                             variant="h6"
                             component="h2"
@@ -364,7 +359,7 @@ function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelectionProps) {
                           >
                             {plan.description}
                           </Typography>
-                        </Box>
+                        </div>
                       }
                       sx={{
                         alignItems: 'flex-start',

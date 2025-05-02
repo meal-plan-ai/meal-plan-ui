@@ -22,6 +22,7 @@ import {
   CheckCircleOutline,
 } from '@mui/icons-material';
 import { useTheme } from '@/contexts';
+import Image from 'next/image';
 
 export default function HowItWorksPage() {
   const { theme } = useTheme();
@@ -188,10 +189,11 @@ export default function HowItWorksPage() {
                   className="relative rounded-xl overflow-hidden shadow-lg"
                   sx={{ aspectRatio: '4/3' }}
                 >
-                  <img
+                  <Image
                     src="/images/how-it-works-hero.jpg"
                     alt="NutriPlan meal planning process"
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </Box>
               </Grid>
@@ -243,10 +245,11 @@ export default function HowItWorksPage() {
                       className="relative rounded-xl overflow-hidden shadow-md"
                       sx={{ aspectRatio: '1/1' }}
                     >
-                      <img
+                      <Image
                         src={`/images/step-${step.number}.jpg`}
                         alt={`Step ${step.number}: ${step.title}`}
-                        className="w-full h-full object-cover"
+                        fill
+                        className="object-cover"
                       />
                     </Box>
                   </Grid>
@@ -488,10 +491,11 @@ export default function HowItWorksPage() {
                   justifyContent: 'center',
                 }}
               >
-                <img
+                <Image
                   src="/images/video-thumbnail.jpg"
                   alt="NutriPlan video tutorial"
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.7 }}
+                  fill
+                  style={{ objectFit: 'cover', opacity: 0.7 }}
                 />
                 <Box
                   sx={{

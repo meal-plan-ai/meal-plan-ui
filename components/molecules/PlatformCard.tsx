@@ -2,6 +2,7 @@
 
 import { Paper, Typography, Box, Button } from '@mui/material';
 import { useTheme } from '../../contexts/ThemeContext';
+import Image from 'next/image';
 
 interface PlatformCardProps {
   icon: React.ReactNode;
@@ -79,12 +80,11 @@ function PlatformCard({
           maxHeight: '280px',
         }}
       >
-        <img
+        <Image
           src={image}
           alt={`${title} platform`}
+          fill
           style={{
-            maxWidth: '100%',
-            maxHeight: '100%',
             objectFit: 'contain',
             borderRadius: '8px',
           }}

@@ -11,6 +11,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
         minHeight: '100vh',
         display: 'flex',
         flexDirection: 'column',
+        justifyContent: 'space-between',
         bgcolor: 'background.default',
       }}
     >

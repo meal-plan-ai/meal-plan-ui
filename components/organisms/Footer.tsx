@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useTheme } from '../../contexts/ThemeContext';
 import { Box, Container, Grid, Typography, Divider, Stack, IconButton } from '@mui/material';
 import { Facebook, Twitter, Instagram, LinkedIn } from '@mui/icons-material';
+import Image from 'next/image';
 
 function Footer() {
   const { theme } = useTheme();
@@ -151,9 +152,11 @@ function Footer() {
                     '&:hover': { opacity: 0.9 },
                   }}
                 >
-                  <img
+                  <Image
                     src="/images/app-store-badge.png"
                     alt="Download on the App Store"
+                    width={120}
+                    height={40}
                     style={{ width: '100%', height: 'auto' }}
                   />
                 </Box>
@@ -166,9 +169,11 @@ function Footer() {
                     '&:hover': { opacity: 0.9 },
                   }}
                 >
-                  <img
+                  <Image
                     src="/images/google-play-badge.png"
                     alt="Get it on Google Play"
+                    width={120}
+                    height={40}
                     style={{ width: '100%', height: 'auto' }}
                   />
                 </Box>

@@ -36,7 +36,7 @@ function formatStatusLabel(status: ESubscriptionStatus) {
   }
 }
 
-export function SubscriptionPage() {
+export default function SubscriptionPage() {
   const { data, isLoading, error } = useGetUserSubscription();
 
   console.log('data', data);
@@ -166,5 +166,3 @@ export function SubscriptionPage() {
     </Box>
   );
 }
-
-export default SubscriptionPage;

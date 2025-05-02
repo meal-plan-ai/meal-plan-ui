@@ -1,8 +1,9 @@
-import { EMealType } from '../../../types/meal-plan.types';
-import { IMealCharacteristic } from '../meal-characteristics/meal-characteristics.types';
-
-export * from '../../../types/meal-plan.types';
-export type { IMealCharacteristic } from '../meal-characteristics/meal-characteristics.types';
+export enum EMealType {
+  BREAKFAST = 'BREAKFAST',
+  LUNCH = 'LUNCH',
+  DINNER = 'DINNER',
+  SNACK = 'SNACK',
+}
 
 export interface IAiMealPlanResponse {
   days: IAiDayPlan[];
@@ -68,3 +69,11 @@ export interface IMealPlan {
 }
 
 export type IMealPlanCreate = Omit<IMealPlan, 'id' | 'userId' | 'createdAt' | 'updatedAt'>;
+
+export interface IMealCharacteristic {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  updatedAt: string;
+}
