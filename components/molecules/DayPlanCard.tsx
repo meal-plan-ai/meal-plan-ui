@@ -2,10 +2,7 @@
 
 import React from 'react';
 import { Card, Typography, Box, Chip, Stack, Divider } from '@mui/material';
-import {
-  IAiDayPlan,
-  IAiMeal,
-} from '../../../meal-plan-server/src/modules/ai-meal-generator/entities/ai-generated-meal-plan.interface';
+import { IAiDayPlan, IAiMeal, EMealType } from '../../types/meal-plan.types';
 import { v4 as uuidv4 } from 'uuid';
 
 interface DayPlanCardProps {
@@ -13,15 +10,19 @@ interface DayPlanCardProps {
   onClick?: () => void;
 }
 
-const MealTypeIcon = ({ mealType }: { mealType: string }) => {
+const MealTypeIcon = ({ mealType }: { mealType: EMealType }) => {
   const iconMap: Record<string, string> = {
-    breakfast: '🍳',
-    lunch: '🍲',
-    dinner: '🍽️',
-    snack: '🥨',
+    [EMealType.BREAKFAST]: '🍳',
+    [EMealType.LUNCH]: '🍲',
+    [EMealType.DINNER]: '🍽️',
+    [EMealType.SNACK]: '🥨',
   };
 
   return <span>{iconMap[mealType] || '🍴'}</span>;
+};
+
+const formatMealType = (mealType: EMealType): string => {
+  return mealType.toLowerCase().charAt(0).toUpperCase() + mealType.toLowerCase().slice(1);
 };
 
 const DayPlanCard: React.FC<DayPlanCardProps> = ({ dayPlan, onClick }) => {
@@ -55,8 +56,7 @@ const DayPlanCard: React.FC<DayPlanCardProps> = ({ dayPlan, onClick }) => {
         {meals.map((meal: IAiMeal, index: number) => (
           <Box key={uuidv4()} sx={{ mb: 1.5 }}>
             <Typography variant="subtitle1" fontWeight="bold">
-              <MealTypeIcon mealType={meal.mealType} />{' '}
-              {meal.mealType.charAt(0).toUpperCase() + meal.mealType.slice(1)}
+              <MealTypeIcon mealType={meal.mealType} /> {formatMealType(meal.mealType)}
             </Typography>
             <Typography variant="body2" noWrap title={meal.name} sx={{ mb: 0.5 }}>
               {meal.name}

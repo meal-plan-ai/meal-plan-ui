@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { DayPlanDetailView } from '../../../../../../components/templates/DayPlanDetailView';
-import { IAiDayPlan } from '../../../../../../../meal-plan-server/src/modules/ai-meal-generator/entities/ai-generated-meal-plan.interface';
+import { IAiDayPlan } from '../../../../../../types/meal-plan.types';
 import { useMealPlan } from '@/api/next-client-api/meal-plan/meal-plan.hooks';
 
 export default function DayPlanPage() {
