@@ -75,7 +75,7 @@ function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelectionProps) {
   const plans: Plan[] = useMemo(
     () => [
       {
-        id: 'free',
+        id: '0',
         name: 'Free',
         description: 'Basic meal planning for individuals',
         price: 0,
@@ -109,7 +109,7 @@ function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelectionProps) {
         ],
       },
       {
-        id: 'premium-monthly',
+        id: '1',
         name: 'Premium Monthly',
         description: 'Advanced meal planning for individuals and families',
         price: monthlyPremiumPrice,
@@ -209,7 +209,7 @@ function PlanSelection({ selectedPlan, onSelectPlan }: PlanSelectionProps) {
     }
     // If switched to monthly plan and an annual plan is selected - switch to monthly
     else if (!annually && selectedPlan?.interval === 'annually') {
-      const monthlyPlan = plans.find(p => p.id === 'premium-monthly');
+      const monthlyPlan = plans.find(p => p.id === '1');
       if (monthlyPlan) {
         onSelectPlan({
           id: monthlyPlan.id,

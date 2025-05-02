@@ -20,7 +20,12 @@ import {
   PaymentSuccess,
   CardDetails,
 } from '@/components/organisms/Payment';
-// Define interface for our plan structure
+import { nextClientSubscriptionApi } from '@/api/next-client-api/subscription/subscription.query';
+import {
+  PurchaseSubscriptionDto,
+  PurchaseSubscriptionResponse,
+} from '@/api/next-client-api/subscription/subscription.types';
+
 interface PlanData {
   id: string;
   name: string;
@@ -32,7 +37,7 @@ interface PlanData {
 // These would typically come from an API
 const AVAILABLE_PLANS = [
   {
-    id: 'basic-monthly',
+    id: '0',
     name: 'Basic Plan',
     price: 9.99,
     interval: 'monthly' as const,
@@ -44,7 +49,7 @@ const AVAILABLE_PLANS = [
     ],
   },
   {
-    id: 'premium-monthly',
+    id: '1',
     name: 'Premium Plan',
     price: 19.99,
     interval: 'monthly' as const,
@@ -54,33 +59,6 @@ const AVAILABLE_PLANS = [
       'Advanced meal planning',
       'Automatic product selection',
       'Calculation of calories and nutrients',
-    ],
-  },
-  {
-    id: 'basic-annually',
-    name: 'Basic Annual Plan',
-    price: 99.99,
-    interval: 'annually' as const,
-    description: 'Basic plan with annual payment. Save 20%.',
-    features: [
-      'Up to 10 recipes per month',
-      'Basic meal planning',
-      'Recipes with minimal ingredients',
-      'Save 20% with annual payment',
-    ],
-  },
-  {
-    id: 'premium-annually',
-    name: 'Premium Annual Plan',
-    price: 199.99,
-    interval: 'annually' as const,
-    description: 'Premium plan with annual payment. Save 20%.',
-    features: [
-      'Unlimited recipes',
-      'Advanced meal planning',
-      'Automatic product selection',
-      'Calculation of calories and nutrients',
-      'Save 20% with annual payment',
     ],
   },
 ];
@@ -98,7 +76,8 @@ export default function CheckoutPage() {
   const [paypalEmail, setPaypalEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [orderComplete] = useState(false);
+  const [orderComplete, setOrderComplete] = useState(false);
+  const [paymentResponse, setPaymentResponse] = useState<PurchaseSubscriptionResponse | null>(null);
 
   // Set initial plan from URL if available
   useEffect(() => {
@@ -184,12 +163,51 @@ export default function CheckoutPage() {
     setError(null);
 
     try {
-      console.log('handleSubmitPayment selectedPlan', selectedPlan);
-      // In a real application, this would be an API call to process payment
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (!selectedPlan || !paymentMethod) {
+        throw new Error('Missing plan or payment method');
+      }
 
-      // Payment successful, redirect to dashboard or show success page
-      // setOrderComplete(true);
+      // Create payment method ID - in a real app this would come from Stripe or other provider
+      // This is a simplified version for demonstration
+      let paymentMethodId = '';
+
+      if (paymentMethod === 'card' && cardDetails) {
+        // In a real implementation, this would be a token from Stripe
+        paymentMethodId = `card_${Date.now()}`;
+      } else if (paymentMethod === 'paypal' && paypalEmail) {
+        // In a real implementation, this would be a token from PayPal
+        paymentMethodId = `paypal_${Date.now()}`;
+      } else {
+        throw new Error('Invalid payment details');
+      }
+
+      // Create the purchase subscription DTO
+      const purchaseData: PurchaseSubscriptionDto = {
+        planId: selectedPlan.id,
+        paymentMethodId: paymentMethodId,
+        currency: 'USD',
+        autoRenew: true,
+        provider: 'stripe',
+        metadata: {
+          paymentType: paymentMethod,
+          ...(paymentMethod === 'card' && cardDetails
+            ? {
+                lastFourDigits: cardDetails.cardNumber.slice(-4),
+                cardholderName: cardDetails.name,
+              }
+            : {}),
+          ...(paymentMethod === 'paypal' ? { email: paypalEmail } : {}),
+        },
+      };
+
+      // Call the API to purchase the subscription
+      const response = await nextClientSubscriptionApi.purchaseSubscription(purchaseData);
+
+      // Set the subscription data
+      setPaymentResponse(response.data);
+
+      // Show success page
+      setOrderComplete(true);
 
       // Track conversion (in a real app)
       // analytics.track('payment_completed', { plan: selectedPlan.id, amount: selectedPlan.price });
@@ -238,7 +256,7 @@ export default function CheckoutPage() {
   if (orderComplete) {
     return (
       <Container maxWidth="md" sx={{ py: 8 }}>
-        <PaymentSuccess plan={selectedPlan} />
+        <PaymentSuccess plan={selectedPlan} subscriptionData={paymentResponse || undefined} />
       </Container>
     );
   }

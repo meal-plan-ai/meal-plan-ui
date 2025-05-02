@@ -25,3 +25,25 @@ export interface SubscriptionResponseDto {
   hasActiveSubscription: boolean;
   subscription?: ISubscription;
 }
+
+export interface PurchaseSubscriptionDto {
+  planId: string;
+  paymentMethodId: string;
+  currency?: string;
+  autoRenew?: boolean;
+  metadata?: Record<string, any>;
+}
+
+export interface IPayment {
+  id: string;
+  amount: number;
+  currency: string;
+  status: string;
+  provider: string;
+  createdAt: string;
+}
+
+export interface PurchaseSubscriptionResponseDto {
+  subscription: ISubscription;
+  payment: IPayment;
+}
