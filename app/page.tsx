@@ -32,6 +32,7 @@ import {
   StepCard,
   PlatformCard,
 } from '@/components';
+import Image from 'next/image';
 
 export default function LandingPage() {
   const { theme } = useTheme();
@@ -238,10 +239,11 @@ export default function LandingPage() {
                   className="relative rounded-xl overflow-hidden shadow-lg"
                   sx={{ aspectRatio: '4/3' }}
                 >
-                  <img
+                  <Image
                     src="/images/hero-meal-plan.jpg"
                     alt="NutriPlan AI meal planning app showcase"
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
                   />
                 </Box>
               </Grid>
