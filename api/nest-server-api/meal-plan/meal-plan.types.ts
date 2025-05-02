@@ -1,4 +1,4 @@
-import { EMealType } from '../../../../meal-plan-server/src/modules/ai-meal-generator/entities/ai-generated-meal-plan.interface';
+import { EMealType } from '../../../../meal-plan-server/src/modules/ai-meal-generator/entities/ai-generated-meal-plan.enums';
 import { IMealCharacteristic } from '../meal-characteristics/meal-characteristics.types';
 
 export interface IAiMealPlanResponse {
