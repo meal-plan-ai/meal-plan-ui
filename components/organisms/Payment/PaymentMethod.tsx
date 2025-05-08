@@ -17,12 +17,13 @@ export type PaymentMethodProps = {
   onPaymentMethodChange: (method: string) => void;
   onCardDetailsChange: (details: CardDetails) => void;
   onPaypalEmailChange: (email: string) => void;
+  planId: string;
 };
 
-function PaymentMethod() {
+function PaymentMethod({ planId }: PaymentMethodProps) {
   return (
     <Box>
-      <CheckoutForm />
+      <CheckoutForm planId={planId} />
 
       <Box sx={{ mt: 4 }}>
         <Typography variant="body2" color="text.secondary">

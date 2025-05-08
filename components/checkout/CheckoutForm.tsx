@@ -4,16 +4,17 @@ import { useState, useEffect } from 'react';
 import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { PaymentElement, useStripe, useElements, Elements } from '@stripe/react-stripe-js';
 import { Box, Button, CircularProgress, Typography, Card } from '@mui/material';
+import { useCurrentUser } from '@/api/next-client-api/users/users.hooks';
+import { useRouter } from 'next/navigation';
 
-// Инициализируем Stripe вне компонента
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PK_TEST || '');
 
-// Компонент формы оплаты
 function PaymentForm() {
   const stripe = useStripe();
   const elements = useElements();
   const [message, setMessage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
+  const router = useRouter();
 
   useEffect(() => {
     if (!stripe) {
@@ -35,6 +36,7 @@ function PaymentForm() {
       switch (paymentIntent.status) {
         case 'succeeded':
           setMessage('Payment succeeded!');
+          router.push('/payment/success');
           break;
         case 'processing':
           setMessage('Your payment is processing.');
@@ -47,7 +49,7 @@ function PaymentForm() {
           break;
       }
     });
-  }, [stripe]);
+  }, [stripe, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,20 +113,36 @@ function PaymentForm() {
   );
 }
 
-export default function CheckoutForm() {
+interface CheckoutFormProps {
+  planId: string;
+}
+
+export default function CheckoutForm({ planId }: CheckoutFormProps) {
   const [clientSecret, setClientSecret] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { data: user } = useCurrentUser();
 
   useEffect(() => {
-    // Получаем client secret с сервера
     const fetchClientSecret = async () => {
+      if (!user || !planId) return;
+
       try {
         setIsLoading(true);
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
-        const response = await fetch(`${apiUrl}/stripe/create-checkout-session`, {
+        const apiUrl = process.env.NEXT_PUBLIC_NEST_SERVER_URL || 'http://localhost:3099/api/';
+        const response = await fetch(`${apiUrl}stripe/create-checkout-session`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            planId: planId,
+            userId: user.id,
+            metadata: {
+              userId: user.id,
+              planId: planId,
+              isSubscription: true,
+              autoRenew: true,
+            },
+          }),
         });
 
         const data = await response.json();
@@ -135,7 +153,7 @@ export default function CheckoutForm() {
 
         setClientSecret(data.checkoutSessionClientSecret);
       } catch (error) {
-        console.error('Error fetching client secret:', error);
+        console.error('Error setting up subscription:', error);
         setError(error instanceof Error ? error.message : 'An unknown error occurred');
       } finally {
         setIsLoading(false);
@@ -143,7 +161,7 @@ export default function CheckoutForm() {
     };
 
     fetchClientSecret();
-  }, []);
+  }, [user, planId]);
 
   const options: StripeElementsOptions = {
     clientSecret,
@@ -176,7 +194,7 @@ export default function CheckoutForm() {
     <Card sx={{ p: 3 }}>
       {clientSecret && (
         <Elements stripe={stripePromise} options={options}>
-          <PaymentForm />
+          <PaymentForm planId={planId} />
         </Elements>
       )}
     </Card>

@@ -232,6 +232,7 @@ export default function CheckoutPage() {
             onPaymentMethodChange={handlePaymentMethodChange}
             onCardDetailsChange={handleCardDetailsChange}
             onPaypalEmailChange={handlePaypalEmailChange}
+            planId={selectedPlan?.id || ''}
           />
         );
       case 2:
