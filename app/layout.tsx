@@ -1,11 +1,8 @@
 'use server';
 
-import QueryProvider from '@/providers/QueryProvider';
+import ClientProviders from './client-providers';
 import './globals.css';
 import { Inter } from 'next/font/google';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import ToastProvider from '@/components/providers/toast-provider';
-import ThemeProviderWrapper from '@/components/providers/ThemeProviderWrapper';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -13,12 +10,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang="en">
       <body className={inter.className}>
-        <QueryProvider>
-          <ThemeProviderWrapper>
-            <ToastProvider>{children}</ToastProvider>
-          </ThemeProviderWrapper>
-          <ReactQueryDevtools initialIsOpen={false} />
-        </QueryProvider>
+        <ClientProviders>{children}</ClientProviders>
       </body>
     </html>
   );

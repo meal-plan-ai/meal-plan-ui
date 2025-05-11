@@ -71,9 +71,9 @@ export default function CheckoutPage() {
 
   const [activeStep, setActiveStep] = useState(0);
   const [selectedPlan, setSelectedPlan] = useState<PlanData | null>(null);
-  const [paymentMethod, setPaymentMethod] = useState<string | null>(null);
-  const [cardDetails, setCardDetails] = useState<CardDetails | null>(null);
-  const [paypalEmail, setPaypalEmail] = useState<string | null>(null);
+  const [paymentMethod] = useState<string | null>(null);
+  const [cardDetails] = useState<CardDetails | null>(null);
+  const [paypalEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [orderComplete, setOrderComplete] = useState(false);
@@ -98,35 +98,9 @@ export default function CheckoutPage() {
   }, [initialPlanId]);
 
   const handleNext = () => {
-    // Validate current step
     if (activeStep === 0 && !selectedPlan) {
       setError('Please select a subscription plan');
       return;
-    }
-
-    if (activeStep === 1) {
-      if (!paymentMethod) {
-        setError('Please select a payment method');
-        return;
-      }
-
-      if (paymentMethod === 'card') {
-        if (
-          !cardDetails ||
-          !cardDetails.cardNumber ||
-          !cardDetails.name ||
-          !cardDetails.expiryDate ||
-          !cardDetails.cvv
-        ) {
-          setError('Please fill in all card details');
-          return;
-        }
-      }
-
-      if (paymentMethod === 'paypal' && !paypalEmail) {
-        setError('Please enter email for PayPal');
-        return;
-      }
     }
 
     setError(null);
@@ -143,27 +117,12 @@ export default function CheckoutPage() {
     setError(null);
   }, []);
 
-  const handlePaymentMethodChange = (method: string) => {
-    setPaymentMethod(method);
-    setError(null);
-  };
-
-  const handleCardDetailsChange = (details: CardDetails) => {
-    setCardDetails(details);
-    setError(null);
-  };
-
-  const handlePaypalEmailChange = (email: string) => {
-    setPaypalEmail(email);
-    setError(null);
-  };
-
   const handleSubmitPayment = async () => {
     setLoading(true);
     setError(null);
 
     try {
-      if (!selectedPlan || !paymentMethod) {
+      if (!selectedPlan) {
         throw new Error('Missing plan or payment method');
       }
 
@@ -224,16 +183,7 @@ export default function CheckoutPage() {
       case 0:
         return <PlanSelection selectedPlan={selectedPlan} onSelectPlan={handlePlanSelect} />;
       case 1:
-        return (
-          <PaymentMethod
-            selectedMethod={paymentMethod}
-            cardDetails={cardDetails}
-            paypalEmail={paypalEmail}
-            onPaymentMethodChange={handlePaymentMethodChange}
-            onCardDetailsChange={handleCardDetailsChange}
-            onPaypalEmailChange={handlePaypalEmailChange}
-          />
-        );
+        return <PaymentMethod />;
       case 2:
         return (
           <PaymentSummary
