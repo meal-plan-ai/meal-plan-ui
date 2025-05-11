@@ -117,11 +117,10 @@ export default function CheckoutForm() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Получаем client secret с сервера
     const fetchClientSecret = async () => {
       try {
         setIsLoading(true);
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+        const apiUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || 'http://localhost:3001/api';
         const response = await fetch(`${apiUrl}/stripe/create-checkout-session`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

@@ -6,7 +6,7 @@ interface EnhancedError extends Error {
   data?: Record<string, unknown>;
 }
 
-const BASE_URL = '/api';
+const BASE_URL = process.env.NEXT_PUBLIC_NEXT_API_URL || 'http://localhost:3001/api';
 
 const nextClientApiClient = axios.create({
   baseURL: BASE_URL,
