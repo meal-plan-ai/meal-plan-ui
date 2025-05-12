@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { cookies } from 'next/headers';
 
-const BASE_URL = process.env.NEXT_PUBLIC_SERVER_API_URL || 'http://localhost:3001/api';
+const BASE_URL = process.env.NEXT_PUBLIC_NEST_SERVER_URL || 'http://localhost:3099/api/';
 
 const nestServerApiClient = axios.create({
   baseURL: BASE_URL,
