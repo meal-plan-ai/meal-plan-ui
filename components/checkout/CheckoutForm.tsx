@@ -120,7 +120,7 @@ export default function CheckoutForm() {
     const fetchClientSecret = async () => {
       try {
         setIsLoading(true);
-        const apiUrl = process.env.NEXT_PUBLIC_SERVER_API_URL || 'http://localhost:3001/api';
+        const apiUrl = process.env.NEXT_PUBLIC_NEST_SERVER_URL || 'http://localhost:3001/api';
         const response = await fetch(`${apiUrl}/stripe/create-checkout-session`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
