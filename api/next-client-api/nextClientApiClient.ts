@@ -6,6 +6,27 @@ interface EnhancedError extends Error {
   data?: Record<string, unknown>;
 }
 
+// Global auth error handler
+let globalQueryClient: any = null;
+
+export const setGlobalQueryClient = (queryClient: any) => {
+  globalQueryClient = queryClient;
+};
+
+const handleAuthError = () => {
+  // Clear React Query cache if available
+  if (globalQueryClient) {
+    globalQueryClient.clear();
+    globalQueryClient.invalidateQueries({ queryKey: ['users'] });
+    globalQueryClient.invalidateQueries({ queryKey: ['profile'] });
+  }
+
+  const pathname = window.location.pathname;
+  if (!pathname.startsWith('/auth/')) {
+    window.location.href = `/auth/login?callbackUrl=${encodeURIComponent(pathname)}`;
+  }
+};
+
 const BASE_URL = process.env.NEXT_PUBLIC_NEXT_API_URL || 'http://localhost:3001/api';
 
 const nextClientApiClient = axios.create({
@@ -22,12 +43,8 @@ nextClientApiClient.interceptors.response.use(
   },
   error => {
     if (error.response?.status === 401) {
-      const pathname = window.location.pathname;
-
-      if (!pathname.startsWith('/auth/')) {
-        window.location.href = `/auth/login?callbackUrl=${encodeURIComponent(pathname)}`;
-        return new Promise(() => {});
-      }
+      handleAuthError();
+      return new Promise(() => {});
     }
 
     const errorMessage =

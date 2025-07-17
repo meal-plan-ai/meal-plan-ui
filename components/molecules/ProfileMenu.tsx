@@ -36,6 +36,8 @@ function ProfileMenu() {
       handleProfileMenuClose();
     } catch (error) {
       console.error('Logout failed:', error);
+      // Error handling is now done in the hook
+      handleProfileMenuClose();
     }
   };
 

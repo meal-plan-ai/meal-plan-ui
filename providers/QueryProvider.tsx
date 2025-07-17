@@ -1,7 +1,8 @@
 'use client';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ReactNode, useState } from 'react';
+import { ReactNode, useState, useEffect } from 'react';
+import { setGlobalQueryClient } from '@/api/next-client-api/nextClientApiClient';
 
 interface QueryProviderProps {
   children: ReactNode;
@@ -20,6 +21,11 @@ export default function QueryProvider({ children }: QueryProviderProps) {
         },
       })
   );
+
+  useEffect(() => {
+    // Set global query client for auth error handling
+    setGlobalQueryClient(queryClient);
+  }, [queryClient]);
 
   return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
 }

@@ -11,18 +11,21 @@ interface ProtectedRouteProps {
 
 function ProtectedRoute({ children, fallbackPath = '/auth/login' }: ProtectedRouteProps) {
   const router = useRouter();
-  const { data: user, isLoading } = useCurrentUser();
+  const { data: user, isLoading, error } = useCurrentUser();
 
   useEffect(() => {
+    // If not loading and no user data, redirect to login
     if (!isLoading && !user) {
       router.push(fallbackPath);
     }
-  }, [user, isLoading, router, fallbackPath]);
+  }, [user, isLoading, error, router, fallbackPath]);
 
+  // Show loading while checking authentication
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">Loading...</div>;
   }
 
+  // If no user, don't render anything (redirect is happening)
   if (!user) {
     return null;
   }

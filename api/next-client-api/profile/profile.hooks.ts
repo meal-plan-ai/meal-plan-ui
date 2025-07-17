@@ -11,8 +11,17 @@ export function useProfile() {
   return useQuery({
     queryKey: profileKeys.me,
     queryFn: async () => {
-      const { data } = await nextClientProfileApi.getMyProfile();
-      return data;
+      try {
+        const { data } = await nextClientProfileApi.getMyProfile();
+        return data;
+      } catch (error: any) {
+        // If 401 error, the interceptor will handle redirect
+        // Return null so ProtectedRoute redirects appropriately
+        if (error.status === 401) {
+          return null;
+        }
+        throw error;
+      }
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     retry: false,
