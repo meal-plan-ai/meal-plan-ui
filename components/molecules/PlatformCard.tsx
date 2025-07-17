@@ -78,12 +78,14 @@ function PlatformCard({
           mb: 3,
           position: 'relative',
           maxHeight: '280px',
+          minHeight: '200px',
         }}
       >
         <Image
           src={image}
           alt={`${title} platform`}
           fill
+          sizes="(max-width: 768px) 100vw, 33vw"
           style={{
             objectFit: 'contain',
             borderRadius: '8px',

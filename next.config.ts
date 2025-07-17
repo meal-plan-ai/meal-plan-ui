@@ -16,6 +16,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    formats: ['image/avif', 'image/webp'],
   },
   async headers() {
     const isDev = process.env.NODE_ENV === 'development';
@@ -26,8 +27,8 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value: isDev
-              ? "upgrade-insecure-requests; default-src 'self'; img-src 'self' https: data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline'; frame-src https://js.stripe.com;"
-              : "upgrade-insecure-requests; default-src 'self'; img-src 'self' https: data:; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline'; frame-src https://js.stripe.com;",
+              ? "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline'; frame-src https://js.stripe.com;"
+              : "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline'; frame-src https://js.stripe.com;",
           },
           {
             key: 'X-Content-Type-Options',

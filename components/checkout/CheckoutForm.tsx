@@ -5,10 +5,8 @@ import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { PaymentElement, useStripe, useElements, Elements } from '@stripe/react-stripe-js';
 import { Box, Button, CircularProgress, Typography, Card } from '@mui/material';
 
-// Инициализируем Stripe вне компонента
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PK_TEST || '');
 
-// Компонент формы оплаты
 function PaymentForm() {
   const stripe = useStripe();
   const elements = useElements();
@@ -20,7 +18,6 @@ function PaymentForm() {
       return;
     }
 
-    // Получаем статус платежа из URL (если пользователь был перенаправлен)
     const clientSecret = new URLSearchParams(window.location.search).get(
       'payment_intent_client_secret'
     );
@@ -67,7 +64,6 @@ function PaymentForm() {
       },
     });
 
-    // Если error.type === "card_error" или "validation_error", ошибка ввода
     if (error) {
       setMessage(error.message || 'An unexpected error occurred.');
     }
@@ -83,8 +79,8 @@ function PaymentForm() {
             layout: 'tabs',
             defaultValues: {
               billingDetails: {
-                name: 'John Doe', // Можете удалить или заменить на реальные данные
-                email: 'john@example.com', // Можете удалить или заменить на реальные данные
+                name: 'John Doe',
+                email: 'john@example.com',
               },
             },
           }}
@@ -120,7 +116,7 @@ export default function CheckoutForm() {
     const fetchClientSecret = async () => {
       try {
         setIsLoading(true);
-        const apiUrl = process.env.NEXT_PUBLIC_NEST_SERVER_URL || 'http://localhost:3001/api';
+        const apiUrl = process.env.NEXT_PUBLIC_NEST_SERVER_URL || 'http://localhost:3099/api';
         const response = await fetch(`${apiUrl}/stripe/create-checkout-session`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

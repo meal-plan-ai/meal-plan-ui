@@ -67,7 +67,7 @@ export default function LandingPage() {
   const testimonials = [
     {
       name: 'Sarah Johnson',
-      avatar: '/avatars/avatar1.jpg',
+      avatar: '/avatars/avatar1.svg', // Change to .svg
       role: 'Fitness Coach',
       review:
         'NutriPlan has revolutionized how I create meal plans for my clients. The AI recommendations are spot-on!',
@@ -75,7 +75,7 @@ export default function LandingPage() {
     },
     {
       name: 'Michael Chen',
-      avatar: '/avatars/avatar2.jpg',
+      avatar: '/avatars/avatar2.svg', // Change to .svg
       role: 'Working Professional',
       review:
         "I've saved so much time and improved my nutrition. The shopping lists make grocery shopping effortless.",
@@ -83,7 +83,7 @@ export default function LandingPage() {
     },
     {
       name: 'Emma Garcia',
-      avatar: '/avatars/avatar3.jpg',
+      avatar: '/avatars/avatar3.svg', // Change to .svg
       role: 'Busy Parent',
       review:
         'As a mom of three, NutriPlan has been a lifesaver. Healthy meals my kids actually enjoy!',
@@ -240,9 +240,10 @@ export default function LandingPage() {
                   sx={{ aspectRatio: '4/3' }}
                 >
                   <Image
-                    src="/images/hero-meal-plan.jpg"
+                    src="/images/hero-meal-plan.svg"
                     alt="NutriPlan AI meal planning app showcase"
                     fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-cover"
                   />
                 </Box>
@@ -363,7 +364,7 @@ export default function LandingPage() {
                   icon={<ComputerOutlined fontSize="large" />}
                   title="Web App"
                   description="Access NutriPlan from any device with a web browser. No installation required."
-                  image="/images/web-platform.jpg"
+                  image="/images/web-platform.svg"
                   buttonText="Open Web App"
                   buttonLink="/auth/register"
                 />
@@ -374,7 +375,7 @@ export default function LandingPage() {
                   icon={<Apple fontSize="large" />}
                   title="iOS App"
                   description="Experience NutriPlan on your iPhone or iPad with our dedicated native app."
-                  image="/images/ios-platform.jpg"
+                  image="/images/ios-platform.svg"
                   buttonText="Download on App Store"
                   buttonLink="#"
                   disabled={true}
@@ -386,7 +387,7 @@ export default function LandingPage() {
                   icon={<Android fontSize="large" />}
                   title="Android App"
                   description="Take NutriPlan with you on your Android phone or tablet."
-                  image="/images/android-platform.jpg"
+                  image="/images/android-platform.svg"
                   buttonText="Get on Google Play"
                   buttonLink="#"
                   disabled={true}
