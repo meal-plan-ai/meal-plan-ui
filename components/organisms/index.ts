@@ -4,3 +4,4 @@ export * from './MealCharacteristicsForm';
 export * from './Navbar';
 export * from './Sidebar';
 export * from './Payment';
+export { default as DashboardOverviewSection } from './DashboardOverviewSection';
