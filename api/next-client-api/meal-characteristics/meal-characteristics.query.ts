@@ -1,11 +1,11 @@
 import { IBaseResponse } from '@/api/api.types';
 import { nextClientApiClient } from '../nextClientApiClient';
 import { NEXT_CLIENT_MEAL_CHARACTERISTICS_ENDPOINTS } from './meal-characteristics.constants';
-import { IMealCharacteristic } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
+import { INutritionProfileCharacteristic } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
 
 export const nextClientMealCharacteristicsApi = {
   getAll: (page: number = 1, limit: number = 10) => {
-    return nextClientApiClient.get<IBaseResponse<IMealCharacteristic[]>>(
+    return nextClientApiClient.get<IBaseResponse<INutritionProfileCharacteristic[]>>(
       NEXT_CLIENT_MEAL_CHARACTERISTICS_ENDPOINTS.GET_ALL,
       {
         params: { page, limit },
@@ -14,7 +14,7 @@ export const nextClientMealCharacteristicsApi = {
   },
 
   getById: (id: string) => {
-    return nextClientApiClient.get<IBaseResponse<IMealCharacteristic>>(
+    return nextClientApiClient.get<IBaseResponse<INutritionProfileCharacteristic>>(
       NEXT_CLIENT_MEAL_CHARACTERISTICS_ENDPOINTS.GET_BY_ID(id)
     );
   },

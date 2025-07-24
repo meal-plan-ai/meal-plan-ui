@@ -1,4 +1,6 @@
 import axios from 'axios';
+import toast from 'react-hot-toast';
+import { IResponseError } from '../api.types';
 
 interface EnhancedError extends Error {
   originalError: unknown;
@@ -47,11 +49,39 @@ nextClientApiClient.interceptors.response.use(
       return new Promise(() => {});
     }
 
+    const errorData = error.response?.data as IResponseError;
     const errorMessage =
+      errorData?.message ||
+      errorData?.error ||
       error.response?.data?.error ||
       error.response?.data?.message ||
       error.message ||
       'An unexpected error occurred';
+
+    // Show toast for different error types
+    if (error.response) {
+      switch (error.response.status) {
+        case 400:
+          toast.error(`Bad Request: ${errorMessage}`);
+          break;
+        case 403:
+          toast.error(`Access Denied: ${errorMessage}`);
+          break;
+        case 404:
+          toast.error(`Not Found: ${errorMessage}`);
+          break;
+        case 409:
+          toast.error(errorMessage);
+          break;
+        case 500:
+          toast.error('Server error. Please try again later.');
+          break;
+        default:
+          toast.error(errorMessage);
+      }
+    } else {
+      toast.error(errorMessage);
+    }
 
     const enhancedError = new Error(errorMessage) as EnhancedError;
 

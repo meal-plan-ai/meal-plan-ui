@@ -1,7 +1,7 @@
 'use client';
 
 import { Paper, Typography, Box } from '@mui/material';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface AwardBadgeProps {
   icon: React.ReactNode;

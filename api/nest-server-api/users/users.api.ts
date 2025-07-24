@@ -5,6 +5,7 @@ import { UserResponseDto, CurrentUserResponseDto, PaginatedUsersResponseDto } fr
 
 export const nestServerUsersApi = {
   getCurrentUser: (): Promise<AxiosResponse<CurrentUserResponseDto>> => {
+    console.log('getCurrentUser');
     return nestServerApiClient.get<CurrentUserResponseDto>(NEST_SERVER_USERS_ENDPOINTS.ME);
   },
 

@@ -107,7 +107,7 @@ function PaymentForm() {
   );
 }
 
-export default function CheckoutForm() {
+function CheckoutForm() {
   const [clientSecret, setClientSecret] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -177,3 +177,5 @@ export default function CheckoutForm() {
     </Card>
   );
 }
+
+export { CheckoutForm };

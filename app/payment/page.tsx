@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Container, Typography, Paper } from '@mui/material';
-import CheckoutForm from '@/components/checkout/CheckoutForm';
+import { CheckoutForm } from '@/components';
 
 export default function PaymentPage() {
   return (

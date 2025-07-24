@@ -34,7 +34,7 @@ import { calculateCalories } from '@/utils/calorieCalculations';
 import { ChipInputSection } from '@/components';
 import {
   ActivityLevel,
-  IMealCharacteristic,
+  INutritionProfileCharacteristic,
   Gender,
   Goal,
   CookingComplexity,
@@ -50,7 +50,7 @@ const preferences = [
 ];
 
 // Default empty characteristics state
-const defaultCharacteristics: IMealCharacteristic = {
+const defaultCharacteristics: INutritionProfileCharacteristic = {
   id: '',
   userId: '',
   createdAt: '',
@@ -97,7 +97,7 @@ const defaultCharacteristics: IMealCharacteristic = {
 
 interface MealCharacteristicsFormProps {
   isEditMode: boolean;
-  initialData?: IMealCharacteristic;
+  initialData?: INutritionProfileCharacteristic;
   formState: FormState;
   isPending: boolean;
   action: (formData: FormData) => void;
@@ -117,7 +117,7 @@ function MealCharacteristicsForm({
   submitButtonText = isEditMode ? 'Update Plan' : 'Save Plan',
 }: MealCharacteristicsFormProps) {
   // Use initial data if provided (for edit mode), otherwise use defaults
-  const [characteristics, setCharacteristics] = useState<IMealCharacteristic>(
+  const [characteristics, setCharacteristics] = useState<INutritionProfileCharacteristic>(
     initialData || defaultCharacteristics
   );
 

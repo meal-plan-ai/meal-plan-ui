@@ -5,6 +5,7 @@ import { ProfileResponseDto, UpdateProfileRequestDto } from './profile.types';
 
 export const nestServerProfileApi = {
   getMyProfile: (): Promise<AxiosResponse<ProfileResponseDto>> => {
+    console.log('getMyProfile');
     return nestServerApiClient.get<ProfileResponseDto>(NEST_SERVER_PROFILE_ENDPOINTS.ME);
   },
 

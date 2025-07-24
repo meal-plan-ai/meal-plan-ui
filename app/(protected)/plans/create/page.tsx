@@ -21,14 +21,17 @@ import {
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { createMealPlan } from '../actions';
 import { useMealCharacteristics } from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
+import { mealPlanKeys } from '@/api/next-client-api/meal-plan/meal-plan.hooks';
 import { FormState, EMPTY_FORM_STATE } from '@/utils/form-state';
 import { useFormReset } from '@/hooks/useFormReset';
+import { useQueryClient } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 
 const initialState: FormState = EMPTY_FORM_STATE;
 
 export default function CreateMealPlanPage() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [redirecting, setRedirecting] = useState(false);
 
   const [formState, action, isPending] = useActionState(createMealPlan, initialState);
@@ -40,9 +43,13 @@ export default function CreateMealPlanPage() {
     if (formState.status === 'SUCCESS' && !redirecting) {
       setRedirecting(true);
       toast.success('Meal plan created successfully');
+
+      // Invalidate meal plans queries to refresh the list
+      queryClient.invalidateQueries({ queryKey: mealPlanKeys.all });
+
       router.push('/plans');
     }
-  }, [formState.status, redirecting, router]);
+  }, [formState.status, redirecting, router, queryClient]);
 
   const handleCancel = useCallback(() => {
     router.push('/plans');

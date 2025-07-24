@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Typography,
@@ -28,6 +29,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from 'recharts';
+import { DashboardOverviewSection } from '@/components';
 
 // Mock data for our charts
 const weeklyCaloriesData = [
@@ -66,6 +68,23 @@ const nutrientIntakeData = [
 
 export default function DashboardPage() {
   const [timeRange, setTimeRange] = useState('week');
+  const router = useRouter();
+
+  const handleProfileClick = (id: string) => {
+    router.push(`/characteristics/view/${id}`);
+  };
+
+  const handleMealPlanClick = (id: string) => {
+    router.push(`/plans/view/${id}`);
+  };
+
+  const handleCreateProfile = () => {
+    router.push('/characteristics/create');
+  };
+
+  const handleCreateMealPlan = () => {
+    router.push('/plans/create');
+  };
 
   return (
     <Box>
@@ -96,6 +115,12 @@ export default function DashboardPage() {
       </Box>
 
       <Grid container spacing={3}>
+        <DashboardOverviewSection
+          onProfileClick={handleProfileClick}
+          onMealPlanClick={handleMealPlanClick}
+          onCreateProfile={handleCreateProfile}
+          onCreateMealPlan={handleCreateMealPlan}
+        />
         {/* Summary Cards */}
         <Grid item xs={12} sm={6} md={3}>
           <Card>

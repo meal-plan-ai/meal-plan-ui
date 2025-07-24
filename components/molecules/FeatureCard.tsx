@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Paper, Typography } from '@mui/material';
-import { useTheme } from '../../contexts/ThemeContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface FeatureCardProps {
   icon: React.ReactNode;

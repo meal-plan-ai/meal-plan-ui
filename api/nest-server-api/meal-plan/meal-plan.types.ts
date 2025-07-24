@@ -1,8 +1,8 @@
 import { EMealType } from '../../../types/meal-plan.types';
-import { IMealCharacteristic } from '../meal-characteristics/meal-characteristics.types';
+import { INutritionProfileCharacteristic } from '../meal-characteristics/meal-characteristics.types';
 
 export * from '../../../types/meal-plan.types';
-export type { IMealCharacteristic } from '../meal-characteristics/meal-characteristics.types';
+export type { INutritionProfileCharacteristic } from '../meal-characteristics/meal-characteristics.types';
 
 export interface IAiMealPlanResponse {
   days: IAiDayPlan[];
@@ -62,7 +62,7 @@ export interface IMealPlan {
   createdAt: string;
   updatedAt: string;
   mealCharacteristicId?: string;
-  mealCharacteristic?: IMealCharacteristic;
+  mealCharacteristic?: INutritionProfileCharacteristic;
   aiGeneratedMealPlanId?: string;
   aiGeneratedMealPlan?: IAiGeneratedMealPlan;
 }

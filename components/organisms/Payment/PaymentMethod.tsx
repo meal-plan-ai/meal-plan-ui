@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Box, Typography } from '@mui/material';
-import CheckoutForm from '@/components/checkout/CheckoutForm';
+import { CheckoutForm } from '@/components';
 export type CardDetails = {
   cardNumber: string;
   name: string;

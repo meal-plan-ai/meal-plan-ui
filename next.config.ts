@@ -20,6 +20,7 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     const isDev = process.env.NODE_ENV === 'development';
+    console.log('isDev', isDev);
     return [
       {
         source: '/:path*',
@@ -27,8 +28,8 @@ const nextConfig: NextConfig = {
           {
             key: 'Content-Security-Policy',
             value: isDev
-              ? "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline'; frame-src https://js.stripe.com;"
-              : "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline'; frame-src https://js.stripe.com;",
+              ? "default-src 'self'; connect-src 'self' http://localhost:3000; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com; style-src 'self' 'unsafe-inline'; frame-src https://js.stripe.com;"
+              : "default-src 'self'; connect-src 'self'; img-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' https://js.stripe.com; style-src 'self' 'unsafe-inline'; frame-src https://js.stripe.com;",
           },
           {
             key: 'X-Content-Type-Options',

@@ -63,14 +63,14 @@ export interface IMealPlan {
   createdAt: string;
   updatedAt: string;
   mealCharacteristicId?: string;
-  mealCharacteristic?: IMealCharacteristic;
+  mealCharacteristic?: INutritionProfileCharacteristic;
   aiGeneratedMealPlanId?: string;
   aiGeneratedMealPlan?: IAiGeneratedMealPlan;
 }
 
 export type IMealPlanCreate = Omit<IMealPlan, 'id' | 'userId' | 'createdAt' | 'updatedAt'>;
 
-export interface IMealCharacteristic {
+export interface INutritionProfileCharacteristic {
   id: string;
   name: string;
   description?: string;

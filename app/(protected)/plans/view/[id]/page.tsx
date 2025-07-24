@@ -5,11 +5,10 @@ import { Box, Typography, Button, Alert, Grid, CircularProgress } from '@mui/mat
 import { ArrowBack as ArrowBackIcon, Edit as EditIcon } from '@mui/icons-material';
 import { useMealPlan, useGenerateAiPlan } from '@/api/next-client-api/meal-plan/meal-plan.hooks';
 import { use } from 'react';
-import PlanDetails from '@/components/molecules/PlanDetails';
-import MealCharacteristicDetails from '@/components/molecules/MealCharacteristicDetails';
-import PlanScheduleView from '@/components/molecules/PlanScheduleView';
+import { PlanDetails, MealCharacteristicDetails, PlanScheduleView } from '@/components';
+import { useTheme } from '@/contexts';
 
-const ActionButtons = ({ id }: { id: string }) => {
+const GenerateButton = ({ id }: { id: string }) => {
   const { mutate: generateAiPlan } = useGenerateAiPlan();
 
   const handleCreateAI = () => {
@@ -25,13 +24,14 @@ const ActionButtons = ({ id }: { id: string }) => {
         onClick={handleCreateAI}
         sx={{ mr: 2 }}
       >
-        Create AI Plan
+        Generate AI Plan
       </Button>
     </>
   );
 };
 
 function MealPlanContent({ id }: { id: string }) {
+  const { theme } = useTheme();
   const { data: mealPlan, isLoading: loading, error: fetchError } = useMealPlan(id);
 
   if (loading) {
@@ -63,16 +63,13 @@ function MealPlanContent({ id }: { id: string }) {
             Back to Plans
           </Button>
         </Link>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Typography variant="h4" component="h1">
-            {mealPlan.name}
-          </Typography>
-          <ActionButtons id={id} />
-        </Box>
+        <Typography variant="h4" component="h1">
+          Nutrition Profile: {mealPlan.name}
+        </Typography>
       </Box>
 
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12}>
           <PlanDetails mealPlan={mealPlan} />
         </Grid>
 
@@ -82,6 +79,37 @@ function MealPlanContent({ id }: { id: string }) {
           </Grid>
         )}
       </Grid>
+
+      {/* CTA: Generate AI Plan if not present */}
+      {!mealPlan?.aiGeneratedMealPlan && (
+        <Box
+          sx={{
+            p: 4,
+            my: 4,
+            borderRadius: 3,
+            background:
+              theme === 'dark'
+                ? 'linear-gradient(135deg, #232526 0%, #414345 100%)'
+                : 'linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)',
+            boxShadow: 3,
+            textAlign: 'center',
+          }}
+        >
+          <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>
+            Generate Your AI Meal Plan!
+          </Typography>
+          <Typography variant="body1" sx={{ mb: 3, maxWidth: 500, mx: 'auto' }}>
+            You’ve set up your nutrition profile and selected the number of days for your plan. Now,
+            click the button below and let our AI create a personalized meal plan for you—tailored
+            to your goals, preferences, and restrictions.
+          </Typography>
+          <GenerateButton id={mealPlan.id} />
+          <Typography variant="caption" sx={{ display: 'block', mt: 2, color: 'text.secondary' }}>
+            When you click the button, we’ll generate your meal plan on the server.
+          </Typography>
+        </Box>
+      )}
+
       {mealPlan?.aiGeneratedMealPlan && <PlanScheduleView mealPlan={mealPlan} />}
     </Box>
   );

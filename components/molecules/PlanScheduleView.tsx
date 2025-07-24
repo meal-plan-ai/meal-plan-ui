@@ -15,7 +15,7 @@ import { ChevronLeft, ChevronRight } from '@mui/icons-material';
 import { useRouter } from 'next/navigation';
 import { v4 as uuidv4 } from 'uuid';
 import { IMealPlan } from '@/api/nest-server-api/meal-plan/meal-plan.types';
-import DayPlanCard from './DayPlanCard';
+import { DayPlanCard } from '@/components';
 
 interface PlanScheduleViewProps {
   mealPlan: IMealPlan;
@@ -153,4 +153,4 @@ const PlanScheduleView: React.FC<PlanScheduleViewProps> = ({
   );
 };
 
-export default PlanScheduleView;
+export { PlanScheduleView };

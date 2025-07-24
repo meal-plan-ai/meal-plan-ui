@@ -37,7 +37,7 @@ import {
 } from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
 import {
   Goal,
-  IMealCharacteristic,
+  INutritionProfileCharacteristic,
 } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
 import { toast } from 'react-hot-toast';
 
@@ -96,6 +96,7 @@ function CharacteristicsListPageContent() {
         toast.success('Plan deleted successfully');
         refetch();
       } catch (error) {
+        // Error toast is handled by the API client interceptor
         console.error('Error deleting plan:', error);
       }
     }
@@ -194,7 +195,7 @@ function CharacteristicsListPageContent() {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    data.data.map((plan: IMealCharacteristic) => (
+                    data.data.map((plan: INutritionProfileCharacteristic) => (
                       <TableRow key={plan.id}>
                         <TableCell component="th" scope="row">
                           {plan.planName}
