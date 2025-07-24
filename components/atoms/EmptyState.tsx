@@ -9,15 +9,17 @@ interface EmptyStateProps {
   onAction: () => void;
 }
 
-export default function EmptyState({
-  icon,
-  title,
-  description,
-  actionLabel,
-  onAction,
-}: EmptyStateProps) {
+export function EmptyState({ icon, title, description, actionLabel, onAction }: EmptyStateProps) {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: 300 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 300,
+      }}
+    >
       {icon}
       <Typography variant="body1" color="text.secondary" align="center" sx={{ mb: 1 }}>
         {title}
@@ -25,13 +27,9 @@ export default function EmptyState({
       <Typography variant="body2" color="text.secondary" align="center" sx={{ mb: 3 }}>
         {description}
       </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={onAction}
-      >
+      <Button variant="contained" color="primary" onClick={onAction}>
         {actionLabel}
       </Button>
     </Box>
   );
-} 
+}

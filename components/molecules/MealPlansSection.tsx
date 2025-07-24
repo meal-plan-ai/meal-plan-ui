@@ -1,15 +1,15 @@
 import { Paper, Typography, Stack, CircularProgress, Alert, Box } from '@mui/material';
 import { Assignment as AssignmentIcon } from '@mui/icons-material';
 import { useUserMealPlans } from '@/api/next-client-api/meal-plan/meal-plan.hooks';
-import MealPlanCard from './MealPlanCard';
-import EmptyState from '../atoms/EmptyState';
+
+import { EmptyState, MealPlanCard } from '@/components';
 
 interface MealPlansSectionProps {
   onPlanClick: (id: string) => void;
   onCreateClick: () => void;
 }
 
-export default function MealPlansSection({ onPlanClick, onCreateClick }: MealPlansSectionProps) {
+function MealPlansSection({ onPlanClick, onCreateClick }: MealPlansSectionProps) {
   const { data: mealPlans, isLoading, error } = useUserMealPlans();
 
   return (
@@ -18,7 +18,7 @@ export default function MealPlansSection({ onPlanClick, onCreateClick }: MealPla
         <AssignmentIcon color="primary" />
         Meal Plans
       </Typography>
-      
+
       {isLoading ? (
         <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 250 }}>
           <CircularProgress />
@@ -27,12 +27,8 @@ export default function MealPlansSection({ onPlanClick, onCreateClick }: MealPla
         <Alert severity="error">Failed to load meal plans</Alert>
       ) : mealPlans?.data && mealPlans.data.length > 0 ? (
         <Stack spacing={2} sx={{ maxHeight: 280, overflow: 'auto', pr: 1 }}>
-          {mealPlans.data.map((plan) => (
-            <MealPlanCard
-              key={plan.id}
-              plan={plan}
-              onClick={onPlanClick}
-            />
+          {mealPlans.data.map(plan => (
+            <MealPlanCard key={plan.id} plan={plan} onClick={onPlanClick} />
           ))}
         </Stack>
       ) : (
@@ -46,4 +42,6 @@ export default function MealPlansSection({ onPlanClick, onCreateClick }: MealPla
       )}
     </Paper>
   );
-} 
+}
+
+export { MealPlansSection };

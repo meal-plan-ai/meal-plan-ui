@@ -1,5 +1,5 @@
 import { Grid } from '@mui/material';
-import { NutritionProfilesSection, MealPlansSection } from '../molecules';
+import { NutritionProfilesSection, MealPlansSection } from '@/components';
 
 interface DashboardOverviewSectionProps {
   onProfileClick: (id: string) => void;
@@ -24,11 +24,8 @@ export default function DashboardOverviewSection({
         />
       </Grid>
       <Grid item xs={12} md={6}>
-        <MealPlansSection
-          onPlanClick={onMealPlanClick}
-          onCreateClick={onCreateMealPlan}
-        />
+        <MealPlansSection onPlanClick={onMealPlanClick} onCreateClick={onCreateMealPlan} />
       </Grid>
     </Grid>
   );
-} 
+}
