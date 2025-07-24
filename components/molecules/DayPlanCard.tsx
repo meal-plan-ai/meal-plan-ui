@@ -86,4 +86,4 @@ const DayPlanCard: React.FC<DayPlanCardProps> = ({ dayPlan, onClick }) => {
   );
 };
 
-export default DayPlanCard;
+export { DayPlanCard };

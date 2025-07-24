@@ -1,7 +1,10 @@
+'use client';
+
 import { Paper, Typography, Stack, CircularProgress, Alert, Box } from '@mui/material';
 import { RestaurantMenu as RestaurantMenuIcon } from '@mui/icons-material';
 import { useMealCharacteristics } from '@/api/next-client-api/meal-characteristics/meal-characteristics.hooks';
-import { NutritionProfileCard, EmptyState } from '../atoms';
+import { NutritionProfileCard, BlurOverlay, EmptyState } from '@/components';
+import { useRouter } from 'next/navigation';
 
 interface NutritionProfilesSectionProps {
   onProfileClick: (id: string) => void;
@@ -15,6 +18,7 @@ function NutritionProfilesSection({
   limit = 5,
 }: NutritionProfilesSectionProps) {
   const { data: mealCharacteristics, isLoading, error } = useMealCharacteristics(1, limit);
+  const router = useRouter();
 
   return (
     <Paper sx={{ p: 3, height: 350, overflow: 'hidden' }}>
@@ -31,13 +35,35 @@ function NutritionProfilesSection({
         <Alert severity="error">Failed to load nutrition profiles</Alert>
       ) : mealCharacteristics?.data && mealCharacteristics.data.length > 0 ? (
         <Stack spacing={2} sx={{ maxHeight: 280, overflow: 'auto', pr: 1 }}>
-          {mealCharacteristics.data.map(characteristic => (
-            <NutritionProfileCard
-              key={characteristic.id}
-              characteristic={characteristic}
-              onClick={onProfileClick}
-            />
-          ))}
+          {mealCharacteristics.data.slice(0, 3).map((characteristic, idx) =>
+            idx === 2 ? (
+              <BlurOverlay
+                key={characteristic.id}
+                onShowAll={() => router.push('/characteristics')}
+              >
+                <NutritionProfileCard
+                  characteristic={{
+                    id: characteristic.id,
+                    planName: characteristic.planName,
+                    targetDailyCalories: characteristic.targetDailyCalories || 0,
+                    dietaryRestrictions: characteristic.dietaryRestrictions || [],
+                  }}
+                  onClick={onProfileClick}
+                />
+              </BlurOverlay>
+            ) : (
+              <NutritionProfileCard
+                key={characteristic.id}
+                characteristic={{
+                  id: characteristic.id,
+                  planName: characteristic.planName,
+                  targetDailyCalories: characteristic.targetDailyCalories || 0,
+                  dietaryRestrictions: characteristic.dietaryRestrictions || [],
+                }}
+                onClick={onProfileClick}
+              />
+            )
+          )}
         </Stack>
       ) : (
         <EmptyState

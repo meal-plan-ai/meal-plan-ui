@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Box, Button, CircularProgress, Typography } from '@mui/material';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { DayPlanDetailView } from '../../../../../../components/templates/DayPlanDetailView';
+import { DayPlanDetailView } from '../../../../../../components/common/DayPlanDetailView';
 import { IAiDayPlan } from '../../../../../../types/meal-plan.types';
 import { useMealPlan } from '@/api/next-client-api/meal-plan/meal-plan.hooks';
 

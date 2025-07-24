@@ -72,4 +72,4 @@ const PlanDetails = ({ mealPlan }: { mealPlan: IMealPlan }) => {
   );
 };
 
-export default PlanDetails;
+export { PlanDetails };

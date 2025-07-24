@@ -69,4 +69,4 @@ const MealCharacteristicDetails = ({
   );
 };
 
-export default MealCharacteristicDetails;
+export { MealCharacteristicDetails };

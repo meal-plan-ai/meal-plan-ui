@@ -1,8 +1,10 @@
+'use client';
+
 import { Paper, Typography, Stack, CircularProgress, Alert, Box } from '@mui/material';
 import { Assignment as AssignmentIcon } from '@mui/icons-material';
 import { useUserMealPlans } from '@/api/next-client-api/meal-plan/meal-plan.hooks';
-
-import { EmptyState, MealPlanCard } from '@/components';
+import { MealPlanCard, BlurOverlay, EmptyState } from '@/components';
+import { useRouter } from 'next/navigation';
 
 interface MealPlansSectionProps {
   onPlanClick: (id: string) => void;
@@ -11,6 +13,7 @@ interface MealPlansSectionProps {
 
 function MealPlansSection({ onPlanClick, onCreateClick }: MealPlansSectionProps) {
   const { data: mealPlans, isLoading, error } = useUserMealPlans();
+  const router = useRouter();
 
   return (
     <Paper sx={{ p: 3, height: 350, overflow: 'hidden' }}>
@@ -27,9 +30,15 @@ function MealPlansSection({ onPlanClick, onCreateClick }: MealPlansSectionProps)
         <Alert severity="error">Failed to load meal plans</Alert>
       ) : mealPlans?.data && mealPlans.data.length > 0 ? (
         <Stack spacing={2} sx={{ maxHeight: 280, overflow: 'auto', pr: 1 }}>
-          {mealPlans.data.map(plan => (
-            <MealPlanCard key={plan.id} plan={plan} onClick={onPlanClick} />
-          ))}
+          {mealPlans.data.slice(0, 3).map((plan, idx) =>
+            idx === 2 ? (
+              <BlurOverlay key={plan.id} onShowAll={() => router.push('/plans')}>
+                <MealPlanCard key={plan.id} plan={plan} onClick={onPlanClick} />
+              </BlurOverlay>
+            ) : (
+              <MealPlanCard key={plan.id} plan={plan} onClick={onPlanClick} />
+            )
+          )}
         </Stack>
       ) : (
         <EmptyState
