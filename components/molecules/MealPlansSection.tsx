@@ -13,7 +13,7 @@ function MealPlansSection({ onPlanClick, onCreateClick }: MealPlansSectionProps)
   const { data: mealPlans, isLoading, error } = useUserMealPlans();
 
   return (
-    <Paper sx={{ p: 3, height: 350, overflow: 'auto' }}>
+    <Paper sx={{ p: 3, height: 350, overflow: 'hidden' }}>
       <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <AssignmentIcon color="primary" />
         Meal Plans

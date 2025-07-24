@@ -7,15 +7,14 @@ interface DashboardOverviewSectionProps {
   onCreateProfile: () => void;
   onCreateMealPlan: () => void;
 }
-
-export default function DashboardOverviewSection({
+function DashboardOverviewSection({
   onProfileClick,
   onMealPlanClick,
   onCreateProfile,
   onCreateMealPlan,
 }: DashboardOverviewSectionProps) {
   return (
-    <Grid container spacing={3} sx={{ mb: 4 }}>
+    <>
       <Grid item xs={12} md={6}>
         <NutritionProfilesSection
           onProfileClick={onProfileClick}
@@ -26,6 +25,8 @@ export default function DashboardOverviewSection({
       <Grid item xs={12} md={6}>
         <MealPlansSection onPlanClick={onMealPlanClick} onCreateClick={onCreateMealPlan} />
       </Grid>
-    </Grid>
+    </>
   );
 }
+
+export { DashboardOverviewSection };

@@ -1,5 +1,16 @@
-import { Box, Typography, Card, CardContent, CardActionArea, Chip } from '@mui/material';
-import { Assignment as AssignmentIcon } from '@mui/icons-material';
+import {
+  Box,
+  Typography,
+  Card,
+  CardContent,
+  CardActionArea,
+  Chip,
+  IconButton,
+} from '@mui/material';
+import {
+  Assignment as AssignmentIcon,
+  ArrowForward as ArrowForwardIcon,
+} from '@mui/icons-material';
 import { IMealPlan } from '@/api/nest-server-api/meal-plan/meal-plan.types';
 
 interface MealPlanCardProps {
@@ -38,7 +49,7 @@ function MealPlanCard({ plan, onClick }: MealPlanCardProps) {
             p: 2,
             height: '100%',
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'row',
             justifyContent: 'space-between',
             '&:last-child': { pb: 2 },
           }}
@@ -51,41 +62,19 @@ function MealPlanCard({ plan, onClick }: MealPlanCardProps) {
               </Typography>
             </Box>
 
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5, lineHeight: 1.3 }}>
-              Duration: {plan.durationInDays} days
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1, lineHeight: 1.3 }}>
-              Created: {new Date(plan.createdAt).toLocaleDateString()}
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
-            <Chip
-              size="small"
-              label={`${plan.durationInDays} days`}
-              color="primary"
-              variant="outlined"
-              sx={{ fontSize: '0.7rem', height: '20px' }}
-            />
-            {plan.mealCharacteristic && (
+            <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
               <Chip
                 size="small"
-                label="With Profile"
-                color="success"
+                label={`${plan.durationInDays} days`}
+                color="primary"
                 variant="outlined"
                 sx={{ fontSize: '0.7rem', height: '20px' }}
               />
-            )}
-            {plan.aiGeneratedMealPlan && (
-              <Chip
-                size="small"
-                label="AI Generated"
-                color="info"
-                variant="outlined"
-                sx={{ fontSize: '0.7rem', height: '20px' }}
-              />
-            )}
+            </Box>
           </Box>
+          <IconButton size="small" color="primary">
+            <ArrowForwardIcon />
+          </IconButton>
         </CardContent>
       </CardActionArea>
     </Card>

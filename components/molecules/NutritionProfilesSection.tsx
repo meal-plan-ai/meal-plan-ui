@@ -9,7 +9,7 @@ interface NutritionProfilesSectionProps {
   limit?: number;
 }
 
-export default function NutritionProfilesSection({
+function NutritionProfilesSection({
   onProfileClick,
   onCreateClick,
   limit = 5,
@@ -17,7 +17,7 @@ export default function NutritionProfilesSection({
   const { data: mealCharacteristics, isLoading, error } = useMealCharacteristics(1, limit);
 
   return (
-    <Paper sx={{ p: 3, height: 350, overflow: 'auto' }}>
+    <Paper sx={{ p: 3, height: 350, overflow: 'hidden' }}>
       <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
         <RestaurantMenuIcon color="primary" />
         Nutrition Profiles
@@ -51,3 +51,5 @@ export default function NutritionProfilesSection({
     </Paper>
   );
 }
+
+export { NutritionProfilesSection };

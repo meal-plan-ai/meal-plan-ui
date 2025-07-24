@@ -5,6 +5,7 @@ import { ChangePasswordDto, ChangePasswordResponseDto, UserResponseDto } from '.
 
 export const nextClientUsersApi = {
   getCurrentUser: (): Promise<AxiosResponse<UserResponseDto>> => {
+    console.log('[nextClientUsersApi]getCurrentUser');
     return nextClientApiClient.get<UserResponseDto>(NEXT_CLIENT_USERS_ENDPOINTS.ME);
   },
 
