@@ -96,6 +96,7 @@ function CharacteristicsListPageContent() {
         toast.success('Plan deleted successfully');
         refetch();
       } catch (error) {
+        // Error toast is handled by the API client interceptor
         console.error('Error deleting plan:', error);
       }
     }

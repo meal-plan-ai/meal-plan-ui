@@ -209,7 +209,7 @@ export async function createCharacteristic(
     };
     try {
       await nestServerMealCharacteristicsApi.create(characteristicData);
-      revalidatePath('/dashboard/characteristics');
+      revalidatePath('/characteristics');
       return toFormState('SUCCESS', 'Nutrition plan created successfully');
     } catch (error) {
       if (error && typeof error === 'object' && 'response' in error) {
@@ -341,7 +341,7 @@ export async function updateCharacteristic(
 
     try {
       await nestServerMealCharacteristicsApi.update(id, characteristicData);
-      revalidatePath('/dashboard/characteristics');
+      revalidatePath('/characteristics');
       return toFormState('SUCCESS', 'Nutrition plan updated successfully');
     } catch (error) {
       if (error && typeof error === 'object' && 'response' in error) {
