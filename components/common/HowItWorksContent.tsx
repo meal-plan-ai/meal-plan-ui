@@ -25,7 +25,7 @@ import Image from 'next/image';
 const detailedSteps = [
   {
     number: 1,
-    title: 'Create Your Profile',
+    title: 'Create Your Nutrition Profile',
     description: 'Set your dietary preferences, restrictions, and nutritional goals',
     details: [
       'Select dietary preferences (vegetarian, vegan, paleo, etc.)',

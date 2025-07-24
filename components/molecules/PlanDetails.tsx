@@ -37,13 +37,6 @@ const PlanDetails = ({ mealPlan }: { mealPlan: IMealPlan }) => {
         <Grid container spacing={2}>
           <Grid item xs={12} sm={6}>
             <Typography variant="subtitle2" color="text.secondary">
-              Name
-            </Typography>
-            <Typography variant="body1">{mealPlan.name}</Typography>
-          </Grid>
-
-          <Grid item xs={12} sm={6}>
-            <Typography variant="subtitle2" color="text.secondary">
               Duration
             </Typography>
             <Typography variant="body1">{mealPlan.durationInDays} days</Typography>

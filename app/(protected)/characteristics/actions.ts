@@ -4,12 +4,12 @@ import { z } from 'zod';
 import { FormState, fromErrorToFormState, toFormState } from '@/utils/form-state';
 import { revalidatePath } from 'next/cache';
 import {
-  IMealCharacteristic,
+  INutritionProfileCharacteristic,
   ActivityLevel,
   Gender,
   Goal,
   CookingComplexity,
-  IMealCharacteristicCreate,
+  INutritionProfileCharacteristicCreate,
 } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.types';
 import { nestServerMealCharacteristicsApi } from '@/api/nest-server-api/meal-characteristics/meal-characteristics.api';
 
@@ -179,7 +179,7 @@ export async function createCharacteristic(
       };
     }
 
-    const characteristicData: IMealCharacteristicCreate = {
+    const characteristicData: INutritionProfileCharacteristicCreate = {
       planName: formData.get('planName') as string,
       gender: formData.get('gender') as Gender,
       age: formData.get('age') ? Number(formData.get('age')) : undefined,
@@ -309,7 +309,7 @@ export async function updateCharacteristic(
       };
     }
 
-    const characteristicData: Partial<IMealCharacteristic> = {
+    const characteristicData: Partial<INutritionProfileCharacteristic> = {
       id,
       planName: formData.get('planName') as string,
       gender: formData.get('gender') as Gender,

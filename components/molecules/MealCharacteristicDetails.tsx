@@ -1,6 +1,6 @@
 'use client';
 
-import { IMealCharacteristic } from '@/api/nest-server-api';
+import { INutritionProfileCharacteristic } from '@/api/nest-server-api';
 import { Divider, Grid, Typography, CardContent, Card, Button, Box } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
@@ -8,7 +8,7 @@ import { useCallback } from 'react';
 const MealCharacteristicDetails = ({
   mealCharacteristic,
 }: {
-  mealCharacteristic: IMealCharacteristic;
+  mealCharacteristic: INutritionProfileCharacteristic;
 }) => {
   const router = useRouter();
 

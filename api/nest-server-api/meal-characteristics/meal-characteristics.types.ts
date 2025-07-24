@@ -24,7 +24,7 @@ export enum CookingComplexity {
   GOURMET = 'Gourmet',
 }
 
-export interface IMealCharacteristic {
+export interface INutritionProfileCharacteristic {
   id: string;
   userId: string;
   planName: string;
@@ -52,7 +52,7 @@ export interface IMealCharacteristic {
   updatedAt: string;
 }
 
-export type IMealCharacteristicCreate = Omit<
-  IMealCharacteristic,
+export type INutritionProfileCharacteristicCreate = Omit<
+  INutritionProfileCharacteristic,
   'id' | 'userId' | 'createdAt' | 'updatedAt'
 >;
