@@ -4,6 +4,13 @@ import { INutritionProfileCharacteristic } from '../meal-characteristics/meal-ch
 export * from '../../../types/meal-plan.types';
 export type { INutritionProfileCharacteristic } from '../meal-characteristics/meal-characteristics.types';
 
+export enum AiGenerationStatus {
+  IDLE = 'idle',
+  IN_PROGRESS = 'in_progress',
+  COMPLETED = 'completed',
+  FAILED = 'failed',
+}
+
 export interface IAiMealPlanResponse {
   days: IAiDayPlan[];
 }
@@ -65,6 +72,7 @@ export interface IMealPlan {
   mealCharacteristic?: INutritionProfileCharacteristic;
   aiGeneratedMealPlanId?: string;
   aiGeneratedMealPlan?: IAiGeneratedMealPlan;
+  aiGenerationStatus?: AiGenerationStatus;
 }
 
 export type IMealPlanCreate = Omit<IMealPlan, 'id' | 'userId' | 'createdAt' | 'updatedAt'>;
