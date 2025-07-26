@@ -101,10 +101,6 @@ function StepBar() {
       {/* Block 2: Content */}
       <Paper elevation={1} sx={{ p: 4, mb: 3, minHeight: 400 }}>
         <Box>
-          <Typography variant="h5" gutterBottom color="primary">
-            Step {activeStep + 1}: {currentStep?.title}
-          </Typography>
-
           <Box sx={{ mt: 3 }}>
             {currentStep?.component || (
               <Typography color="text.secondary">Content not found for the current step</Typography>
@@ -132,11 +128,6 @@ function StepBar() {
           >
             Back
           </Button>
-
-          {/* Progress information */}
-          <Typography variant="body2" color="text.secondary">
-            {activeStep + 1} of {steps.length}
-          </Typography>
 
           {/* Next button */}
           <Button
