@@ -8,6 +8,7 @@ import {
   CalendarMonth as CalendarIcon,
   AccountCircle as AccountIcon,
   CreditCard as CreditCardIcon,
+  Create as CreateIcon,
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { useDrawer } from '../providers/DrawerController';
@@ -18,6 +19,7 @@ interface SidebarProps {
 
 const menuItems = [
   { title: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+  { title: 'Create Wizard', icon: <CreateIcon />, path: '/create-wizard' },
   { title: 'Nutrition Profiles', icon: <RestaurantIcon />, path: '/characteristics' },
   { title: 'Meal Plans', icon: <CalendarIcon />, path: '/plans' },
   { title: 'Subscription', icon: <CreditCardIcon />, path: '/subscription' },
