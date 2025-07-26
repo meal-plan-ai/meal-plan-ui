@@ -99,7 +99,7 @@ function MealPlanContent({ id }: { id: string }) {
           </Button>
         </Link>
         <Typography variant="h4" component="h1">
-          Nutrition Profile: {mealPlan.name}
+          Meal Plan Name: {mealPlan.name}
         </Typography>
       </Box>
 
@@ -150,7 +150,7 @@ function MealPlanContent({ id }: { id: string }) {
       )}
 
       {/* CTA: Generate AI Plan if not present and not generating */}
-      {!mealPlan?.aiGeneratedMealPlan && !isGenerating && (
+      {!isGenerating && !mealPlan?.aiGeneratedMealPlan && (
         <Box
           sx={{
             p: 4,
