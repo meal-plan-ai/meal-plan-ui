@@ -89,6 +89,8 @@ const PlanScheduleView: React.FC<PlanScheduleViewProps> = ({
     };
   }, []);
 
+  console.log('days', days);
+
   return (
     <Container>
       <Paper elevation={0} sx={{ p: 3, mb: 4, backgroundColor: 'transparent', borderRadius: 2 }}>
