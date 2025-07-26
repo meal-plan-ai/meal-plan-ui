@@ -5,6 +5,7 @@ import { CreditCard as CreditCardIcon } from '@mui/icons-material';
 import { useGetUserSubscription } from '@/api/next-client-api/subscription/subscription.hooks';
 import { ESubscriptionStatus } from '@/api/nest-server-api/subscription/subscription.types';
 import { formatDate } from '@/utils';
+import { PricingContent } from '@/components';
 
 function getStatusColor(status: ESubscriptionStatus) {
   switch (status) {
@@ -74,6 +75,7 @@ export default function SubscriptionPage() {
             View Available Plans
           </Button>
         </Paper>
+        <PricingContent />
       </Box>
     );
   }
